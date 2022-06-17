@@ -1,0 +1,42 @@
+# Presto SQL 数据类型
+
+- **Boolean**
+  - true or false
+
+- **Integer**
+  - **TINYINT** :  - 2 ^ 7 ~  2 ^ 7 - 1
+  - **SMALLINT** :  - 2 ^ 15 ~  2 ^ 15 - 1
+  - **INTEGER** :  - 2 ^ 31 ~  2 ^ 31 - 1
+  - **BIGING** :  - 2 ^ 63 ~  2 ^ 63 - 1
+- **Floating-Point**
+  - **REAL** :  32位
+  - **DOUBLE** : 64位
+- **Fixed-Precision**
+  - **DECIMAL** : 固定精度的数值，支持总共38位数，但是最好在18位以内。`DECIMAL(10,3)`
+- **String**
+  - **VARCHAR** : 变长的字符数据，可选最大长度，如 varchar(128)
+  - **CHAR** : 固定长度的字符数据，默认长度为1。char(7)表示总有7个字符，插入`dog`时会在末尾加上4个隐式的空格，比较时会带上。
+  - **VARNINARY** : 变长的二进制数据，如`X'65683F'`。
+  - **JSON** : JSON对象。
+- **Data and Time**
+  - **DATE** : Calendar date (year, month, day)。如`DATE '2001-08-22'`。
+  - **TIME** :  Time of day (hour, minute, second, millisecond) without a time zone。如 `TIME '01:02:03.456'`。
+  - **TIME WITH ZONE** :  (hour, minute, second, millisecond) 。`TIME '01:02:03.456 America/Los_Angeles'`。
+  - **TIMESTAMP** : 没有时区的包含date和day的时间。`TIMESTAMP '2001-08-22 03:04:05.321'`
+  - **TIMESTAMP WITH ZONE** : 有时区的date和day的时间。`TIMESTAMP '2001-08-22 03:04:05.321 America/Los_Angeles'`
+  - **INTERVAL YEAR TO MONTH** :  `INTERVAL '3' MONTH`
+  - **INTERVAL DAT TO SECOND** :  `INTERVAL '2' DAY'`
+- **Structural**
+  - **ARRAY** :  `ARRAY[1, 2, 3]`
+  - **MAP** :  `MAP(ARRAY['foo', 'bar'], ARRAY[1, 2])`
+  - **ROW** :  `CAST(ROW(1, 2e0) AS ROW(x BIGINT, y DOUBLE))`，可以通过`.x`或者`[1]`获取。
+- **Network Address**
+  - **IPADDRESS** :  `IPADDRESS '10.0.0.1'`, `IPADDRESS '2001:db8::1'`
+- **UUID**
+  - `UUID '12151fd2-7586-11e9-8f9e-2a86e4085a59'`
+- **HyperLogLog**
+  - **HyperLogLog** : 高效计算`approx_distinct()`，开始以稀疏表示，若更有效则切换位稠密表示。
+  - **P4HyperLogLog** :  一直以稠密表示
+- **Quantile Digest**
+  - 表示数据分布的结构，精度可配置。
+

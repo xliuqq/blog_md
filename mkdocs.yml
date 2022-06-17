@@ -1,0 +1,133 @@
+site_name: XLiu知识空间
+site_description: 计算机体系的知识
+site_author: LiuZhiqiang(刘志强）
+site_url: https://liuzhiqiang.notfound.com/
+docs_dir: docs
+site_dir: site
+ 
+use_directory_urls: false
+
+theme:
+    name: material
+    features:
+      - navigation.tabs
+      - navigation.tabs.sticky
+    language: 'zh'
+
+nav:
+    - 如何读论文: README.md
+    - 代码内功:
+      - 设计原则: code_think/design_principle.md
+      - 代码整洁之道: code_think/clean_code.md
+      - 重构: code_think/refactor.md
+    - 设计模式: 
+      - 导览: design_pattern/README.md
+      - 创建型模式:
+        - （TODO）工厂模式: design_pattern/factory.md
+        - 抽象工厂: design_pattern/abstract_factory.md
+        - 单例: design_pattern/singleton.md
+        - 构造者模式: design_pattern/builder.md
+      - 结构型模式:
+        - 适配器模式: design_pattern/adapter.md
+        - 桥接模式: design_pattern/bridge.md
+        - 组合模式: design_pattern/composite.md
+        - 装饰模式: design_pattern/decorator.md
+        - 外观模式: design_pattern/facade.md
+        - 享元模式: design_pattern/flyweight.md
+        - 代理模式: design_pattern/proxy.md
+      - 行为型模式:
+        - 职责链模式: design_pattern/chain.md
+        - 命令模式: design_pattern/command.md
+        - 解释器模式: design_pattern/interpret.md
+        - 迭代器模式: design_pattern/iterator.md
+        - 中介者模式: design_pattern/medium.md
+        - 备忘录模式: design_pattern/memo.md
+        - 观察者模式: design_pattern/observer.md
+        - 状态模式: design_pattern/state.md
+        - 策略模式: design_pattern/strategy.md
+        - 模板方法: design_pattern/template.md
+        - 访问者模式: design_pattern/visitor.md
+      - 分布式应用设计模式:
+        - 边车模式: design_pattern/sidecar.md
+    - Java:
+      - 三方包:
+        - pickle: languages/java/packages/java_pickle.md
+      - 性能:
+        - arthas性能分析: languages/java/performance/arthas.md
+        - jvm-profile分布式应用分析: languages/java/performance/jvm_profile.md
+    - 存储: 
+      - （TODO）Apache Pulsar: ./data_store/pulsar/apache_pulsar.md
+    - 数据管理:
+      - 数据同步:
+        - 概念: data_manage/data_synch/README.md
+        - CDC: data_manage/data_synch/cdc.md
+    - 操作系统:
+      - 磁盘: os/disk.md
+      - 网络:
+        - 基础: os/network/README.md
+        - 内网穿透: os/network/intranet_penetration.md
+        - 协议: protocols.md
+    - 分布式调度系统:
+      - 概念: distributed_scheduler/README.md
+      - DophinScheduler: distributed_scheduler/README.md
+    - 数据查询:
+      - Presto:
+        - 安装: ./data_query/presto/install.md
+        - 介绍: ./data_query/presto/presto.md
+        - 数据类型: ./data_query/presto/data_types.md
+        - 语法: ./data_query/presto/syntax.md
+        - Raptorx和Presto on Spark: ./data_query/presto/presto_scale.md
+    - 图像视频:
+      - 图像特征: imagevideo/image_feature.md
+    - 机器学习:
+      - 自然语言处理NLP:
+        - 动手做聊天机器人(TODO): machine_learning/nlp/chatbot.md
+    - Devops:
+      - 概览: devops/devops.md
+      - CI/CD:
+        - 概览: devoos/ci/README.md
+        - Gitlab: devops/ci/gitlab.md
+        - Commit规范: devops/ci/commit_format.md
+        - 版本自动发布: devops/ci/release_changelog.md
+      - Ansible(部署): devops/ansible.md
+      - Prometheus(时序数据存储): devops/prometheus.md
+      - Grafana(数据可视化): devops/ansible.md
+      - 数据来源:
+        - 日志收集: devops/log_collector.md
+        - 节点监控: devops/monitor.md
+    - 数据湖:
+      - Apache Hudi:
+        - 原理: data_store/data_lake/apache_hudi/hudi.md
+        - 服务:
+          - 压缩（Compaction）: data_store/data_lake/apache_hudi/compaction.md
+          - 聚簇（clustering）: data_store/data_lake/apache_hudi/clustering.md
+    - 集群调度:
+      - 调度的策略: cluster_manager/scheduler.md
+      - K8s:
+        - 安装: 
+          - K8s集群安装: cluster_manager/k8s/install.md
+          - rook-ceph存储安装: cluster_manager/k8s/k8s_rook_ceph.md
+          - 开源管理软件KubeShpere: cluster_manager/k8s/KubeSphere.md
+        - 基础概念: cluster_manager/k8s/k8s.md 
+        - 使用: cluster_manager/k8s/usage.md
+        - Helm: cluster_manager/k8s/helm.md
+        - CRD:
+          - kubebuild: cluster_manager/k8s/kubebuild.md
+      - Yarn:
+        - 架构: cluster_manager/yarn/arch.md
+    - 云原生:
+      - 概念: cloud/cloud_native.md
+      - fluid: cloud/fluid.md
+      - sealer(K8s集群交付）: cloud/sealer.md
+    - CS系统知识:
+      - 基础: cs/cs_basic.md
+      - 操作系统: cs/cs_os.md
+      - 网络: cs/cs_network.md
+      - 数据库: cs/cs_db.md
+      - 软件工程: cs/software_engineering.md
+    - Web服务:
+      - 后端:
+        - 接口管理设计: web/backend/api_manager.md
+    - 数据密集型系统设计:
+      - 数据系统基础:
+        - 
