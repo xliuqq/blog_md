@@ -1,91 +1,174 @@
-# 基于浏览器使用CentOS
+# 基于浏览器使用CentOS（多用户）
 
-## 1. 拉取基础CentOS镜像
+# 0. noVNC定制化代码部分
 
-```bash
-# 该镜像的yum源为阿里云
-docker pull centos:7.9.2009
-```
+- noVNC版本：[https://github.com/novnc/noVNC/tree/v1.2.0](https://github.com/novnc/noVNC/tree/v1.0.0)
+- websockify版本：https://github.com/novnc/websockify
 
-## 2. docker启动镜像
+## 0.1 设置不同用户url路径不同
 
-```bash
-docker run -itd --privileged --name centos7.9_vnc -p 15901:5901 -p 16901:6901 centos:7.9.2009 /usr/sbin/init
-```
+- 新增脚本：`/noVNC/app/sed.sh`
 
-## 3. docker进入容器进行vnc/novnc安装配置
+- - `WEBSOCK_PATH`参数需**在启动镜像的k8s.yaml中配置，为不同用户不同url路径**
+  - 1920x1080为分辨率，根据用户机的显示器大小自行调整
 
 ```bash
-docker exec -it centos7.9_vnc bash
+#!/bin/bash
+
+sed -i "s#WEBSOCK_PATH#${WEBSOCK_PATH}#g" /noVNC/app/ui.js
+vncserver -geometry 1920x1080
+nohup /noVNC/./utils/launch.sh --vnc 0.0.0.0:5901 1>/dev/null 2>&1 
 ```
 
-## 4. 设置root密码(root)
+- 修改文件：`/noVNC/app/ui.js`
 
-此密码即为可视化终端root用户密码
+- - 将注释替换成下一行
 
 ```bash
-echo -e "root\nroot" | passwd
+# UI.initSetting('path', 'websockify');
+UI.initSetting('path', 'WEBSOCK_PATH/websockify');
 ```
 
-## ~~5. GNOME桌面(体积过大且需要init权限，改为xfce实现)~~
+- 修改文件：`/noVNC/vnc.html`，用于nginx配置转发
 
-- 安装 tigervnc-server 并为 root 开启一个 vnc 桌面；
-- 请求输入 vnc 密码；
-- 安装 GNOME 并设置开机进行图形界面；
-- 关闭 selinux 与关闭防火墙；
-- 安装 noVNC 于根目录；
-- 设置 root 的 VNC 与 noVNC 为开机启动。
+- - 将注释替换成下一行
 
 ```bash
-# 下载
-curl -L https://gitee.com/panchongwen/my_scripts/raw/main/linux/centos7_vnc_install.sh -o centos7_vnc_install.sh
-# 执行安装
-bash ./centos7_vnc_install.sh
+#<input id="noVNC_setting_path" type="text" value="websockify">
+<input id="noVNC_setting_path" type="text" value="/noVNC/websockify">
 ```
 
-- 在安装完 tigervnc-server 后会让你设置 vnc 密码，输入一个大于六位的密码即可
-- 继续会询会是否需要设置一个只可查看不可操作的 view-only 密码，如果不需要，输入 n 回车
+## 0.2 免密登录修改
 
-## 5. 安装xfce桌面，VNC与noVNC
+- 修改文件：/noVNC/app/ui.js
 
-定制版本，将定制好的文件copy至镜像指定位置
+- - 新增部分：`.then(() => {document.getElementById("noVNC_connect_button").click()});`
+
+- - 新增部分：`password = "rootroot";`
+
+```javascript
+prime() {
+  return WebUtil.initSettings().then(() => {
+    if (document.readyState === "interactive" || document.readyState === "complete") {
+      return UI.start();
+    }
+    
+    return new Promise((resolve, reject) => {
+      document.addEventListener('DOMContentLoaded', () => UI.start().then(resolve).catch(reject));
+    });
+  }).then(() => {
+    document.getElementById("noVNC_connect_button").click()
+    });
+ },
+
+    .......
+      
+    password = "rootroot";
+    UI.hideStatus();
+  
+```
+
+
+
+# 1. 通过Dockerfile构建可视化终端镜像
+
+## 1.1 文件目录组织
+
+- **Dockerfile**：用于构建可视化终端镜像
+
+- **centos7_vnc_install.sh**：用于安装centos系统相关组件等
+- **noVNC**：用于提供vnc代理服务并基于开源1.2.0版本定制了部分内容，详细改动见第0节
+- **setvncpasswd.sh**：用于自动化设置vnc密码
+- **vncservers**：用于启动vnc服务
+- **xstartup**：用于启动xfce远程可视化桌面服务
+
+![img](pics/1655560936934-ee7b0017-fc08-4630-9708-cee4949ed6c3-16556927772804.png)
+
+## 1.2 Dockerfile文件
+
+```dockerfile
+# 基于centos7镜像构建本服务，且该镜像的yum源已配置为国内
+FROM centos:7.9.2009
+ENV noVNCVersion v1.2
+ENV AUTHOR HC
+ENV LANG en_US.UTF-8
+ENV TZ=Asia/Shanghai
+ENV SHELL=/bin/bash
+LABEL maintainer="test"
+# 设置工作目录
+WORKDIR /noVNCSet
+COPY . /noVNCSet
+
+# 设置时区，设置root密码，启动centos7_vnc_install.sh安装脚本，启动setvncpasswd.sh密码设置脚本，拷贝xfce配置文件xstartup到vnc目录
+RUN set -ex && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo '$TZ' > /etc/timezone && mv /noVNCSet/noVNC /noVNC && echo -e "root\nroot" | passwd && sh /noVNCSet/centos7_vnc_install.sh && chmod 755 /noVNCSet/setvncpasswd.sh &&  cd /noVNCSet &&  ./setvncpasswd.sh && mv /noVNCSet/xstartup /root/.vnc/xstartup && chmod 755 /root/.vnc/xstartup
+
+EXPOSE 6901
+
+ENTRYPOINT sh /noVNC/app/sed.sh
+```
+
+## 1.3 centos7_vnc_install.sh文件
 
 ```bash
-# 换源
-yum install -y  wget
-mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bk
-cd /etc/yum.repos.d
-wget -nc http://mirrors.aliyun.com/repo/Centos-7.repo
-mv Centos-7.repo CentOS-Base.repo
-yum clean all
-yum list
-yum makecache
-yum install -y "tigervnc-server"
+#/bin/bash
 
-# 设置密码： root/root，不设置viewonly密码
-vncpasswd
+function install_vnc
+{
+        # 安装wget及centos源管理工具
+        yum install -y  wget
+        wget http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+        rpm -ivh epel-release-latest-7.noarch.rpm
+        yum update
+        yum install deltarpm -y
+        # 安装vnc相关服务
+        yum install -y "tigervnc-server"
+        yum install tcl-devel -y、
+        # 安装自动化执行命令服务expect
+        yum install expect -y
+        # 安装xfce
+        yum install epel-release
+        yum  -y --enablerepo=epel groupinstall xfce
+        # 安装中文字体
+        yum -y  --enablerepo=epel groupinstall Fonts
+        # 安装火狐浏览器
+        yum -y install firefox
+        yum -y install python3
+        pip3 install numpy -i https://pypi.douban.com/simple/
+}
 
-# 安装xfce
-yum install epel-release
-yum groupinstall xfce
-
-# 安装中文字体
-yum -y groupinstall Fonts
-
-# 安装火狐浏览器
-yum -y install firefox
-
-# 安装python3及numpy
-yum -y install python3
-pip3 install numpy -i https://pypi.douban.com/simple/
+install_vnc
 ```
 
-### 5.1 设置xface随vncserver启动
+## 1.4 noVNC文件（属于定制版本，详细改变看第0节）
 
-- 先启动vncsercver生成配置文件： `/root/.vnc/xstartup`
-- 修改`xstartup`
 
-```shell
+
+## 1.5 setvncpasswd.sh文件
+
+```bash
+#!/usr/bin/expect
+set timeout 10
+spawn vncpasswd
+expect "Password:"
+send "rootroot\n"
+expect "Verify:"
+send "rootroot\n"
+expect "Would you like to enter a view-only password (y/n)?"
+send "n\n"
+interact
+```
+
+## 1.6 vncservers文件
+
+```bash
+# THIS FILE HAS BEEN REPLACED BY /lib/systemd/system/vncserver@.service
+VNCSERVERS="1:root"
+VNCSERVERARGS[1]="-geometry 1920x1080"
+```
+
+## 1.7 xstartup文件
+
+```bash
 #!/bin/sh
 
 unset SESSION_MANAGER
@@ -97,32 +180,11 @@ exec startxfce4
 # /etc/X11/xinit/Xclients or ~/.Xclients yourself to achieve a different result, then you should
 # be responsible to modify below code to avoid that your session will be automatically killed
 if [ -e /usr/bin/gnome-session -o -e /usr/bin/startkde ]; then
-	vncserver -kill $DISPLAY
+vncserver -kill $DISPLAY
 fi
 ```
 
-
-
-## 6. 访问noVNC
-
-- 利用 noVNC 直接在浏览器访问 6901 端口映射出来的端口，密码为设置的密码；
-
-## ~~7. 将vnc服务添加到后台启动(废弃)~~
-
-```yaml
-systemctl start vncserver@:1.service && systemctl enable vncserver@:1.service # 启动vnc并加入开机自启
-```
-
-## 7. 启动vnc及novnc服务(非特权模式)
-
-```bash
-vncserver -geometry 1920x1080
-
-
-nohup /noVNC/./utils/launch.sh --vnc 0.0.0.0:5901 1>/dev/null 2>&1
-```
-
-## 8. 将noVNC服务启动命令加到k8s的yaml中
+# 2. 将noVNC服务启动命令加到k8s的yaml中
 
 ```yaml
 apiVersion: v1
@@ -137,7 +199,7 @@ spec:
   - name: hc-terminal-container1
     securityContext:
       privileged: true
-    image: 172.16.2.131:30002/starfish/hc-terminal:v3.0               #ts-jupyter是包含hc-cpu-jupyterflow+keras+jupyter的镜像的名字
+    image: 172.16.2.131:30002/starfish/hc-terminal:v3.0               # 第1节通过dockerfile构建出来的镜像
     imagePullPolicy: IfNotPresent
     resources:
       requests:
@@ -165,15 +227,9 @@ metadata:
 spec:
   ports:
   - name: http
-    port: 6901                           #jupyter notebook对外暴露服务的端口号
+    port: 6901                           #terminal对外暴露服务的端口号
     protocol: TCP
   selector:
     app: hc-terminal-pod-label
   type: NodePort
-```
-
-## 9. 打包当前容器为最终可视化终端镜像
-
-```yaml
-docker commit centos7.9_vnc hc-terminal:v3.0
 ```

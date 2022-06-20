@@ -119,6 +119,8 @@ nav:
       - 概念: cloud/cloud_native.md
       - fluid: cloud/fluid.md
       - sealer(K8s集群交付）: cloud/sealer.md
+      - 自定义镜像:
+        - 浏览器操作系统: cloud/images/web_centos.md
     - CS系统知识:
       - 基础: cs/cs_basic.md
       - 操作系统: cs/cs_os.md

@@ -90,6 +90,7 @@ kubectl get node --show-labels
     - 将storage的useAllNodes属性改为false
     - 在storage的nodes下增加需要使用osd的节点及对应硬盘
   - 将storage下的config的`osdsPerDevice`注释打开并设为1
+    - 要在每个设备上创建的 OSD 数。NVMe等高性能设备可以处理运行多个OSD。如果需要，可以为每个节点和每个设备覆盖此内容。本次环境为机械硬盘，故采用参数设置为1
 
 ```yaml
 #################################################################################################################
@@ -390,6 +391,8 @@ spec:
 
 ## 2.6 设置secret
 
+rook-ceph安装时需要一个secret
+
 ```bash
 kubectl -n rook-ceph create secret generic rook-ceph-crash-collector-keyring
 ```
@@ -400,7 +403,7 @@ kubectl -n rook-ceph create secret generic rook-ceph-crash-collector-keyring
 kubectl apply -f cluster.yaml
 ```
 
-## 2.8 删除secret
+## 2.8 删除secret（Rook-ceph 1.8.1 BUG）
 
 当前版本ceph bug，需先设置secret完成cluster创建后再删除保证后续操作成功
 
@@ -488,7 +491,9 @@ kubectl get svc -n rook-ceph
 kubectl -n rook-ceph get secret rook-ceph-dashboard-password -o jsonpath="{['data']['password']}" | base64 --decode && echo
 ```
 
-## 2.13 格式化osd硬盘重新挂载
+## 2.13 ceph运维：格式化osd硬盘重新挂载
+
+> 当osd出现无法修复的问题时，格式化osd硬盘重新挂载（当前集群OSD出现故障时操作，需备份相关数据）
 
 ### 2.13.1 删除osd
 
@@ -651,13 +656,16 @@ kubectl create -f filesystem-test.yaml
 
 ### 4.1.2 创建动态存储storageclass
 
-- 配置: csi/cephfs/storageclass.yaml
+- 配置: `csi/cephfs/storageclass.yaml`
+- 如需设置本storageclass为**默认storageclass**，则需将`storageclass.beta.kubernetes.io/is-default-class`的值从"false"设置为"true"
 
 ```yaml
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: rook-cephfs
+  annotations:
+     storageclass.beta.kubernetes.io/is-default-class: "false"
 # Change "rook-ceph" provisioner prefix to match the operator namespace if needed
 provisioner: rook-ceph.cephfs.csi.ceph.com # driver:namespace:operator
 parameters:
@@ -747,7 +755,7 @@ spec:
 
 ## 4.3 将k8s默认存储设为cephfs
 
-### 4.3.1 创建cephfs及mds
+### 4.3.1 创建cephfs及mds（若4.1.1操作过，则此步骤略过）
 
 - 配置: filesystem-test.yaml
 - 部署: kubectl create -f filesystem-test.yaml
@@ -786,42 +794,52 @@ spec:
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-name: rook-cephfs
-annotations:
-storageclass.beta.kubernetes.io/is-default-class: "true"
+  name: rook-cephfs
+  annotations:
+     storageclass.beta.kubernetes.io/is-default-class: "true"
 # Change "rook-ceph" provisioner prefix to match the operator namespace if needed
 provisioner: rook-ceph.cephfs.csi.ceph.com # driver:namespace:operator
 parameters:
-# clusterID is the namespace where the rook cluster is running
-# If you change this namespace, also change the namespace below where the secret namespaces are defined
-clusterID: rook-ceph # namespace:cluster
+  # clusterID is the namespace where the rook cluster is running
+  # If you change this namespace, also change the namespace below where the secret namespaces are defined
+  clusterID: rook-ceph # namespace:cluster
 
-# CephFS filesystem name into which the volume shall be created
-fsName: myfs
+  # CephFS filesystem name into which the volume shall be created
+  fsName: myfs
 
-# Ceph pool into which the volume shall be created
-# Required for provisionVolume: "true"
-pool: myfs-replicated
+  # Ceph pool into which the volume shall be created
+  # Required for provisionVolume: "true"
+  pool: myfs-replicated
 
-# The secrets contain Ceph admin credentials. These are generated automatically by the operator
-# in the same namespace as the cluster.
-csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
-csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph # namespace:cluster
-csi.storage.k8s.io/controller-expand-secret-name: rook-csi-cephfs-provisioner
-csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph # namespace:cluster
-csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
-csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph # namespace:cluster
+  # The secrets contain Ceph admin credentials. These are generated automatically by the operator
+  # in the same namespace as the cluster.
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
+  csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph # namespace:cluster
+  csi.storage.k8s.io/controller-expand-secret-name: rook-csi-cephfs-provisioner
+  csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph # namespace:cluster
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
+  csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph # namespace:cluster
 
-# (optional) The driver can use either ceph-fuse (fuse) or ceph kernel client (kernel)
-# If omitted, default volume mounter will be used - this is determined by probing for ceph-fuse
-# or by setting the default mounter explicitly via --volumemounter command-line argument.
-# mounter: kernel
-reclaimPolicy: Delete
+  # (optional) The driver can use either ceph-fuse (fuse) or ceph kernel client (kernel)
+  # If omitted, default volume mounter will be used - this is determined by probing for ceph-fuse
+  # or by setting the default mounter explicitly via --volumemounter command-line argument.
+  # mounter: kernel
+reclaimPolicy: Retain
 allowVolumeExpansion: true
 mountOptions:
-# uncomment the following line for debugging
+  # uncomment the following line for debugging
   #- debug
 ```
+
+### 4.3.3 KubeSphere默认动态存储修改
+
+- 若k8s集群采用kubesphere部署，则记得将kubesphere对应行改为- storageclass.beta.kubernetes.io/is-default-class: "false"
+
+<img src="pics/1655563133058-61b4589e-22ff-4700-9aad-f536ceadd4e8.png" alt="img" style="zoom: 25%;" />
+
+<img src="pics/1655563114548-051d5a51-190f-460f-876b-a5f374c1154b.png" alt="img" style="zoom:25%;" />
+
+<img src="pics/1655563096715-a2bf328c-9fc3-4672-8e43-9eff0ebbefe6.png" alt="img" style="zoom:25%;" />
 
 # 5. 卸载
 
@@ -857,6 +875,21 @@ rm -rf /var/lib/kubelet/plugins/csi* /var/lib/kubelet/plugins_registry/csi*
 ```
 
 ## 5.4 清除device
+
+- dd if=/dev/zero of="$DISK" bs=1M count=100 oflag=direct,dsync
+  - if：输入文件名，缺省为标准输入
+  - of=file：输出文件名，缺省为标准输出
+  - bs：同时设置读入/输出的块大小为1M个字节
+  - count：仅拷贝100 个块，块大小等于bs指定的字节数
+  - oflag：指定写的方式FLAGS，FLAGS参数说明：
+    - append -append  mode  (makes  sense  only  for output; conv=notrunc sug-gested)
+    - direct：读写数据采用直接IO方式；
+    - directory：读写失败除非是directory；
+    - dsync：读写数据采用同步IO；
+    - sync：同上，但是针对是元数据
+    - fullblock：堆积满block（accumulate full blocks of input ）(iflag only)；
+    - nonblock：读写数据采用非阻塞IO方式
+    - noatime：读写数据不更新访问时间
 
 ```bash
 yum install gdisk -y
