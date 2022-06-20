@@ -10,13 +10,13 @@
 
 Python进程通过Py4j调用Java方法提交Job，Job运行结果通过本地Socket被拉取到Python进程。
 
-对于大数据量，例如广播变量等，Python进程和JVM进程是通过本地文件系统来交互，以减少进程间的数据传输。
+对于大数据量，例如广播变量等，**Python进程和JVM进程是通过本地文件系统来交互**，以减少进程间的数据传输。
 
 
 
-![pyspark-executor.png](D:\personal\blog_md\distributed_computing\spark\pics\pyspark-executor.png)
+![pyspark-executor.png](pics\pyspark-executor.png)
 
-每个Executor上有一个公共的pyspark.deamon进程，负责接收Task请求，并fork pyspark.worker进程单独处理每个Task，实际数据处理过程中，pyspark.worker进程和JVM Task会较频繁地进行本地Socket数据通信。
+每个Executor上有一个公共的pyspark.deamon进程，负责接收Task请求，并`fork pyspark.worker`进程单独处理每个Task，实际数据处理过程中，pyspark.worker进程和JVM Task会较频繁地进行本地Socket数据通信。
 
 
 

@@ -55,6 +55,9 @@ nav:
       - 性能:
         - arthas性能分析: languages/java/performance/arthas.md
         - jvm-profile分布式应用分析: languages/java/performance/jvm_profile.md
+    - Python:
+      - 三方包:
+        - java和Python互相访问: languages/python/packages/java_python.md
     - 存储: 
       - （TODO）Apache Pulsar: ./data_store/pulsar/apache_pulsar.md
     - 数据管理:
