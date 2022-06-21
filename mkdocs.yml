@@ -133,6 +133,7 @@ nav:
     - Web服务:
       - 后端:
         - 接口管理设计: web/backend/api_manager.md
-    - 数据密集型系统设计:
-      - 数据系统基础:
-        - 
+    - 分布式计算引擎:
+      - Spark:
+        - Spark on Yarn: distributed_computing/spark/spark_yarn.md
+        - Spark Yarn RestAPI: distributed_computing/spark/spark_yarn_rest.md

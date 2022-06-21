@@ -1,8 +1,8 @@
-[toc]
-
 # RDD Barrier
 
-https://issues.apache.org/jira/browse/SPARK-24374
+> [SPIP：Support Barrier Execution Mode in Apache Spark](https://issues.apache.org/jira/browse/SPARK-24374)
+
+**用于MPI或者分布式机器学习的场景，要求所有的Task必须同时同时执行；**
 
 
 

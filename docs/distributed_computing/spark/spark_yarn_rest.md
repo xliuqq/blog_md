@@ -165,12 +165,11 @@ examples/jars/spark-examples_2.11-2.4.8.jar 1000
 ```
 
 - 在`spark-class`里，执行的操作
-
-- - 设置ENV `SPARK_CONF_DIR`；
+  - 设置ENV `SPARK_CONF_DIR`；
   - 将`spark-env.sh`中设置的变量，全部export；
-
-- - 设置ENV `SPARK_SCALA_VERSION`；
+  - 设置ENV `SPARK_SCALA_VERSION`；
   - 执行如下命令，获取启动命令
+
 
 ```shell
 /opt/tmp_workspace/jdk1.8.0_201/bin/java -Xmx128m -cp \
@@ -181,10 +180,10 @@ org.apache.spark.launcher.Main org.apache.spark.deploy.SparkSubmit \
 examples/jars/spark-examples_2.11-2.4.8.jar 1000
 ```
 
-- - `Main`中，针对`SparkSubmit`，执行的操作：
+- `Main`中，针对`SparkSubmit`，执行的操作：
+  - 构建CLASSPATH，添加`spark.driver.extraClasspath`、`$SPARK_CONF_DIR`、`$SPARK_HOME/jars`, `$HADOOP_CONF_DIR`、`$YARN_CONF_DIR`；
+  - 构建之后的执行命令如下所示：
 
-- - - 构建CLASSPATH，添加`spark.driver.extraClasspath`、`$SPARK_CONF_DIR`、`$SPARK_HOME/jars`, `$HADOOP_CONF_DIR`、`$YARN_CONF_DIR`；
-    - 构建之后的执行命令如下所示：
 
 ```shell
 exec /opt/tmp_workspace/jdk1.8.0_201/bin/java -cp '/home/hadoop/workspace/spark-2.4.8-bin-hadoop2.7/conf/:/home/hadoop/workspace/spark-2.4.8-bin-hadoop2.7/jars/*:/home/hadoop/workspace/hadoop-2.7.2/etc/hadoop/' \
@@ -200,18 +199,14 @@ org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode cluster \
 - 以`proxyUser`的用户身份，执行以下操作；
 - `YarnClusterApplication::start()`调用`Client::run()`：
 
-
-
-
-
 ### 3.3 `Client`类
 
 
 
 - 在 HDFS 的 `/user/${user}/.sparkStaging/${appId}`下建立目录，用于Yarn的localResource，如下所示；
-
-- - 上传spark配置`__spark_conf__.zip`和应用的jar包到HDFS的路径；
+  - 上传spark配置`__spark_conf__.zip`和应用的jar包到HDFS的路径；
   - 对这两个文件，作为Yarn AM的 local resource；
+
 
 ```shell
 $ hdfs dfs -ls /user/hadoop/.sparkStaging/application_1631928041971_0067
@@ -219,15 +214,20 @@ $ hdfs dfs -ls /user/hadoop/.sparkStaging/application_1631928041971_0067
 -rw-r--r--   2 hadoop supergroup    2017859 2021-09-28 11:21 /user/hadoop/.sparkStaging/application_1631928041971_0067/spark-examples_2.11-2.4.8.jar
 ```
 
-- - `__spark_conf__.zip`目录组织如下：
+- `__spark_conf__.zip`目录组织如下：
 
-- - - `__hadoop_conf__`中包含`HADOOP_CONF_DIR`和`YARN_CONF_DIR`下的所有文件；
+  - `__hadoop_conf__`中包含`HADOOP_CONF_DIR`和`YARN_CONF_DIR`下的所有文件；
+
     - 包含`SPARK_CONF_DIR`下的xml文件；
 
-- - - 包含CLASSPATH中的`log4j.properties`和`metrics.properties`文件；
+   - 包含CLASSPATH中的`log4j.properties`和`metrics.properties`文件；
+  
+  
     - 将Hadoop Conf 写到`__spark_hadoop_conf__.xml`；
-
-- - - 将Spark Conf 写到`__spark_conf__.properties`；
+  
+  
+    - 将Spark Conf 写到`__spark_conf__.properties`；
+  
 
 ```shell
 drwx------. 2 hadoop hadoop  4096 Sep 26 15:32 __hadoop_conf__
@@ -238,9 +238,9 @@ drwx------. 2 hadoop hadoop  4096 Sep 26 15:32 __hadoop_conf__
 ```
 
 - 添加的额外的spark的属性
-
-- - `spark.yarn.cache.confArchive`：`__spark_conf__.zip`的路径（作为其它container的配置）；
+  - `spark.yarn.cache.confArchive`：`__spark_conf__.zip`的路径（作为其它container的配置）；
   - `spark.yarn.cache.filenames`、`spark.yarn.cache.timestamps` 、` spark.yarn.cache.visibilities`、`spark.yarn.cache.types`、`spark.yarn.cache.sizes`：spark自身的jar包，每一个都是Yarn app的localResource。
+
 
 
 
