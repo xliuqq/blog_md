@@ -606,7 +606,7 @@ Pod 绑定Service服务，**Service服务声明的IP地址等信息是固定不�
 
 ### 负载均衡原理
 
-通过kube-proxy配置iptables或者通过ipvs进行转发处理。
+通过**kube-proxy配置iptables或者通过ipvs**进行转发处理。
 
 #### 会话保持机制
 
@@ -652,14 +652,16 @@ subsets:
 
 ### Service类型
 
-#### CluseterIP模式
+为一组Pod抽象一个稳定的网络访问地址，提供**服务注册、服务发现、服务负载均衡**等。
+
+#### ClusterIP模式
 
 默认，分配一个**集群内部**可以访问的虚拟IP（VIP）
 
 - Services的**VIP**（Virtual IP）方式：vip将请求转发到某一个Pod上；
 - Service的**DNS**方式：通过域名解析成对应ip
   - **Normal Service**：解析后的ip就是Service的**vip**；
-  - **Headless Service**：解析出的是具体的Pod的ip；
+  - **Headless Service**：没有ClusterIP（None），解析出的是所有的Pod的ip:port地址列表；
   - dns记录域名为：`<pod-name>.<svc-name>.<namespace>.svc.cluster.local`
 
 #### NodePort模式
@@ -692,12 +694,13 @@ spec:
   - protocol: tcp
     # service暴露在cluster ip上的端口，服务间内部使用
     port: 80
-    # 节点上的端口，给外部直接通过节点ip:port访问
+    # 节点上的端口，给外部直接通过节点ip:port访问（NodePort模式使用）
     nodePort: 8090
     # 容器里的端口
     targetPort: 8081
     name: web
-  # Headless Service
+  # ClusterIP模式（默认）：不指定时，自动分配
+  # 指定为None时，属于Headless模式
   clusterIP: None
   # 选择pod(根据对应的label: app=nginx)
   selector:

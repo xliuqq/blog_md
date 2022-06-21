@@ -122,6 +122,9 @@
 问题点：
 
 - 在**运行时才能生成OpenAPI 文档**（通过`mvn verify`）：`springdoc-openapi-maven-plugin` 依赖于 `spring-boot-maven` 插件。Maven在**集成测试阶段**(integration-test)运行openapi插件。
+  - 因此，如果SpringBoot启动失败，则无法生成对应的文档内容；
+  - github上有直接根据注解进行静态解析，生成对应的yaml接口文档，如 https://github.com/UbiqueInnovation/springboot-swagger3 ，但是鲁棒性不够；
+
 
 ```xml
 <dependency>
