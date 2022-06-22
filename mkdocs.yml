@@ -128,6 +128,7 @@ nav:
     - Web服务:
       - 后端:
         - 接口管理设计: web/backend/api_manager.md
+        - 刷库: web/backend/db_flush.md
     - 数据密集型系统设计:
       - 数据系统基础:
         - 
