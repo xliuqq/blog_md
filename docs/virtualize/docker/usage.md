@@ -87,6 +87,8 @@ $ docker run -d -p 127.0.0.1:5000:5000/udp training/webapp python app.py
 - **-m**：分配容器的内存总量，B、K、M、G单位
 - **-P** :是容器内部端口随机映射到主机的高端口；    
 - **-p** : 是容器内部端口绑定到指定的主机端口。
+- **--rm**：容器运行退出后自动删除
+- **--runtime string**：Runtime to use for this container
 
 ### images
 

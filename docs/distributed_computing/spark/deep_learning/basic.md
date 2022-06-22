@@ -1,5 +1,3 @@
-[toc]
-
 # databricks/spark-deep-learning
 
 提供一些high-level的API，把底层的模型进行组件化，同时它期望可以兼容底层深度式学习框架。
