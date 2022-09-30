@@ -16,13 +16,26 @@ Runtime创建的PV的大小，常量100Gi？
 
 ObjectMeta的Generation为什么被用来做DataSetController的AddFinalizer的判断？
 
-AssignNodesToCache 在master分支，不用了？那谁去设置节点的标签？
+AssignNodesToCache 没有调用方？
+
+- 搜索节点放值worker，现在alluxio的worker通过helm安装的，调度信息在哪里？
+- 节点打标签，通过Engine::SyncScheduleInfoToCacheNodes函数设置；
+
+DataSet的亲和性和Pod的亲和性冲突了怎么处理？
+
+- DataSet的亲和性应该保证和Pod一致，即将Pod的节点亲和性配置应用到DataSet中；
 
 ## 场景
 
-
-
-
+1. 作为新的PVC：实现远程文件的访问；（Alluxio + FUSE，作为 SI ）
+2. 加速已有的PVC：NFS的带宽成为了瓶颈；而Fluid基于Alluxio提供了分布式缓存的P2P数据读取能力；
+3. 数据预加载；
+4. HDFS访问加速：通过hdfs client 访问 PVC（hdfs访问Alluxio FS）；
+5. Restful访问Dataset；
+6. 数据缓存亲和性和容忍（DataSet支持NodeSelector）；
+7. 手动扩缩容（通过修改Runtime的Worker的replica数量）；
+8. Fuse客户端全局部署：不要求数据和Fuse客户端之间的强制亲和性（即FUSE和Worker部署在一个节点）；
+9. 指定特定用户进行访问数据；
 
 ## 架构
 
@@ -31,12 +44,12 @@ AssignNodesToCache 在master分支，不用了？那谁去设置节点的标签�
 **原理和流程：**
 
 - DataSet声明数据集的来源，**Runtime选择node打标签进行worker调度**；
-
 - APP 通过 PVC 获取数据，PVC通过CSI-Plugin获取数据，进行`/runtime-mnt`的文件操作，触发FUSE容器通过Alluxio Worker中获取数据；
 
   - PVC的数据读取通过CSI-Plugin和FUSE实现，**CSI-Plugin 和 FUSE DaemonSet都挂载宿主机的相同目录（/runtime-mnt）**；
   - FUSE DaemonSet的本地挂载目录为`/runtime-mnt/alluxio/default/demo`，后两个为*dataset  namespace*和*name*；
   - Alluxio Worker 根据 DataSet 中声明的远程路径，进行数据操作；
+- Pod选定Runtime的节点，通过webhook通过节点亲和性进行处理；
 
 Alluxio Runtime会创建`**-config`存储Alluxio集群的相关配置信息，供FUSE使用；
 
@@ -54,7 +67,7 @@ App Pod 指定 PVC，PV 和 PVC 由对应的 Cache Runtime 创建（通过指定
   - 具备CSI插件的节点：通过`Node-Selector:  fluid.io/f-default-demo=true`
   - Pod 和 FUSE 需要在一个节点，CSI将本地的对应的目录挂载到Pod中；
 
-- FUSE 和 Worker 不需要在一个节点上；
+- FUSE 和 Worker 不需要在一个节点上，根据Runtime的Global字段进行设置？；
 
 **Runtime和DataSet是一对一的关系，通过name进行关联！**
 
@@ -73,9 +86,11 @@ Dataset的生命周期流程如图所示：
 #### Spec
 
 - `mounts`：定义来源，**支持 https://, http://, local:// 和 pvc://；**
+  - 支持多个Mount，会根据名字，建立不同的文件目录；
+
 - `owner`：定义用户，设置权限，uid/gid；
-- `nodeAffinity`：缓存的节点亲和性；
-- `tolerations`：pod's tolerations
+- **`nodeAffinity`：缓存的节点亲和性（限制runtime的worker的节点选择）；**
+- `tolerations`：pod's tolerations；
 - `accessModes`：Array，"ReadWriteOnce"、"ReadOnlyMany"、"ReadWriteMany"
 - `runtimes`：支持数据集的运行时，如AlluxioRuntimes；
 - `placement`：
@@ -92,7 +107,29 @@ spec:
   mounts:
     - mountPoint: https://mirrors.bit.edu.cn/apache/spark/
       name: spark
+---------------------------------------------------------------   
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    fluid.io/dataset.fusedemo.sched: required
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      volumeMounts:
+        - mountPath: /datahbase
+          name: hbase-vol
+  volumes:
+    - name: hbase-vol
+      persistentVolumeClaim:
+        claimName: fusedemo
 ```
+
+对于nginx pod，其`/datahbase`下有目录`/spark`。
+
+
 
 #### Status
 
@@ -116,13 +153,15 @@ spec:
 
 ### DataLoader（数据预加载）
 
-DataSet不会创建DataLoader，DataLoader不会创建Runtime
+DataLoader前置：创建DataSet和Runtime，通过创建Runtime的DataLoad Job实现。
 
 #### Spec
 
 - `dataset`：定义目标数据集，当前只允许在一个名空间下；
 - `loadMetadata`：数据加载前首先进行元数据同步；
 - `target`：加载指定的子目录(或文件)，而不是整个数据集，以及副本数；
+  - path：加载的子目录或文件
+
 - `options`：其它属性；
 
 #### Status
@@ -173,9 +212,10 @@ Executing阶段
 
 ## 运行时
 
-Setup时，创建Worker，对Node设置如下标签：
+Setup时，创建Worker：
 
-- `alluxio.node.go`中`AssignNodesToCache`函数，寻找 node 进行 worker的放置（考虑数据集的亲和性）；
+- `alluxio.node.go`中`AssignNodesToCache`函数（废弃不用），寻找 node 进行 worker的放置（考虑数据集的亲和性）；
+- `LabelCacheNode和UnlabelCacheNode`：对Node设置和取消设置标签；
 
 ```yaml
 # 设置数据集个数
@@ -190,6 +230,10 @@ fluid.io/s-h-alluxio-d-default-demo=1GiB
 fluid.io/s-h-alluxio-t-default-demo=3GiB
 # 排他性
 fluid_exclusive=default_demo
+
+## yaml中会设置这两个值，用作Dataset的排他/共享模式
+fluid.io/dataset: {{ .Release.Namespace }}-{{ .Release.Name }}
+fluid.io/dataset-placement: {{ .Values.placement }}
 ```
 
 ### AlluxioRuntime
@@ -202,6 +246,7 @@ fluid_exclusive=default_demo
 - `FUSE`：FUSE的配置，有两个DaemonSet（默认enabled为true，clientEnabled为false）；
   - `Global`：常量为true，FUSE 以 Global 形式部署（可配置节点亲和性NodeSelector）；
   - `NodeSelector`：配置的节点亲和性NodeSelector；
+- `APIGateway`：设置`alluxio.proxy.web.port`；
 
 
 #### Status
@@ -263,17 +308,27 @@ Runtime包含Delete时间戳：
 
 #### Engine
 
+每一个namespace:name都会生成一个Engine，进行处理
+
 生命周期：
 
-- 创建：setup -> CreateVolume -> Sync
+- 创建：setup -> CreateVolume -> Sync（进行node label）
 
 - 删除：DeleteVolume -> Shutdown
 
 engine#setup：创建 Master/Worker的StatefulSet，**FUSE**的DaemonSet，检查UFS（同步元数据），检查Runtime Ready，绑定到DataSet
 
 - **Worker的亲和性调度（TODO）？**
+
 - 元数据（通过alluxio master的alluxio fs命令）：文件总数，文件总大小
+
 - DataSet 阶段设为`BoundDatasetPhase`，状态设为`DatasetReady`；
+
+- **FUSE Pod**如何创建的：
+
+  DaemonSet申请：`value.Fuse.NodeSelector[e.getFuseLabelname()] = "true"`
+
+  CSI NodeStageVolume里设置该值；
 
 #### RuntimePortAllocator
 
@@ -285,7 +340,7 @@ engine#setup：创建 Master/Worker的StatefulSet，**FUSE**的DaemonSet，检�
 
 [Knative 下FUSE使用](https://github.com/fluid-cloudnative/fluid/blob/master/docs/zh/samples/knative.md)
 
-`namespace` 需要添加标签`fluid.io/enable-injection`，开启此namespace下Pod的调度优化功能。
+`namespace` 需要添加标签`fluid.io/enable-injection`，开启此namespace下Pod的调度优化功能。（用作关闭FUSE sidecar）
 
 **作为 Serverless 集群的Controller，Pod Fuse Sidecar的状态判断。**
 
@@ -308,15 +363,26 @@ Fluid 默认安装webhook的Deployment，对Pods的create/update进行回调，�
 
   > Registered webhook handler      {"path": "/mutate-fluid-io-v1alpha1-schedulepod"}
 
-- 如果是 serverlesss 模式，则进行 FUSE 容器注入；
+- 如果是 serverlesss 模式，则进行 **FUSE 容器注入**；
 - 如果不是 serverless 模式，则进行`RequireNodeWithFuse`，`PreferNodesWithCache`，`MountPropagationInjector`；
   - `RequireNodeWithFuse`：fuse的global 和 selector的注入Pod；
   - `PreferNodesWithCache`：pod的节点亲和性调度设置，调度到具备`commonLabel（fluid.io/s-default-demo=true）`的节点；
   - `MountPropagationInjector`：pod进行`MountPropagation`配置为`HostToContainer`
 
+### RequireNodeWithFuse
+
+对 FUSE 的 global 和 selector 进行判断，两者只能有一个起作用：
+
+- global 为 false，选择具有common label的节点；
+- global 为 true，考虑nodeselector进行调度；
+
+
+
 ## CSI
 
 配置 FuseRecovery，FUSE的自动恢复；
+
+选择`fluid.io/s-default-fusedemo: "true"`的Volume绑定；
 
 配置 Fluid Driver，进行自定义存储驱动；
 
@@ -331,7 +397,11 @@ Fluid 默认安装webhook的Deployment，对Pods的create/update进行回调，�
 
 `NodeStageVolume`阶段：
 
-- 设置`fluid.io/f-default-demo=true` 标签，即节点上具备该CSI插件，共FUSE使用；
+- 设置`fluid.io/f-default-demo=true` 标签，即节点上具备该CSI插件，供FUSE使用（此时Fuse daemonset满足调度条件，才会进行调度）；
+
+`NodePublishVolume`阶段：
+
+- 将 fluid-path 挂载到 pod 的目录中；
 
 ## 使用
 

@@ -2,7 +2,7 @@
 
 **Apache ServiceComb**：微服务解决方案
 
-**lstio**：Connect, secure, control, and observe services.
+[**lstio**](../../cloud/istio.md)：Connect, secure, control, and observe services.
 
 **linkerd**：Ultralight service mesh for Kubernetes and beyond
 

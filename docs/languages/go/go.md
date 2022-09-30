@@ -20,6 +20,18 @@ make也是一个内建函数，用来为 slice，map 或 chan 类型分配内存
 
 - new 的作用是初始化一个指向类型的指针(*T)，make 的作用是只为 slice，map 或 chan 初始化并返回引用（T）；
 
+## 循环
+
+```go
+for key, value := range oldMap {
+    newMap[key] = value
+}
+```
+
+
+
+
+
 ## 指针
 
 **函数返回局部变量的地址是安全的**（但是C/C++中，函数返回局部变量的地址是不安全的）
@@ -41,7 +53,7 @@ golang中只有值传递，没有引用传递。因为拷贝的内容有时候�
 
 ```go
 //数组的赋值
-var c =[3]int{1,2,3}    //定义一个长度为3的int类型的数组
+var c =[]int32{1,2,3}    //定义一个长度为3的int类型的数组
 d := c      //将数组c赋值给d
 d[1] = 100  //修改数组d中索引为1的值为100
 fmt.Printf("c的值是%v，c的内存地址是%p\n",c,&c)   //c的值是[1 2 3]，c的内存地址是0xc42000a180
@@ -77,7 +89,7 @@ type Person struct {
 
 ### 引用类型
 
-引用类型包括指针，slice切片，map ，chan，interface。
+引用类型包括指针，**slice切片，map ，chan，interface**。
 
 变量直接存放的就是一个内存地址值，这个地址值指向的空间存的才是值。所以修改其中一个，另外一个也会修改（同一个内存地址）。
 
@@ -148,6 +160,15 @@ func add(x int, y int) int { return x + y}
 // 给返回值命名，返回两个int值，不需要显示 return变量
 func split(sum int) (x, y int) {x = … y = … return}
 ```
+
+## 映射Map
+
+```go
+m := map[int]int{1: 1, 2: 12, 3: 13}
+value, ok := m[1]
+```
+
+`map[key]`：如果key不存在，则value为key的类型的默认值，ok为false；
 
 
 
@@ -233,6 +254,19 @@ func A() {
 >
 > Go1.11版本之后无需手动配置环境变量，使用 go mod 管理项目，也不需要非得把项目放到 GOPATH
 
+*GO111MODULE* 有三个值：off, on和auto（默认值）。
+
+- *GO111MODULE=off*，无模块支持，go命令行将不会支持module功能，寻找依赖包的方式将会沿用旧版本那种通过vendor目录或者GOPATH模式来查找
+
+- *GO111MODULE=on*，模块支持，go命令行会使用modules，而不会去GOPATH目录下查找。
+
+- *GO111MODULE=auto*，默认值，go命令行将会根据当前目录来决定是否启用module功能。
+
+  这种情况下可以分为两种情形：
+
+  - 当前目录在GOPATH/src之外且该目录包含go.mod文件，开启模块支持。
+  - 当前文件在包含go.mod文件的目录下面。
+
 ```shell
 go mod init demo
 
@@ -297,3 +331,7 @@ func init() {
 - 大小开头，则全局可见；
 
 ## 
+
+## 异常
+
+panic

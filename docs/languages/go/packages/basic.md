@@ -186,3 +186,10 @@ func main() {
 }
 ```
 
+
+
+## Template
+
+https://golang.google.cn/pkg/text/template/
+
+模板引擎

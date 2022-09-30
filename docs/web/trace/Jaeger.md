@@ -1,6 +1,10 @@
 # Jaeger
 
-> CNCF 基金会开源的分布式追踪系统
+> CNCF 基金会开源的分布式追踪系统。
+>
+> open source, end-to-end distributed tracing
+>
+> Monitor and troubleshoot transactions in complex distributed systems
 
 
 
@@ -20,3 +24,8 @@
 
 **spark-job**：基于spark的运算任务，可以计算服务的依赖关系，调用次数等；
 
+
+
+## API
+
+使用 OpenTelemetry

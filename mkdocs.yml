@@ -8,133 +8,201 @@ site_dir: site
 use_directory_urls: false
 
 theme:
-    name: material
-    features:
-      - navigation.tabs
-      - navigation.tabs.sticky
-    language: 'zh'
+  name: material
+  palette:
+    primary: indigo
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+  language: 'zh'
 
 nav:
-    - 如何读论文: README.md
-    - 代码内功:
-      - 设计原则: code_think/design_principle.md
-      - 代码整洁之道: code_think/clean_code.md
-      - 重构: code_think/refactor.md
+  - 如何读论文: README.md
+  - 云原生:
+    - 概念: cloud/cloud_native.md
+    - Fluid: cloud/fluid.md
+    - ServiceMesh: cloud/Istio.md
+    - Serverless: 
+      - 概念: cloud/serverless/serverless.md
+      - knative: cloud/serverless/knative.md
+      - openfaas: cloud/serverless/openfaas.md
+    - 云边协同（TODO）:
+      - KubeEdge: cloud/cloud_edge/kubeedge.md
+      - baetyl:  cloud/cloud_edge/baetyl.md
+      - mqtt协议: cloud/cloud_edge/mqtt.md
+    - 自定义镜像:
+      - 浏览器操作系统: cloud/images/web_centos.md
+    - K8s:
+      - 安装:
+        - K8s集群安装: cloud/k8s/install.md
+        - rook-ceph存储安装: cloud/k8s/k8s_rook_ceph.md
+        - minikube: cloud/k8s/minikube.md
+      - 概念: cloud/k8s/k8s.md 
+      - 配置: cloud/k8s/conf.md
+      - 使用: cloud/k8s/usage.md
+      - 资源类型: cloud/k8s/k8s_resource.md
+      - 权限: cloud/k8s/authnz.md
+      - Helm: cloud/k8s/helm.md
+      - 镜像仓库: cloud/k8s/habor.md
+      - CRD:
+        - native: cloud/k8s/crds_native.md
+        - java operator: cloud/k8s/crds_java.md
+        - kubebuild: cloud/k8s/crds_kubebuild.md
+        - operator sdk: cloud/k8s/crds_operator_sdk.md
+      - 资源管理: cloud/k8s/res_manage.md
+      - 网络: cloud/k8s/k8s_network.md
+      - CSI机制: cloud/k8s/k8s_csi.md
+      - 调度: cloud/k8s/k8s_scheduler.md
+      - 开源管理软件: cloud/k8s/KubeSphere.md
+    - 虚拟化:
+      - 工具对比: cloud/virtualize/virtualize.md
+      - docker:
+        - 概念: cloud/virtualize/docker/docker.md
+        - 使用: cloud/virtualize/docker/usage.md
+        - 镜像搬运工具: cloud/virtualize/docker/skopeo.md
+        - FAQ: cloud/virtualize/docker/faqs.md
+      - gpu虚拟化: cloud/virtualize/gpu_virtualize.md
+  - 调度系统:
+    - 概念: scheduler_system/README.md
+    - 调度的策略: scheduler_system/scheduler.md
+    - Yarn:
+      - 架构: scheduler_system/yarn/arch.md
+    - DophinScheduler: scheduler_system/apache_dolphin_scheduler.md
+
+  - 代码内功:
+    - 设计原则: code_guide/design_principle.md
+    - 代码整洁之道: code_guide/clean_code.md
+    - 重构: code_guide/refactor.md
     - 设计模式: 
-      - 导览: design_pattern/README.md
+      - 导览: code_guide/design_pattern/README.md
       - 创建型模式:
-        - （TODO）工厂模式: design_pattern/factory.md
-        - 抽象工厂: design_pattern/abstract_factory.md
-        - 单例: design_pattern/singleton.md
-        - 构造者模式: design_pattern/builder.md
+        - （TODO）工厂模式: code_guide/design_pattern/factory.md
+        - 抽象工厂: code_guide/design_pattern/abstract_factory.md
+        - 单例: code_guide/design_pattern/singleton.md
+        - 构造者模式: code_guide/design_pattern/builder.md
       - 结构型模式:
-        - 适配器模式: design_pattern/adapter.md
-        - 桥接模式: design_pattern/bridge.md
-        - 组合模式: design_pattern/composite.md
-        - 装饰模式: design_pattern/decorator.md
-        - 外观模式: design_pattern/facade.md
-        - 享元模式: design_pattern/flyweight.md
-        - 代理模式: design_pattern/proxy.md
+        - 适配器模式: code_guide/design_pattern/adapter.md
+        - 桥接模式: code_guide/design_pattern/bridge.md
+        - 组合模式: code_guide/design_pattern/composite.md
+        - 装饰模式: code_guide/design_pattern/decorator.md
+        - 外观模式: code_guide/design_pattern/facade.md
+        - 享元模式: code_guide/design_pattern/flyweight.md
+        - 代理模式: code_guide/design_pattern/proxy.md
       - 行为型模式:
-        - 职责链模式: design_pattern/chain.md
-        - 命令模式: design_pattern/command.md
-        - 解释器模式: design_pattern/interpret.md
-        - 迭代器模式: design_pattern/iterator.md
-        - 中介者模式: design_pattern/medium.md
-        - 备忘录模式: design_pattern/memo.md
-        - 观察者模式: design_pattern/observer.md
-        - 状态模式: design_pattern/state.md
-        - 策略模式: design_pattern/strategy.md
-        - 模板方法: design_pattern/template.md
-        - 访问者模式: design_pattern/visitor.md
+        - 职责链模式: code_guide/design_pattern/chain.md
+        - 命令模式: code_guide/design_pattern/command.md
+        - 解释器模式: code_guide/design_pattern/interpret.md
+        - 迭代器模式: code_guide/design_pattern/iterator.md
+        - 中介者模式: code_guide/design_pattern/medium.md
+        - 备忘录模式: code_guide/design_pattern/menmento.md
+        - 观察者模式: code_guide/design_pattern/observer.md
+        - 状态模式: code_guide/design_pattern/state.md
+        - 策略模式: code_guide/design_pattern/strategy.md
+        - 模板方法: code_guide/design_pattern/template.md
+        - 访问者模式: code_guide/design_pattern/visitor.md
       - 分布式应用设计模式:
-        - 边车模式: design_pattern/sidecar.md
+        - 边车模式: code_guide/design_pattern/sidecar.md
+    - 数据结构:
+      - 数组: code_guide/data_structure/array.md
+      - 队列: code_guide/data_structure/queue.md
+      - 列表: code_guide/data_structure/list.md
+      - 树: code_guide/data_structure/tree.md
+      - 布隆过滤器: code_guide/data_structure/bloom_filter.md
+      - Ping-Pong-Buffer: code_guide/data_structure/ping_pong_buffer.md
+    - 算法:
+      - 常用算法: code_guide/algs/common.md
+      - 负载均衡算法: code_guide/algs/load_balance.md
+      - 算法应用: code_guide/algs/applications.md
+      
+  - 编程语言:      
     - Java:
-      - 三方包:
-        - pickle: languages/java/packages/java_pickle.md
       - 性能:
         - arthas性能分析: languages/java/performance/arthas.md
         - jvm-profile分布式应用分析: languages/java/performance/jvm_profile.md
+      - Native: 
+        - 概览: language/java/native/java_native.md
+        - JNI: language/java/native/jni.md
+        - JNR: language/java/native/jnr.md
     - Python:
       - 三方包:
         - java和Python互相访问: languages/python/packages/java_python.md
-    - 存储: 
-      - （TODO）Apache Pulsar: ./data_store/pulsar/apache_pulsar.md
-    - 数据管理:
-      - 数据同步:
-        - 概念: data_manage/data_synch/README.md
-        - CDC: data_manage/data_synch/cdc.md
-    - 操作系统:
-      - 磁盘: os/disk.md
-      - 网络:
-        - 基础: os/network/README.md
-        - 内网穿透: os/network/intranet_penetration.md
-        - 协议: protocols.md
-    - 分布式调度系统:
-      - 概念: distributed_scheduler/README.md
-      - DophinScheduler: distributed_scheduler/README.md
+      
+  - 数据系统:
+    - 消息队列:
+      - Apache Pulsar: data_store/messagequeue/pulsar/apache_pulsar.md
+    - 数据同步:
+      - 概念: data_manage/data_synch/README.md
+      - CDC: data_manage/data_synch/cdc.md
     - 数据查询:
       - Presto:
         - 安装: ./data_query/presto/install.md
         - 介绍: ./data_query/presto/presto.md
         - 数据类型: ./data_query/presto/data_types.md
         - 语法: ./data_query/presto/syntax.md
-        - Raptorx和Presto on Spark: ./data_query/presto/presto_scale.md
-    - 图像视频:
-      - 图像特征: imagevideo/image_feature.md
-    - 机器学习:
-      - 自然语言处理NLP:
-        - 动手做聊天机器人(TODO): machine_learning/nlp/chatbot.md
-    - Devops:
-      - 概览: devops/devops.md
-      - CI/CD:
-        - 概览: devoos/ci/README.md
-        - Gitlab: devops/ci/gitlab.md
-        - Commit规范: devops/ci/commit_format.md
-        - 版本自动发布: devops/ci/release_changelog.md
-      - Ansible(部署): devops/ansible.md
-      - Prometheus(时序数据存储): devops/prometheus.md
-      - Grafana(数据可视化): devops/ansible.md
-      - 数据来源:
-        - 日志收集: devops/log_collector.md
-        - 节点监控: devops/monitor.md
+        - Raptorx和Presto on Spark: ./data_query/presto/presto_scale.md  
     - 数据湖:
       - Apache Hudi:
         - 原理: data_store/data_lake/apache_hudi/hudi.md
         - 服务:
           - 压缩（Compaction）: data_store/data_lake/apache_hudi/compaction.md
           - 聚簇（clustering）: data_store/data_lake/apache_hudi/clustering.md
-    - 集群调度:
-      - 调度的策略: cluster_manager/scheduler.md
-      - K8s:
-        - 安装: 
-          - K8s集群安装: cluster_manager/k8s/install.md
-          - rook-ceph存储安装: cluster_manager/k8s/k8s_rook_ceph.md
-          - 开源管理软件KubeShpere: cluster_manager/k8s/KubeSphere.md
-        - 基础概念: cluster_manager/k8s/k8s.md 
-        - 使用: cluster_manager/k8s/usage.md
-        - Helm: cluster_manager/k8s/helm.md
-        - CRD:
-          - kubebuild: cluster_manager/k8s/kubebuild.md
-      - Yarn:
-        - 架构: cluster_manager/yarn/arch.md
-    - 云原生:
-      - 概念: cloud/cloud_native.md
-      - fluid: cloud/fluid.md
-      - sealer(K8s集群交付）: cloud/sealer.md
-      - 自定义镜像:
-        - 浏览器操作系统: cloud/images/web_centos.md
-    - CS系统知识:
-      - 基础: cs/cs_basic.md
-      - 操作系统: cs/cs_os.md
-      - 网络: cs/cs_network.md
-      - 数据库: cs/cs_db.md
-      - 软件工程: cs/software_engineering.md
-    - Web服务:
-      - 后端:
-        - 接口管理设计: web/backend/api_manager.md
-        - 刷库: web/backend/db_flush.md
-    - 分布式计算引擎:
-      - Spark:
-        - Spark on Yarn: distributed_computing/spark/spark_yarn.md
-        - Spark Yarn RestAPI: distributed_computing/spark/spark_yarn_rest.md
+
+  - 计算引擎:
+    - Spark:
+      - Spark on Yarn: distributed_computing/spark/spark_yarn.md
+      - Spark Yarn RestAPI: distributed_computing/spark/spark_yarn_rest.md
+
+  - 操作系统:
+    - 磁盘: os/disk.md
+    - 网络:
+      - 基础: os/network/README.md
+      - 内网穿透: os/network/intranet_penetration.md
+      - 协议: protocols.md
+    - Linux 知识:
+      - cgroup: os/linux/cgroup.md
+
+  - 机器学习:
+    - 图像视频:
+      - 图像特征: machine_learning/imagevideo/image_feature.md
+    - 自然语言处理NLP:
+      - 动手做聊天机器人(TODO): machine_learning/nlp/chatbot.md
+
+  - Devops:
+    - 概览: devops/devops.md
+    - CI/CD:
+      - 概览: devoos/ci/README.md
+      - Gitlab: devops/ci/gitlab.md
+      - Commit规范: devops/ci/commit_format.md
+      - 版本自动发布: devops/ci/release_changelog.md
+    - Ansible(部署): devops/ansible.md
+    - Prometheus(时序数据存储): devops/prometheus.md
+    - Grafana(数据可视化): devops/ansible.md
+    - 数据来源:
+      - 日志收集: devops/log_collector.md
+      - 节点监控: devops/monitor.md
+    - 部署:
+      - K8s集群交付: devops/sealer.md
+
+  - CS系统知识:
+    - 基础: cs/cs_basic.md
+    - 操作系统: cs/cs_os.md
+    - 网络: cs/cs_network.md
+    - 数据库: cs/cs_db.md
+    - 软件工程: cs/software_engineering.md
+    
+  - Web服务:
+    - 后端:
+      - 接口管理设计: web/backend/api_manager.md
+      - 刷库: web/backend/db_flush.md
+    - 分布式追踪:
+      - 概览: web/trace/tracing.md
+  - 工具:
+    - 静态网页生成: tools/static_web_generator.md
+    - maven:
+      - 基础: tools/maven/README.md
+      - 插件: tools/maven/plugins.md
+    - markdown:
+      - 公式: tools/markdown/math.md
+      - Typora: tools/markdown/typora.md
+    - 开源协议声明: tools/licenses.md

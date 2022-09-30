@@ -33,13 +33,14 @@ SparkEnv中会创建serializer，closureSerializer和serializerManager三个实�
   - shuffle RDD between executors；
   - RDD serialized cache；
   - Broadcast对象的传输；
+  - **ResultTask/ShuffleMapTask的结果的序列化，返回给Driver；**
 ### closureSerializer
 - 闭包清理的序列化工作，是 JavaSerializer；
-- Task的序列化
+- Task的序列化；
 
 ### serializerManager
 
-- 其成员变量defaultSerializer是SparkEnv中的serializer实例
+- 其成员变量defaultSerializer是SparkEnv中的serializer实例（即根据配置确定）；
 - RDD Shuffle时的序列化判断，ShuffleRDD.getDependencies -> SerializerManager.getSerializer
   - 对于ShuffledRDD如果K, V是基本类型、String、Array基本类型，则使用kryo序列化；
   - 否则，使用defaultSerializer
@@ -59,7 +60,7 @@ Task在序列化的时候主要是要**序列化该stage中的最后一个RDD（
 - cache不会斩断世系lineage，因此不会影响序列化的长度；
 - checkpoint会斩断世系，因为RDD的`dependencies`函数会判断checkpointRDD是否存在，不存在时才会`getDependencies`并设置`dependencies_ `；并且会在checkpoint后，调用`markCheckpointed`函数将`dependencies_`置为空；
 
-ShuffledRDD可以断掉序列化时的lineage，也就是说序列化链碰到ShuffledRDD就停止了，这与stage划分方法一致
+**ShuffledRDD可以断掉序列化时的lineage**，也就是说序列化链碰到ShuffledRDD就停止了，这与stage划分方法一致
 
 - ShuffleDependency是不会保存依赖的RDD，但是OneToOneDependency等窄依赖会保存依赖的RDD；
 

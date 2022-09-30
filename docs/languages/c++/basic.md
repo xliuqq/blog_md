@@ -38,3 +38,9 @@ int main(int argc, char* argv[])
 }
  ```
 
+## __attribute__
+
+`__attribute__((constructor))` 与 `__attribute__((destructor)) `是 GCC 中用来修饰函数的
+
+- constructor 可以使被修饰的函数在 **main() 执行前被调用**；
+- destructor 可以使被修饰的函数在 **main() 执行结束或 exit() 调用结束后**被执行。

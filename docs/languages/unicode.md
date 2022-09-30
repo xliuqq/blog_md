@@ -95,11 +95,11 @@ UTF-32编码以32位为编码单位。Unicode的UTF-32编码就是其对应的32
 
 Unicode标准建议用BOM（Byte Order Mark）来区分字节序，其值为 U+FEFF（特定的用途的unicode）。
 
-- 字节FE(二进制为1111 1110)和FF(二进制为1111 1111)在UTF-8编码中永远不会出现，称之为零宽度不中断空格(ZERO WIDTH NO-BREAK SPACE)；
+- 字节**FE(二进制为1111 1110)**和**FF(二进制为1111 1111)**在 UTF-8 编码中永远不会出现，称之为零宽度不中断空格(ZERO WIDTH NO-BREAK SPACE)；
 
 接收到 **FEFF 表示大端，接收到 FFEF 表示小端。**
 
-> UTF-8不需要BOM来表明字节顺序，但可以用BOM来表明编码方式。字符”`ZERO WIDTH NO-BREAK SPACE`“的`UTF-8编码`是`EF BB BF`。但，最好不要使用，防止无法识别。
+> UTF-8 不需要BOM来表明字节顺序，但可以用BOM来表明编码方式。字符”`ZERO WIDTH NO-BREAK SPACE`“的`UTF-8编码`是`EF BB BF`。但，最好不要使用，防止无法识别。
 
 | **Unicode编码** | 0x 00 6C 49             | 0x 02 0C 30             |
 | --------------- | ----------------------- | ----------------------- |
