@@ -67,3 +67,15 @@ __sync_synchronize()
 [X86内存模型](https://research.swtch.com/hwmm)
 
 [Ad hoc synchronization considered harmful](https://www.usenix.org/events/osdi10/tech/full_papers/Xiong.pdf) 
+
+[Model checking for programming languages using VeriSoft](https://dl.acm.org/doi/abs/10.1145/263699.263717)：第一个 “software model checker”，不记状态；
+
+[Finding and reproducing Heisenbugs in concurrent programs](https://dl.acm.org/doi/10.5555/1855741.1855760)
+
+[Using model checking to find serious file system errors](https://dl.acm.org/doi/10.1145/1189256.1189259)
+
+[VSync: Push-button verification and optimization for synchronization primitives on weak memory models](https://dl.acm.org/doi/abs/10.1145/3445814.3446748)
+
+
+
+## 3. 并发编程
