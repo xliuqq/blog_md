@@ -127,7 +127,7 @@ nav:
     - Python:
       - 三方包:
         - java和Python互相访问: languages/python/packages/java_python.md
-      
+        
   - 数据系统:
     - 消息队列:
       - Apache Pulsar: data_store/messagequeue/pulsar/apache_pulsar.md
@@ -153,6 +153,13 @@ nav:
       - Spark on Yarn: distributed_computing/spark/spark_yarn.md
       - Spark Yarn RestAPI: distributed_computing/spark/spark_yarn_rest.md
 
+    - GPU编程:
+      - 介绍: distributed_computing/gpu/arch.md
+      - Cuda: 
+        - 安装: distributed_computing/gpu/cuda/install.md
+        - 编程: distributed_computing/gpu/cuda/program.md
+      - Rocm:
+        - 编程: distributed_computing/gpu/cuda/hip.md
   - 操作系统:
     - 磁盘: os/disk.md
     - 网络:

@@ -1,5 +1,3 @@
-[toc]
-
 # GPU
 
 ## CPU与GPU体系结构对比
@@ -7,6 +5,11 @@
 <img src="pics/cpu_gpu.png" alt="cpu_vs_gpu" style="zoom:80%;" />
 
 ## GPU计算应用
+
+> Nvidia GPU架构变迁史
+>
+> https://www.expreview.com/68156.html
+> https://www.cnblogs.com/timlly/p/11471507.html
 
 <img src="pics/gpu_app.png" alt="gpu_app" style="zoom:80%;" />
 
@@ -26,11 +29,18 @@
 
 <img src="pics/gpu_sm.png" alt="gpu_sm" style="zoom:67%;" />
 
-## 执行说明
 
-- CUDA的设备在实际执行过程中，会以block为单位，把一个个block分配给SM进行运算；
-- block中的thread又会以warp（线程束）为单位，对thread进行分组计算。
-  - 目前CUDA的warp大小都是32，也就是说32个thread会被组成一个warp来一起执行。
-  - 同一个warp中的thread执行的指令是相同的，只是处理的数据不同。
-- 一个SM 一次只会执行一个block 里的一个warp
-  - 当遇到正在执行的warp 需要等待的时候（例如存取global memory 就会要等好一段时间），就切换到别的warp来继续做运算
+
+## 编程语言
+
+### CUDA
+
+NVIDIA GPU的编程语言，见 [Cuda编程](./cuda/program.md)
+
+### ROCm(HIP)
+
+> ROCm 的目标是建立可替代 CUDA 的生态（图1），并在源码级别上对 CUDA 程序的支持。
+
+AMD GPU的编程语言，见[HIP编程](./rocm/hip.md)
+
+![在这里插入图片描述](pics/cuda_hip.png)
