@@ -18,7 +18,7 @@ theme:
   language: 'zh'
 
 nav:
-  - 如何读论文: README.md
+  - 主页: README.md
   - 云原生:
     - 概念: cloud/cloud_native.md
     - Fluid: cloud/fluid.md
