@@ -1,12 +1,12 @@
 site_name: XLiu知识空间
 site_description: 计算机体系的知识
 site_author: LiuZhiqiang(刘志强）
-site_url: https://liuzhiqiang.notfound.com/
+site_url: https://xliuqq.github.io/blog_md/
 docs_dir: docs
 site_dir: site
  
 use_directory_urls: false
-
+  
 theme:
   name: material
   palette:
@@ -23,6 +23,7 @@ nav:
     - 概念: cloud/cloud_native.md
     - Fluid: cloud/fluid.md
     - ServiceMesh: cloud/Istio.md
+    - argo: cloud.argo.md
     - Serverless: 
       - 概念: cloud/serverless/serverless.md
       - knative: cloud/serverless/knative.md
@@ -30,6 +31,7 @@ nav:
     - 云边协同（TODO）:
       - KubeEdge: cloud/cloud_edge/kubeedge.md
       - baetyl:  cloud/cloud_edge/baetyl.md
+      - OpenYurt: cloud/cloud_edge/openyurt.md
       - mqtt协议: cloud/cloud_edge/mqtt.md
     - 自定义镜像:
       - 浏览器操作系统: cloud/images/web_centos.md
@@ -37,7 +39,7 @@ nav:
       - 安装:
         - K8s集群安装: cloud/k8s/install.md
         - rook-ceph存储安装: cloud/k8s/k8s_rook_ceph.md
-        - minikube: cloud/k8s/minikube.md
+        - 发行版: cloud/k8s/release_compare.md
       - 概念: cloud/k8s/k8s.md 
       - 配置: cloud/k8s/conf.md
       - 使用: cloud/k8s/usage.md
@@ -174,7 +176,8 @@ nav:
       - 图像特征: machine_learning/imagevideo/image_feature.md
     - 自然语言处理NLP:
       - 动手做聊天机器人(TODO): machine_learning/nlp/chatbot.md
-
+    - 示例案例: machine_learning/ai_demo/tools.md
+    
   - Devops:
     - 概览: devops/devops.md
     - CI/CD:
@@ -213,3 +216,4 @@ nav:
       - 公式: tools/markdown/math.md
       - Typora: tools/markdown/typora.md
     - 开源协议声明: tools/licenses.md
+

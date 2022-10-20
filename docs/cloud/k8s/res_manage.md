@@ -22,7 +22,7 @@ Volcano支持各种调度策略，包括：
 
 ## 架构
 
-![image](./pics/arch_2.PNG)
+![image](./pics/volcano_arch_2.PNG)
 
 Volcano由scheduler、controllermanager、admission和vcctl组成:
 
@@ -35,7 +35,7 @@ Volcano由scheduler、controllermanager、admission和vcctl组成:
 
 负责Pod调度的组件，它由一系列action和plugin组成。action定义了调度各环节中需要执行的动作；plugin根据不同场景提供了action 中算法的具体实现细节。
 
-![Volcano scheduler工作流](pics/scheduler.PNG)
+![Volcano scheduler工作流](./pics/volcano_scheduler.PNG)
 
 工作流程如下：
 

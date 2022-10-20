@@ -708,6 +708,8 @@ spec:
   # ClusterIP模式（默认）：不指定时，自动分配
   # 指定为None时，属于Headless模式
   clusterIP: None
+  # 指定为 NodePort模式
+  type: NodePort      
   # 选择pod(根据对应的label: app=nginx)
   selector:
     app: nginx
