@@ -45,14 +45,18 @@ mount 命令用来挂载文件系统。其基本命令格式为：
 **type**：指定挂载的文件系统类型，一般不用指定，mount 命令能够自行判断。
 **options**：指定挂载参数，比如 ro 表示以只读方式挂载文件系统。 
 
+**绑定挂载**
+
 ```bash
 # --bind 将两个目录连接起来，将/host挂载到/test上，对/test的访问和修改都是在/host上
-$ mount --bing /host /test
+$ mount --bind /host /test
 ```
 
 
 
 ### /etc/fstab 自动挂载配置文件
+
+
 
 ### 查看已经挂载的目录
 
@@ -654,6 +658,23 @@ Disassembly of section .init:
   402154:       48 8b 05 6d 8e 21 00    mov    0x218e6d(%rip),%rax        # 61afc8 <__gmon_start__>
   40215b:       48 85 c0                test   %rax,%rax
 ```
+
+
+
+针对`symbol not found`，通过`objdump -T`查看符号链接，如
+
+```shell
+$ objdump -T /usr/lib/x86_64-linux-gnu/libdde-file-manager.so.1 | grep hasPartitionTableEv
+0000000000000000      DF *UND*  0000000000000000              _ZNK12DBlockDevice17hasPartitionTableEv
+
+# 可以通过 ldd .so + awk + xargs + objdump -T 搜索包含该符号定义的so
+$ objdump -T /usr/lib/x86_64-linux-gnu/libudisks2-qt5.so | grep hasPartitionTableEv
+0000000000045cb0 g    DF .text  000000000000003d  Base        _ZNK12DBlockDevice17hasPartitionTableEv
+```
+
+
+
+
 
 ### strace
 

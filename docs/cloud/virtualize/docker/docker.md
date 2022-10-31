@@ -1,6 +1,6 @@
-[toc]
-
 # Docker
+
+> 参考书籍：《Docker 容器与容器云》
 
 同一台机器上的所有容器共享主机操作系统的内核。
 
@@ -48,9 +48,9 @@ docker中使用overlay2存储的原理：https://zhuanlan.zhihu.com/p/41958018
 
 
 
-## 隔离
+## 资源隔离
 
-基于Linux中的[`Namespace`机制](../../linux/namespace.md)。
+基于Linux中的[`Namespace`机制](../../../os/linux/namespace.md)。
 
 ### 用户（User Namespace）
 

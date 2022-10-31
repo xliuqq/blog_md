@@ -170,6 +170,7 @@ nav:
       - 协议: protocols.md
     - Linux 知识:
       - cgroup: os/linux/cgroup.md
+      - namespace: os/linux/namespace.md
 
   - 机器学习:
     - 图像视频:
