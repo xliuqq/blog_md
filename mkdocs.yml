@@ -58,12 +58,13 @@ nav:
       - 调度: cloud/k8s/k8s_scheduler.md
       - 开源管理软件: cloud/k8s/KubeSphere.md
     - 虚拟化:
-      - 工具对比: cloud/virtualize/virtualize.md
+      - 容器生态: cloud/virtualize/virtualize.md
       - docker:
         - 概念: cloud/virtualize/docker/docker.md
         - 使用: cloud/virtualize/docker/usage.md
         - 镜像搬运工具: cloud/virtualize/docker/skopeo.md
         - FAQ: cloud/virtualize/docker/faqs.md
+      - containerd: cloud/virtualize/containerd/containerd.md
       - gpu虚拟化: cloud/virtualize/gpu_virtualize.md
   - 调度系统:
     - 概念: scheduler_system/README.md

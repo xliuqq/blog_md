@@ -34,9 +34,7 @@ docker run hello-world
 
 ```text
 {
-
 "registry-mirrors": "http://hub-mirror.c.163.com"
-
 }
 ```
 
@@ -145,9 +143,78 @@ Untagged:192.168.0.1/you/tom:1.0.8
 
 
 
+### export/save
+
+`docker export`：将容器的文件系统导出为`tar`，加载为`docker import`
+
+- **容器**持久化（单层Linux文件系统），丢失历史，加载时可以指定镜像名称；
+- 适合基础镜像；
+
+`docker save`：镜像导出为 `tar`，加载为`docker load`
+
+- **镜像**持久化（分层文件系统），不丢失历史和层，可通过`docker tag`命令实现层回滚；
+- 加载时不可指定镜像名称；
+
+
+
+
+
 ## Dockerfile
 
+`docker build `
 
+### 指令集
+
+```dockerfile
+# FROM <image>:<tag>
+
+# MAINTAINER 
+ 
+# ENV <key> <value>
+
+# COPY <src> <dst>
+# <src> 支持通配符和多个源
+
+# ADD <src> <dst>
+# <src> 对于本地压缩归档文件，复制到容器中会被解压提取，推荐使用 COPY
+
+# RUN <command> (shell格式)
+# RUN  ["executable", "param1", "param2"] （exec格式，推荐）
+# 在前一个命令创建出的镜像基础上创建一个容器，在容器中运行命令，命令结束后提交容器为新镜像
+
+# CMD <command> (shell格式)
+# CMD  ["executable", "param1", "param2"] （exec格式，推荐）
+# 容器运行时的默认值，配合ENTRYPOINT使用，会被docker run命令时指定的命令参数覆盖
+
+# ENTRYPOINT <command> (shell格式)
+# ENTRYPOINT  ["executable", "param1", "param2"] （exec格式，推荐）
+# shell格式时，会忽略 CMD 和 docker run的命令的参数，运行在 /bin.sh -c 中，非1号进程
+
+# ONBUILD [INSTRUCTION]
+# 添加一个将来执行的触发器指令到镜像中。
+
+# VOLUME
+
+# USER
+
+# WORKDIR
+
+# EXPOSE
+```
+
+
+
+### 实践
+
+RUN：
+
+- `RUN apt-get update && apt-get install -y foo`应该放一起，避免缓存问题；
+
+- 不要将所有的命令写在一个RUN指令中；
+
+Expose：
+
+- 不要在Dockerfile中做端口映射，缺乏可移植性；
 
 
 
@@ -155,11 +222,25 @@ Untagged:192.168.0.1/you/tom:1.0.8
 
 https://blog.csdn.net/networken/article/details/108218569
 
+## 容器监控
 
+### cAdvisor
 
-### Alpine
+> Analyzes resource usage and performance characteristics of running containers.
 
-#### Alpine-docker容器中安装GCC
+目前cAdvisor集成到了kubelet组件内，可以在kubernetes集群中每个启动了kubelet的节点使用cAdvisor提供的metrics接口获取该节点所有容器相关的性能指标数据。
+
+从apiserver访问cadvisor的地址：
+
+- cAdvisor的metrics地址: /api/v1/nodes/[节点名称]/proxy/metrics/cadvisor
+
+直接从各个node的kubelet访问cadvisor的地址：
+
+- cAdvisor的metrics地址: node_ip:10250/metrics/cadvisor
+
+## Alpine
+
+### Alpine-docker容器中安装GCC
 
 ```shell
 apk update

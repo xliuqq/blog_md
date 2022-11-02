@@ -57,6 +57,8 @@
 
 在建立`veth pair`前，新旧namespace通过**管道**进行通信。
 
+
+
 ## PID NameSpace（PID）
 
 **不同NS下的进程可以有相同的PID**，内核为所有PID NS维护树形结构；

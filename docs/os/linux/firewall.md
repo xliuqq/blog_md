@@ -8,6 +8,7 @@ systemctl status firewalld
 
 **查看firewall的状态**
 bash
+
 ```bash
 firewall-cmd --state
 ```
