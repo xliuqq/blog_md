@@ -127,6 +127,14 @@ nav:
         - 概览: language/java/native/java_native.md
         - JNI: language/java/native/jni.md
         - JNR: language/java/native/jnr.md
+      - JVM:
+        - 即时编译Jit: language/java/jit.md
+        - jvm规范: language/java/jvm.md
+        - 字节码: language/java/bytecode.md
+      - 反射: language/java/reflection.md
+      - SPI: language/java/spi.md
+      - 测试: language/java/test.md
+      - 类加载器: language/java/classloader.md
     - Python:
       - 三方包:
         - java和Python互相访问: languages/python/packages/java_python.md
