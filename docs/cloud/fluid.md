@@ -334,6 +334,13 @@ engine#setup：创建 Master/Worker的StatefulSet，**FUSE**的DaemonSet，检�
 
   CSI NodeStageVolume里设置该值；
 
+
+
+对于不同类型的Mount如何处理：
+
+- - Local和PVC转换为UFSPaths 和 UFSVolumes，挂载到Runtime的Master/Worker Pod中**"/underFSStorage"，即Alluxio root ufs**；
+  - HTTP等形式通过在MasterPod中执行`alluxio fs mount`；
+
 #### RuntimePortAllocator
 
 运行时端口分配（`portallocator`包）

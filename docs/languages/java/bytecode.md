@@ -1,27 +1,29 @@
-# 字节码增强
+# 字节码
 
-## ASM
+## 编译过程
+
+
+
+## 字节码增强
+
+### ASM
 
 [**asm**](https://asm.ow2.io/) 提供一个简单易用的library来实现对java字节码的操作，业界的btrace 和 [arthas](https://link.zhihu.com/?target=https%3A//alibaba.github.io/arthas/)均是通过它实现了运行时trace的功能。
 
 - 提供了ClassReader，ClassVisitor，ClassWriter分别对java字节码进行读，遍历，写的操作；
 - 用户可以通过实现自己的Visitor对应的VisitXXX方法来达到对指定遍历对象的自定义操作。
 
-### 使用
+#### 使用
 
 
 
-
-
-
-
-## Apache Common BCEL
+### Apache Common BCEL
 
 > Apache Commons Bytecode Engineering Library
 
 
 
-### 使用
+#### 使用
 
 ```xml
 <dependency>
@@ -33,7 +35,7 @@
 
 
 
-## AspectJ
+### AspectJ
 
 [AspectJ](http://www.eclipse.org/aspectj)作为 Java 中流行的 **AOP（aspect-oriented programming）** 编程扩展框架，其内部使用的是 **[BCEL框架](https://github.com/apache/commons-bcel)** 来完成其功能。
 
@@ -44,9 +46,9 @@
 
 
 
-## Java Agent
+### Java Agent
 
-### 配置
+#### 配置
 
 ```xml
 <!-- maven 打包生成-->
@@ -75,7 +77,7 @@
   - Can-Retransform-Classes：true或false（默认），能否重转换此代理需要的类；
   - Can-Set-Native-Method-Prefix：true 或 false（默认），是否能设置此代理所需的本机方法前缀；
 
-### 启动时加载(Premain)
+#### 启动时加载(Premain)
 
 通过 ***-javaagent*** 参数指定一个特定的 jar 文件（包含Instrumentation 代理）来启动代理程序；
 
@@ -90,7 +92,7 @@ public static void premain(final String args, final Instrumentation instrumentat
 public static void premain(String agentArgs);
 ```
 
-### 运行时加载(Agentmain)
+#### 运行时加载(Agentmain)
 
 通过***attach***机制，将JVM A连接至JVM B，并发送指令给JVM B执行。
 
@@ -118,7 +120,7 @@ public static void main(String[] args) {
 }
 ```
 
-### Instrument
+#### Instrument
 
 instrument是JVM提供的一个可以修改已加载类的类库，专门为Java语言编写的插桩服务提供支持。它需要依赖JVMTI的Attach API机制实现。
 

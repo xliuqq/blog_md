@@ -74,7 +74,12 @@
 
 - Java重载的方法（同名但签名不一样的函数）的匹配是按照声明类型匹配形参类型，而不是靠实际类型；
 
-  
+
+**lombok.NonNull、javax.annotation.Nonnull** 和 **javax.validation.constraints.NotNull**的区别和使用场景：
+
+- - **@NonNull**用在强制入参非空、属性非空的场景下，编译时会生成空指针检查的代码，如果不满足，则会抛出NullPointerException。
+  - **@Nonnull**用在返回结果不为空的场景，主要由IDE识别并给出告警提示。
+  - **@NotNull**主要用在Validator校验场景下，限制参数非空，如果不满足，则校验失败。
 
 ## 类和接口
 
