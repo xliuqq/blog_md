@@ -1,9 +1,3 @@
-**Spring 全局资源的加载**
-
-实现CommandLIneRunner 或者 ApplicationRunner，实现 run 方法
-
-
-
 **Spring 资源清理**
 
 退出容器时执行操作，通过
