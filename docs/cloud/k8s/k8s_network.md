@@ -122,7 +122,7 @@ No evevts.
 
 **kube-proxy组件负责虚拟IP路由和转发**，在容器覆盖网络之上实现的虚拟转发网络，功能如下：
 
-- 转发访问Service的虚拟IP的请求到Endpoints
+- 
 - 监控Service和Endpoints的变化，实现刷新转发规则
 - 提供负载均衡能力
 

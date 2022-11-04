@@ -24,7 +24,7 @@ Pod里的容器**共享同一个Network Namespace、同一组Volume**，实现�
 
 - 用户编写的正常的应用不是操作系统里的init进程或者systemmd具有进程管理的功能，无法解决多进程间状态一致性的管理问题；
 
-Pod中有基础容器，称为`pause`容器或者`infra`容器，**pause容器主要为每个业务容器提供以下功能：**
+Pod中有基础容器，称为 `pause`容器或者`infra`容器，**pause容器主要为每个业务容器提供以下功能：**
 
 - **PID命名空间**：Pod中的不同应用程序可以看到其他应用程序的进程ID；
   - 默认`shareProcessNamespace`**默认false，不共享进程命名空间**；
