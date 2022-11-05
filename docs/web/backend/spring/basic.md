@@ -93,12 +93,5 @@ class MyImportSelector implements ImportSelector {
 
 
 
-## Spring 全局资源的加载
-
-实现CommandLIneRunner 或者 ApplicationRunner，实现 run 方法
-
-
-
-
 
 
