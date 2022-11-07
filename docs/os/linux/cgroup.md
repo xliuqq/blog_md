@@ -9,7 +9,31 @@ cgroup，其本身的作用只是任务跟踪。但其它系统（比如cpusets�
 - 资源限制：任务的资源总额进行限制；
 - 优先级分配：通过分配的CPU时间片数量及磁盘IO带宽大小，相当于控制任务优先级；
 - 资源统计：统计系统的资源使用量，如CPU使用时长、内存用量等，适用于计费；
-- 任务控制：对任务执行进行挂起、恢复等操作；
+- 任务控制：对任务执行进行**挂起、恢复**等操作；
+
+## 版本(v1/v2)
+
+Linux 中有两个 cgroup 版本：cgroup v1 和 cgroup v2。cgroup v2 是 Linux `cgroup` API 的下一个版本。
+
+cgroup v2 提供一个具有增强资源管理能力的统一控制系统。 cgroup v2 对 cgroup v1 进行多项改进：
+
+- API 中单个统一的层次结构设计
+- 更安全的子树委派给容器
+- 更新的功能特性， 例如[压力阻塞信息（Pressure Stall Information，PSI）](https://www.kernel.org/doc/html/latest/accounting/psi.html)
+- **跨多个资源**的增强资源分配管理和隔离
+- 统一核算不同类型的内存分配（网络内存、内核内存等）
+- 考虑非即时资源变化，例如页面缓存回写
+
+一些 Kubernetes 特性专门使用 cgroup v2 来增强资源管理和隔离。
+
+- Ubuntu（从 21.10 开始，推荐 22.04+）
+
+```shell
+$ mount | grep cgroup2
+cgroup2 on /sys/fs/cgroup/unified type cgroup2 (rw,nosuid,nodev,noexec,relatime)
+```
+
+判断是否使用 cgroup v2：Yes if `/sys/fs/cgroup/cgroup.controllers` is present.
 
 ## 基本概念
 
@@ -50,6 +74,14 @@ cgroup，其本身的作用只是任务跟踪。但其它系统（比如cpusets�
 
 ### blkio - BLOCK IO 资源控制
 
+> 控制子系统可以限制进程读写的 **IOPS 和吞吐量**，但它只能对 Direct I/O 的文件读写进行限速，对 Buffered I/O 的文件读写无法限制。
+>
+> Buffered I/O 指会**经过 PageCache** 然后再写入到存储设备中。这里面的 Buffered 的含义跟内存中 buffer cache 不同，这里的 Buffered 含义相当于内存中的buffer cache+page cache。
+>
+> 在 Linux 中，**文件默认读写方式为 Buffered I/O**，应用程序一般将文件写入到 PageCache 后就直接返回了，然后**内核线程会异步**将数据从内存同步到磁盘中。
+>
+> cgroup v2 使用了统一层级（unified hierarchy)，各个子系统都可以挂载在统一层级下，一个进程属于一个控制组，每个控制组里可以定义自己需要的多个子系统。cgroup v2 中 io 子系统等同于 v1 中的 blkio 子系统。
+
 限额类是主要有两种策略：
 
 - 一种是基于完全公平队列调度（CFQ：Completely Fair Queuing ）的按权重分配各个 cgroup 所能占用总体资源的百分比，好处是当资源空闲时可以充分利用，但只能用于最底层节点 cgroup 的配置；
@@ -80,23 +112,35 @@ CPU 资源的控制也有两种策略：
 - `memory.oom_disable`的值来设置内存超出设定值时是操作系统kill进程还是休眠进程。
 - `memory.swappiness` 文件的值修改为 0，进程不使用Swap分区（重启失效）。
 
-### net_prio — 网络设备优先级
+### net_prio - 网络设备优先级
 
-### net_cls — 配合tc进行网络限制
+### net_cls - 配合tc进行网络限制
 
+### perf_event - 统一的性能测试
 
+cgroup中的任务可以进行统一的性能测试。 
+
+### pid - 限制总任务数
+
+> linux kernel >= 4.3
+
+限制cgroup及其所有子孙cgroup里面能创建的总的task数量。
+
+`pids.current`: 表示当前cgroup及其所有子孙cgroup中现有的总的进程数量
+
+`pids.max`: 当前cgroup及其所有子孙cgroup中所允许创建的总的最大进程数量
 
 ## cgroup操作准则与方法
 
 ### 准则
 
-#### 一个hierarchy可以有多个subsystem
+#### 一个层级可以有多个子系统
 
-mount 的时候hierarchy可以attach多个subsystem
+mount 的时候hierarchy可以attach多个subsystem，如CPU和Memory的子系统附加到同一个层级。
 
 
 
-#### 一个已经被挂载的 subsystem 只能被再次挂载在一个空的 hierarchy 上
+#### 一个已经被挂载的子系统只能被再次挂载在一个空的层级上
 
 已经mount一个subsystem的hierarchy不能挂载一个已经被其它hierarchy挂载的subsystem
 
@@ -117,7 +161,7 @@ mount 的时候hierarchy可以attach多个subsystem
 #### 层级（Hierarchy ）
 
 ```shell
-# 创建了一个Hierarchy
+# 创建了一个Hierarchy（/sys/fs/cgroup 只读？）
 $ mkdir /sys/fs/cgroup/cpu_and_mem 
 # 挂载生效，并附加了cpu和cpuset两个子系统。
 $ mount -t cgroup -o cpu,cpuset cpu_and_mem /sys/fs/cgroup/cpu_and_mem/ 
@@ -131,7 +175,7 @@ $ umount /sys/fs/cgroup/cpu_and_mem/
 
 #### Control Group
 
-创建Hierarchy的时候其实已经创建了了一个Control Group叫做root group，其表现形式就是一个目录，一个目录就是一个Control Group。
+创建Hierarchy的时候其实已经创建了一个Control Group叫做root group，其表现形式就是一个目录，一个目录就是一个Control Group。
 
 ```shell
 # -t指定的用户或者组对tasks文件的拥有权
@@ -179,12 +223,12 @@ cgroup /sys/fs/cgroup/freezer cgroup rw,seclabel,nosuid,nodev,noexec,relatime,fr
 
 ### 显示CPU使用比例
 
-在目录/sys/fs/cgroup/cpu`下创建文件夹，就创建了一个control group
+在目录`/sys/fs/cgroup/cpu`下创建文件夹，就创建了一个control group
 
 root 用户，写一个死循环的代码，将CPU使用率通过cgroup限制在 20%
 
 ```shell
-# 在/sys/fs/cgroup/cpu/创建进程名
+# 在/sys/fs/cgroup/cpu/ 创建控制组/层级
 $ mkdir /sys/fs/cgroup/cpu/test
 # 创建成功后，自动创建cpu配置文件
 $ cd /sys/fs/cgroup/cpu/test
@@ -204,3 +248,62 @@ $ echo 30167 > tasks
 rmdir tasks
 ```
 
+### 限制进程可创建的子进程数
+
+```shell
+$ mount | grep pids
+cgroup on /sys/fs/cgroup/pids type cgroup (rw,nosuid,nodev,noexec,relatime,pids)
+$ cd /sys/fs/cgroup/pids/
+$ mkdir test
+$ cd test/
+$ ls -l
+total 0
+-rw-r--r-- 1 root root 0 Nov 23 16:18 cgroup.clone_children
+--w--w--w- 1 root root 0 Nov 23 16:18 cgroup.event_control
+-rw-r--r-- 1 root root 0 Nov 23 16:18 cgroup.procs
+-rw-r--r-- 1 root root 0 Nov 23 16:18 notify_on_release
+-r--r--r-- 1 root root 0 Nov 23 16:18 pids.current
+-rw-r--r-- 1 root root 0 Nov 23 16:18 pids.max
+-rw-r--r-- 1 root root 0 Nov 23 16:18 tasks
+# 将pids.max设置为1，即当前cgroup只允许有一个进程
+$ echo 1 >pids.max 
+# 将当前bash进程加入到该cgroup
+$ echo $$ > cgroup.procs
+$ /bin/echo "Here's some processes for you." | cat
+bash: fork: retry: Resource temporarily unavailable
+bash: fork: retry: Resource temporarily unavailable
+```
+
+
+
+## 如何支持GPU
+
+> Linux中每个设备都有一个设备号，设备号由主设备号和次设备号两部分组成。
+
+```shell
+#显示主设备号和次设备号
+ls -l |grep 设备名 
+#只显示主设备号
+cat /proc/devices
+```
+
+ cgroup禁用设备的访问
+
+```shell
+# the c indicates that /dev/tty is a character device, 5:0 is major and minor numbers of the device. The last w is write permission, so the above command forbids tasks to write to the /dev/tty.
+echo "c 5:0 w" > devices.deny
+```
+
+
+
+### nvidia-smi 如何知道被隔离？（TODO）
+
+
+
+## seccomp
+
+linuxkernel从2.6.23版本开始所支持的一种安全机制。
+
+在Linux系统里，大量的系统调用（systemcall）直接暴露给用户态程序。但是，并不是所有的系统调用都被需要，而且不安全的代码滥用系统调用会对系统造成安全威胁。**通过seccomp限制程序使用某些系统调用**，这样可以减少系统的暴露面，同时是程序进入一种“安全”的状态。
+
+1. *从*Linux3.8开始，可以利用`/proc/[pid]/status`中的Seccomp字段查看。如果没有seccomp字段，说明内核不支持seccomp*。*

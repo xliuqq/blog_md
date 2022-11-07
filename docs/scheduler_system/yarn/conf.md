@@ -1,5 +1,13 @@
 # 配置
 
+## 基本配置
+
+
+
+## GPU基本配置
+
+
+
 ## yarn
 
 ### yarn.scheduler.capacity.resource-calculator

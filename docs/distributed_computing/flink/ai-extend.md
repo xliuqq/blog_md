@@ -4,9 +4,25 @@
 
 > [AI Flow](https://github.com/flink-extended/ai-flow) is an open source framework that bridges big data and artificial intelligence.
 
+对工作流模型进行了统一抽象，通过Event机制进行流批混合的调度。
+
+- 把机器学习的工作流抽象成一个AIGraph，引入了数据依赖和控制依赖，能够从多个维度进行Event调度；
+- 使用Python脚本定义工作流，类似于Apache Airflow；
+- 直接兼容Apache Airflow的原生DAG任务，自定义不同的任务插件，自定义底层的调度器；
+
+背景：
+
+- Airflow和Kubeflow都是基于上游任务执行的状态调度，适用于批处理任务（即任务会结束），对于可能会一直运行的流式任务并不适合；
+
+特性：
+
+- **Event-driven**: **基于事件调度工作流**和作业，比状态驱动调度更有效，可以调度包含流式作业的工作流；
+- **Extensible**: 用户可以自定义opreators和executors 提交多种类型的作业到不同的平台；
+- **Exactly-once**: 提供exactly-once的事件处理机制，在错误发生时任务不会丢失和重复；
+
 ### 架构
 
-<img src="pics/architecture.png" alt="architecture" style="zoom: 50%;" />
+<img src="pics/architecture.png" alt="architecture" style="zoom: 45%;" />
 
 #### SDK
 
@@ -55,13 +71,56 @@ Scheduler provides the function of executing workflow.
 5. When the Scheduler runs the workflow, it will publish and subscribe events to Notification Server.
 6. AIFlow server sends events to Notification Server, such as model version generation events, etc
 
+### 安装
+
+- 需要DB进行存储，开发环境可使用SQLite，生产环境建议MySQL；
+
+```shell
+# sqlite作为后端
+$ pip install ai-flow-nightly
+# mysql作为后端
+$ pip install ai-flow-nightly[mysql]
+```
+
+## 示例
+
+TODO：https://ai-flow.readthedocs.io/en/latest/content/tutorial_and_examples/tutorial.html
+
+
+
+### 实战思考
+
+[B站基于AIFlow+Flink在批流融合调度上的实践](https://mp.weixin.qq.com/s/XC7BjfrbOrtFmumwhmctbA)
+
+#### 特征回溯
+
+实时特征计算大的诉求就是特征回溯，对于长时间窗口的特征，业务是很难等到在累积到足够时间的数据之后才开始使用，因此希望使用离线的历史数据进行特征填充，但是离线的数据在hdfs上，基于hdfs有两种计算方案：
+
+- 第一种按照实时的逻辑开发一套离线特征的计算，专门用来做数据回补；
+- 第二种是直接把离线的hdfs数据，灌到实时计算的流程里面。
+
+采用第二种方案：流批一体
+
+**保证数据的顺序性**：离线的 HDFS有分区，分区内的数据完全乱序，实际业务里面大量计算过程是依赖时序；
+
+- 模拟Kafka形成逻辑上的分区，并且逻辑分区内有序；
+
+**保证特征和样本版本的一致性**：比如有两条链路，一条是特征的生产，一条是样本生产，样本生产依赖特征生产，如何保证它们之间版本的一致性，没有穿越？
+
+- 第一个实时特征部分的解决依赖于 Hbase 存储，Hbase 支持根据版本查询。特征计算完后直接按照版本写入 Hbase，样本生成的时候去查 Hbase 带上对应的版本号即可，这里面的版本通常是数据时间；
+- 离线特征部分，因为不需要重新计算了，离线存储 hdfs 都有，但是不支持点查，这块进行 kv 化处理就好，为了性能做异步预加载；
+
+
+
+
+
 
 
 ## Deep Learning on Flink
 
 > [Deep Learning on Flink](https://github.com/flink-extended/dl-on-flink/tree/master/deep-learning-on-flink) aims to integrate Flink and deep learning frameworks (e.g. TensorFlow, PyTorch, etc).
 
-## 架构
+### 架构
 
 [<img src="pics/struct.jpg" alt="structure" style="zoom:50%;" />](https://github.com/flink-extended/dl-on-flink/blob/master/deep-learning-on-flink/image/struct.jpg)
 
@@ -71,3 +130,10 @@ Scheduler provides the function of executing workflow.
 4. AM collect all Worker and Ps address.
 5. Worker and Ps get cluster information.
 6. Worker and Ps start algorithm python process.
+
+
+
+## 原理
+
+https://github.com/flink-extended/dl-on-flink/blob/master/doc/design.md
+[TODO](./404_not_found.md)

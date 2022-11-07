@@ -53,13 +53,15 @@ $ kubectl taint nodes --all node-role.kubernetes.io/master -
 
 [官方文档](https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions)告诉我们，这个版本号是一个 K8s 的内部机制，用户不应该假设它是一个数字或者通过比较两个版本号大小来确定资源对象的新旧，唯一能做的就是**通过比较版本号相等来确定对象是否是同一个版本**（即是否发生了变化）。
 
-
+- 如果两个用户同时对一个资源对象做 update，不管操作的是对象中同一个字段还是不同字段，都存在版本控制的机制确保两个用户的 update 请求不会发生覆盖。
 
 ### Generation
 
 - 对所有变更请求，除非改变是针对 `.metadata` 或 `.status`，`.metadata.generation` 的取值都会增加。
 
 ### Finalizers
+
+> `Finalizers` 是由字符串组成的数组，当 `Finalizers` 字段中存在元素时，相关资源不允许被删除
 
 每当删除 namespace 或 pod 等一些 Kubernetes 资源时，有时资源状态会卡在 `Terminating`，很长时间无法删除，甚至有时增加 `--force` flag 之后还是无法正常删除。这时就需要 `edit` 该资源，将 `finalizers` 字段设置为 []，之后 Kubernetes 资源就正常删除了。
 
@@ -74,6 +76,20 @@ $ kubectl taint nodes --all node-role.kubernetes.io/master -
 每个控制器要负责将其 Finalizer 从列表中去除。
 
 每执行完一个就从 `finalizers` 中移除一个，直到 `finalizers` 为空，之后其宿主资源才会被真正的删除。
+
+### Owner References 属主与附属
+
+ReplicaSet 是一组 Pod 的属主，具有属主的对象是属主的附属（Dependent）。附属对象有一个 `metadata.ownerReferences` 字段，用于引用其属主对象。在 Kubernetes 中不允许跨 namespace 指定属主。
+
+
+
+### delete 策略
+
+**Foreground策略**：先**删除附属对象，再删除属主对象**。将对象的`metadata.finalizers`字段值设置为`foregroundDeletion`，控制器需要主动处理`foregroundDeletion`的finalizers。
+
+**Background策略（默认）**：删除一个对象同时会删除它的附属对象。
+
+**Orphan策略**：不会自动删除它的附属对象，这些残留的依赖被称为原对象的孤儿对象。
 
 ## SecurityContext 
 

@@ -4,19 +4,27 @@
 
 
 
-## UTS NameSpace
+## UTS NameSpace（主机域名）
 
 主机/域名（uts）：UNIX Time-sharing System，在网络上视作独立节点；
 
-## IPC NameSpace
+示例：[`ns_uts.c`](https://gitee.com/luckyQQQ/lifelearning/blob/master/cpp/namespace/ns_uts.cpp)（需要root权限执行）
+
+## IPC NameSpace（进程通信）
+
+> ipcs/ipcmk/ipcrm 查看/创建/删除 信号量、消息队列、共享内存；
 
 进程间通信（ipc）：Inter-Process Communication，包括信号、消息队列和共享内存。
 
+示例：[`ns_ipc.c`](https://gitee.com/luckyQQQ/lifelearning/blob/master/cpp/namespace/ns_ipc.cpp)（需要root权限执行）
 
+```c
+// IPC，验证：
+// 1. 通过父进程 ipcmk -Q 创建消息队列，ipcs -q 显示已创建的队列；
+// 2. 执行本程序，执行 ipcs -q 看不到父进程创建消息队列。
+```
 
-
-
-## User NameSpace
+## User NameSpace（用户/组）
 
 > Linux 3.8 新增的一种 namespace，用于隔离安全相关的资源，包括 **user IDs and group IDs**，**keys**, 和 **capabilities**。同样一个用户的 user ID 和 group ID 在不同的 user namespace 中可以不一样(与 PID nanespace 类似)。
 >
@@ -24,11 +32,24 @@
 
 隔离安全相关的标识符(identifiers)和属性（attributes），包括用户ID、用户组ID、root目录、key（密钥）以及特殊权限。
 
-cloneh函数的`CLONE_NEWNS`标志
+示例：[`ns_user.c`](https://gitee.com/luckyQQQ/lifelearning/blob/master/cpp/namespace/ns_user.cpp)（不需要root权限执行，且安装`libcap-dev`）
 
+- user namespace创建后，第一个进程被赋予该namespace下的所有权限；
 
+- 默认用户显示65534，表示尚未与外部namespace用户映射；
 
-## Net NameSpace
+- 通过**`uid_map`和`gid_map`**将子进程的`root(0)`和外部进程的`1000`用户绑定；
+
+  - 容器内的root用户创建的文件，在外部看来其用户是1000；
+  - 写`gid_map`前，需要先`echo deny > /proc/2506/setgroups`
+
+  > There is a specific limitation added to unprivileged users since Linux 3.19 when **attempting to map the user's group(s): they have to forfeit their right to alter supplementary groups**. This is usually to prevent an user to *remove* itself from a group which acts as a deny filter for files with ownership like `someuser:denygroup` and mode `u=rw,g=,o=r`.
+
+  This is documented in [`user_namespaces(7)`](https://manpages.debian.org/manpages/user_namespaces.7):
+
+  > **Writing "deny" to the `/proc/[pid]/setgroups`** file before writing to `/proc/[pid]/gid_map` will permanently disable `setgroups(2)` in a user namespace and **allow writing to `/proc/[pid]/gid_map` without having the CAP_SETGID capability in the parent user namespace**.
+
+## Net NameSpace（网络）
 
 网络资源的隔离：网络设备，IPV4/IPV6，IP路由表，防火墙，/proc/net目录，/sys/class/net目录，套接字等；
 
@@ -36,24 +57,50 @@ cloneh函数的`CLONE_NEWNS`标志
 
 在建立`veth pair`前，新旧namespace通过**管道**进行通信。
 
-## PID NameSpace
 
-不同NS下的进程可以有相同的PID，内核为所有NS维护树形结构；
 
-- PID隔离，需要配合MOUNT隔离，将`/proc`文件系统重新挂载；
+## PID NameSpace（PID）
+
+**不同NS下的进程可以有相同的PID**，内核为所有PID NS维护树形结构；
+
+- 父节点可以看到子节点中的进程，通过信号等形式影响子节点的进程，而反之不行；
+
+- PID隔离，需要**配合MOUNT隔离**，将`/proc`文件系统重新挂载；
+
+示例：[`ns_pid.c`](https://gitee.com/luckyQQQ/lifelearning/blob/master/cpp/namespace/ns_pid.cpp)（需要root权限执行）
 
 ### Init进程
 
-- 进程号为1的进程需要负责孤儿进程的回收，因此Docker容器运行多个进程时，最先启动的命令进程应该时具有资源监控和回收等管理能力，如`bash`；
+- **进程号为1的进程需要负责孤儿进程的回收**，因此Docker容器运行多个进程时，最先启动的命令进程应该时具有资源监控和回收等管理能力，如`bash`；
 - Init进程具备信号屏蔽，如果未编写处理某个信号的代码逻辑，则同一个Pid namespace下的进程（即使具有超级权限）发给Init进程的信号会被屏蔽，防止被误杀；
 - Namespace树中父节点进程发送的信号，只有`SIGKILL`和`SIGSTOP`会被处理，父节点进程有权终止子节点进程；
-- 一旦init进程被销毁，同一PID namespace中的其它进程都会受到SIKILL信号而被销毁。
+- 一旦init进程被销毁，同一PID namespace中的其它进程都会受到`SIGKILL`信号而被销毁。
 
+### 隔离特殊性
 
+- 一个进程的PID被认为是常量，因此`setns`和`unshare`调用者无法加入新的PID NS，随后创建的子进程才可以加入新的NS。
 
-## Mount NameSpace
+## Mount NameSpace（挂载）
 
-### 挂载传播（Mount Propagation）
+> 默认情况下，对于Mount命名空间里的挂载点列表的后续修改，将不会影响到另外命名空间里看到的挂载点列表(除了下面提到的shared subtrees情况)。
+
+```shell
+# /proc 的重新挂载
+$ mount -t proc proc /proc
+```
+
+### Shared Subtreee
+
+> 引入该机制是为了消除mount ns带来的不便，比如系统新增一块磁盘，我希望所有的NS都感知到新挂载的这块磁盘，那么如果NS 之间是完全隔离的，就需要每个都执行一次挂载操作。
+
+#### peer group
+
+表示了一个或多个挂载点的集合，下面两种情况属于**同一group**：
+
+1. 通过`--bind`操作挂载的源挂载点和目标挂载点（前提是源目录是个挂载点）；
+2. 生成新`mount ns`时，复制过去的挂载点之间同在一个group。
+
+#### 挂载传播（Mount Propagation）
 
 挂载对象的关系：共享关系，从属关系，私有关系（不可绑定挂载）
 
@@ -61,15 +108,14 @@ cloneh函数的`CLONE_NEWNS`标志
 - 从属挂载：`mount --make-slave <mount-object>`
 - 私有挂载（默认）：`mount --make-private <mount-object>`
 
-挂载状态只可能为以下（K8s的Mount propagation概念对应）：
+挂载状态只可能为以下：
 
 - 共享挂载（shared）：双向传播，一个挂载对象的挂载事件会传播到另一个挂载对象；
-- 从属挂载（slave）：单向传播，反之不行；
-- 共享/从属挂载（shared/slave）：具备前两种；
+- 从属挂载（slave）：单向传播(master-slave)，反之不行；
 - 私有挂载（private）：各mount namespace之间相互隔离；
 - 不可绑定挂载（unbindable）：不可让其它mount namespace 挂载；
 
-### 原理
+**注意：**
 
 Mount Namespace跟其它Namespace使用不同的地方：
 
@@ -77,49 +123,14 @@ Mount Namespace跟其它Namespace使用不同的地方：
 
 即先clone指定`CLONE_NEWNS`标志，然后在执行/bin/bash前，先挂载目录。
 
-```c
-#define _GNU_SOURCE
-#include <sys/mount.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <stdio.h>
-#include <sched.h>
-#include <signal.h>
-#include <unistd.h>
+### 示例
 
-#define STACK_SIZE (1024 * 1024)
-static char container_stack[STACK_SIZE];
+`cat /proc/self/mountinfo`可以看到，系统默认的挂载点都是shared的，clone系统调用会完全copy父进程的挂载点信息，因此子进程的挂载点也是shared，因此子进程`mount proc`之后，父进程的`/proc`也会被改变。
 
-char* const container_args[] = {"/bin/bash", NULL};
+代码：[`ns_mnt.c`](https://gitee.com/luckyQQQ/lifelearning/blob/master/cpp/namespace/ns_mnt.cpp)（需要root权限执行）
 
-int container_main(void *args) {
-    printf("Container - inside the container!\n");
-    // 以tmpfs（内存盘）格式重新挂载/tmp目录
-    mount("none", "tmp", "tmpfs" 0, "");
-    execv(container_args[0], container_args);
-    printf("Something wrong!\n");
-    return 1;
-}
-
-int main() {
-    printf("Parent - start a container!\n");
-    int container_pid = clone(container_main, container_stack + STACK_SIZE, CLONE_NEWNS | SIGCHLD, NULL);
-    waitpid(container_pid, NULL, 0);
-    printf("Parent - container stopped@\n");
-    return 0;
-}
-```
-
-编译执行：
-
-```bash
-# 编译
-gcc -o mount_test mount_test.c`
-# 执行，进行新的`bash`环境，
-./mount_test
-# 查看/tmp，发现是个空目录，重新挂载生效
-ls /tmp
-```
+- 注意在子命令空间，需要先执行`mount --make-rprivate /`或者`mount --make-private /proc`修改`/proc`的挂载属性为`private`；
+- 再执行`mount -t proc proc /proc`；
 
 ### 容器镜像（rootfs）
 
@@ -138,9 +149,17 @@ ls /tmp
 chroot $HOME/test /bin/bash
 ```
 
-## Linux C API
+## Linux C API（使用）
 
 ### 创建NameSpace
+
+#### clone
+
+> int clone(int (*child_func)(void *), void * child_stack, int flags, void *arg);
+>
+> 在创建新进程的同时创建namespace，flags跟namespace相关的参数有：
+>
+> - CLONE_NEWIPC, CLONE_NEWNS, CLONE_NEWNET, CLONE_NEWPID, CLONE_NEWUSER, CLONE_NEWUTS
 
 Linux创建新进程的可选参数，比如`PID Namespace : CLONE_NEWPID`
 
@@ -155,17 +174,48 @@ int pid = clone(main_function, stack_size, CLONE_NEWPID | SIGCHLD, NULL);
 - PID：原先进程不进入新的PID NameSpace，后续创建的**子进程**才进入（即**新namespace中的init进程**）；
 - 其它名空间：原进程直接进入新的Namespace；
 
-### 加入NameSpace
+#### fork
 
-进程的每种Linux NameSpace在对应的`/proc/[进程号]/ns`下有对应的虚拟文件，链接到真实的NameSpace文件上。
+fork的返回值：
 
-`setns`系统调用可以加入某个NameSpace中：
+- 父进程返回新创建子进程的进程PID，子进程中返回0；
 
-- 同`unshare`，原进程不入新的NS（仅PID），创建子进程才入NS；
+fork()执行后，父进程有义务监控子进程的运行状态，并在子进程退出后自己才能正常退出，否则子进程会变成”孤儿“进程。
 
-`exec`族的函数(`execv, execvp, execl, execlp`)执行命令。
 
-- `exec**`：C程序立即被实际命令替换，即`exec**`之后的代码不会执行，如果需要控制，可以使用`fork-exec`机制；命令执行失败，返回-1；
+
+### 查看NameSpace
+
+进程的每种Linux NameSpace在对应的`/proc/[进程号]/ns`下有虚拟文件，链接到真实的NameSpace文件。
+
+```shell
+lrwxrwxrwx 1 mtk mtk 0 10月 30 10:55 cgroup -> 'cgroup:[4026531835]'
+lrwxrwxrwx 1 mtk mtk 0 10月 30 10:55 ipc -> 'ipc:[4026531839]'
+lrwxrwxrwx 1 mtk mtk 0 10月 30 10:55 mnt -> 'mnt:[4026531840]'
+lrwxrwxrwx 1 mtk mtk 0 10月 30 10:11 net -> 'net:[4026532008]'
+lrwxrwxrwx 1 mtk mtk 0 10月 30 10:11 pid -> 'pid:[4026531836]'
+lrwxrwxrwx 1 mtk mtk 0 10月 30 10:55 pid_for_children -> 'pid:[4026531836]'
+lrwxrwxrwx 1 mtk mtk 0 10月 30 10:55 time -> 'time:[4026531834]'
+lrwxrwxrwx 1 mtk mtk 0 10月 30 10:55 time_for_children -> 'time:[4026531834]'
+lrwxrwxrwx 1 mtk mtk 0 10月 30 10:11 user -> 'user:[4026531837]'
+lrwxrwxrwx 1 mtk mtk 0 10月 30 10:55 uts -> 'uts:[4026531838]'
+
+```
+
+### 加入 NameSpace
+
+#### setns
+
+> int setns(int fd, int nstype);
+>
+> 系统调用，从原先的namespace加入新的namespace中
+>
+> - fd : 加入namespace的文件描述符，及`/proc[pid]/ns`目录下的对应文件；
+> - 同`unshare`，但是原进程不入新的NS（包括PID），创建子进程才入新的NS（包括PID）；
+
+`exec**`族的函数(`execv, execvp, execl, execlp`)执行命令。
+
+- `exec`：C程序立即被实际命令替换，即`exec**`之后的代码不会执行，如果需要控制，可以使用`fork-exec`机制；命令执行失败，返回-1；
 
 示例如下：`./setns-test /proc/27342/uts /bin/bash`
 
@@ -188,4 +238,12 @@ int main(int argc, char* argv[]) {
     errExit("execvp");				   /* 命令执行成功时，此行不会执行 */
 }
 ```
+
+#### unshare
+
+>int unshare(int flags);
+>
+>在原先的进程上进行namespace隔离（不包括PID）。
+>
+>- flags : namespace的类型（即 CLONE_NEW* ）
 

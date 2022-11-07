@@ -14,3 +14,9 @@ https://blog.csdn.net/hahabeibei123456789/article/details/98937944
 
 gitee链接：https://gitee.com/import-github/ArtCoder
 
+
+
+## 文本生成案例
+
+[诗词生成（RNN+LSTM）](https://gitee.com/luckyQQQ/lifelearning/blob/master/python/text/tf_poem_generate.ipynb)
+

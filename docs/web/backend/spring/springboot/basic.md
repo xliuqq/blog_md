@@ -1,5 +1,3 @@
-[toc]
-
 # 基础
 
 ## 配置文件加载
@@ -24,9 +22,61 @@ java -jar spring-boot-02-config-02.0.0.1-SNAPSHOT.jar  --spring.config.location=
 
 ## 注解
 
-`@ConditionalOnMissingBean`
+### 常用注解
+
+**@Controller**，**@RestController**
+
+**@GetMapping**，**@PostMapping**
+
+**@RequestBody**，**@ResponseBody**
+
+**@ControllerAdvice**
+
+- 和`@ExceptionHandler`、`@InitBinder`以及`@ModelAttribute`注解搭配使用，主要是用来处理控制器所抛出的异常信息；
+
+**@ExceptionHandler**
+
+**@RequestParam**，**@PathVariable**
+
+**@CrossOrigin**
 
 
+
+**@Component**，**@ComponentScan**
+
+
+
+Spring DI注解：
+
+**@DependsOn**
+
+**@Bean**
+
+**@Scope**
+
+- singleton、prototype、request、session、globalSession
+
+
+
+**@Autowired**
+
+**@Primary**
+
+- 定义这些Bean的优先级
+
+
+
+### SpringBoot注解
+
+**@SpringBootApplication**
+
+**@EnableAutoConfiguration**
+
+**@ConditionalOnClass与@ConditionalOnMissingClass**
+
+**@ConditionalOnMissingBean**，**@ConditionalOnMissingBean**
+
+**@ConditionalOnProperty**，**@ConditionalOnResource**
 
 
 
@@ -38,11 +88,11 @@ java -jar spring-boot-02-config-02.0.0.1-SNAPSHOT.jar  --spring.config.location=
 
 #### @Import
 
-@ComponentScan是扫描整个包,但其实你可能只需注入一个或者几个指定的Bean,那我们可以考虑用 **@Import** 注解。
+@ComponentScan是扫描整个包,但其实你可能只需注入一个或者几个指定的Bean，那我们可以考虑用 **@Import** 注解。
 
 #### spring.factories
 
-上面两种注入方式都有个很明显缺点,就是如果我需要引用外部jar包的Bean的时候,都需要在当前项目配置 **@ComponentScan** 或者 **@Import** 去扫描才能注入当前Bean，这样显然不够友好。
+上面两种注入方式都有个很明显缺点，就是如果我需要引用外部jar包的Bean的时候，都需要在当前项目配置 **@ComponentScan** 或者 **@Import** 去扫描才能注入当前Bean，这样显然不够友好。
 
 只需要在将**配置放在第三方jar指定的文件**中即可，使用者会自动加载，从而**避免的代码的侵入**
 
@@ -56,7 +106,11 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.third.bean.Co
 
 
 
-## Runner
+## Spring 全局资源的加载
+
+实现CommandLIneRunner 或者 ApplicationRunner，实现 run 方法
+
+### Runner
 
 项目启动后立马执行一些逻辑：
 

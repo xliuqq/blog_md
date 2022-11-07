@@ -6,23 +6,55 @@ Github + travis 持续集成工具； Softagram （pull request reviews and code
 
 
 
+需求描述：CI / CD + GitOps + ChatOps
+
+- 通过PR的形式触发Preview，执行一系列的检查，并显示结果；
+- 支持多套环境（开发/测试/生产/演示等）的部署；
+
+
+
 ## [Gitlab + Gitlab-ci](./gitlab.md)
 
 持续集成工具；
 
 
 
-## [Jenkins](http://jenkins-ci.org/)
+## [JenkinsX](./jenkinsx.md)
 
-- 可以用于CI（持续集成），支持多种语言，多种代码检查插件等；
+- K8s CI/CD；
 
-- 持续、自动构建/测试软件项目，监控一些定时任务；
+- 原生支持预览环境和 gitops；
 
   
 
+## [Drone](./drone.md)
+
+> Drone is a self-service **Continuous Integration** platform for busy development teams.
+
+- 支持GitHub, GitHubEnterprise, Bitbucket, and GitLab；
+- 使用Yaml作为配置；
 
 
-## 代码审查
+
+## [ArgoCD](https://github.com/argoproj/argo-cd)
+
+> Argo CD is a declarative, GitOps **continuous delivery** tool for Kubernetes.
+
+
+
+## Rancher Pipeline
+
+
+
+# ChatOps
+
+## Prow
+
+## [JenkinsX Lighthouse](./jenkinsx.md#jenkins-x Lighthouse)
+
+
+
+# 代码审查
 
 ### SonarLint
 

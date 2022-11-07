@@ -6,7 +6,9 @@ HIP is a C++ runtime API 。我们使用C++语言，可以调用HIP的API来进�
 
 ## Cuda 兼容性
 
-https://github.com/ROCm-Developer-Tools/HIP/blob/develop/docs/markdown/CUDA_Runtime_API_functions_supported_by_HIP.md
+[Runtime Support](https://github.com/ROCm-Developer-Tools/HIP/blob/develop/docs/markdown/CUDA_Runtime_API_functions_supported_by_HIP.md)
+
+[Not Support](https://github.com/ROCm-Developer-Tools/HIP/blob/develop/docs/markdown/hip_faq.md#what-is-not-supported)
 
 ### CUDA转HIP
 
@@ -15,3 +17,4 @@ https://github.com/ROCm-Developer-Tools/HIP/blob/develop/docs/markdown/CUDA_Runt
 **HIP提供了移植工具 [“hipify”](https://github.com/ROCm-Developer-Tools/HIPIFY)，可以帮助你将cuda源代码转换成HIP**，与原始的CUDA应用程序相比没有开销。
 
 大多数情况下，通过 ”cuda“ 和 ”hip“字符的相互替换（e.g. cudaMalloc -> hipMalloc），可以在源码级别完成移植
+

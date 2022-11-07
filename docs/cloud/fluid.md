@@ -4,7 +4,7 @@
 
 
 
-dataloader中ownerreference的作用？
+Dataset 支持 Spec字段的 update 么？（不支持）
 
 dataloader中executing阶段，**定时20s**（很多处）进行更新？
 
@@ -212,10 +212,14 @@ Executing阶段
 
 ## 运行时
 
+> node 的 labels的创建时机：Sync()函数会定期的进行设置，即使不创建App Pod；
+
+
+
 Setup时，创建Worker：
 
 - `alluxio.node.go`中`AssignNodesToCache`函数（废弃不用），寻找 node 进行 worker的放置（考虑数据集的亲和性）；
-- `LabelCacheNode和UnlabelCacheNode`：对Node设置和取消设置标签；
+- `LabelCacheNode和UnlabelCacheNode`：在Sync的时候，对Node设置和取消设置标签；
 
 ```yaml
 # 设置数据集个数
@@ -330,6 +334,13 @@ engine#setup：创建 Master/Worker的StatefulSet，**FUSE**的DaemonSet，检�
 
   CSI NodeStageVolume里设置该值；
 
+
+
+对于不同类型的Mount如何处理：
+
+- - Local和PVC转换为UFSPaths 和 UFSVolumes，挂载到Runtime的Master/Worker Pod中**"/underFSStorage"，即Alluxio root ufs**；
+  - HTTP等形式通过在MasterPod中执行`alluxio fs mount`；
+
 #### RuntimePortAllocator
 
 运行时端口分配（`portallocator`包）
@@ -402,6 +413,23 @@ Fluid 默认安装webhook的Deployment，对Pods的create/update进行回调，�
 `NodePublishVolume`阶段：
 
 - 将 fluid-path 挂载到 pod 的目录中；
+
+```txt
+NodePublishVolumeRequest is volume_id:"default-phy" 
+staging_target_path:"/var/lib/kubelet/plugins/kubernetes.io/csi/pv/refdemo-ai-education/globalmount"
+target_path:"/var/lib/kubelet/pods/63403007-a2d6-49ae-a9b4-92988e58427b/volumes/kubernetes.io~csi/refdemo-ai-education/mount" volume_capability:<mount:<> access_mode:<mode:MULTI_NODE_READER_ONLY > > 
+volume_context:<key:"csi.storage.k8s.io/ephemeral" value:"false" > 
+volume_context:<key:"csi.storage.k8s.io/pod.name" value:"nginx" > 
+volume_context:<key:"csi.storage.k8s.io/pod.namespace" value:"ai-education" > 
+volume_context:<key:"csi.storage.k8s.io/pod.uid" value:"63403007-a2d6-49ae-a9b4-92988e58427b" > 
+volume_context:<key:"csi.storage.k8s.io/serviceAccount.name" value:"default" > 
+volume_context:<key:"fluid_path" value:"/runtime-mnt/alluxio/default/phy/alluxio-fuse" > 
+volume_context:<key:"mount_type" value:"fuse.alluxio-fuse" > 
+volume_context:<key:"runtime_name" value:"phy" >
+volume_context:<key:"runtime_namespace" value:"default" >
+```
+
+
 
 ## 使用
 

@@ -340,3 +340,34 @@ void Twaiter() {
 - 如果一个 manager 搞不定，可以分多个 (fast/slow path)
   - 把系统设计好，使集中管理不成为瓶颈
     - [Millions of tiny databases](https://www.usenix.org/conference/nsdi20/presentation/brooker) (NSDI'20)
+## 3. 并发编程
+《真实世界的并发编程》
+1. 大规模并行（HPC，大数据）、高性能并发（数据中心）
+2. 01:00:00 go & go routine
+3. 01:34 单线程+事件模型（异步回调，流程模型）
+
+《并发BUG与应对》
+并发bug: 防御式编程，使用`assert`
+
+死锁：AA-Deadlock，ABBA-Deadlock
+1. 死锁的必要条件；
+2. 避免死锁；
+   - AA-Deadlock：容易检测，及早报告；`spinlock-xv6.c`, `if (holding(lk) panic();)
+   - ABBA-Deadlock：按照固定的顺序去获得锁，相反顺序释放锁；
+
+
+数据竞争：
+- Atomic Violation / Order Violation
+
+运行时的死锁检查（Lockdep) 
+- 为每个锁确定唯一的“allocation site"，同一个"allocation site"的存在唯一的分配顺序；
+- 通过打印上锁顺序，判断是否存在环（ x->y ^ y->x ）
+
+运行时的数据竞争（Thread Sanitizer）
+- 为所有事件建立 happens-before 关系；
+- Program-order + release-accquire
+- 对于发生在不同线程且至少有一个是写的x,y检查： x ~ y V y ~ x
+  - Times, clocks ......
+
+
+4. 操作系统状态机

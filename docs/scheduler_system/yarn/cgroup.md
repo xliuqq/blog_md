@@ -1,5 +1,3 @@
-[toc]
-
 # CGroup
 
 ## 前提
@@ -58,7 +56,7 @@ cgroup已经安装好，在 `/sys/fs/cgroup` 目录下。
 | yarn                                                         | (default：true)                                              | yarn                      |
 | yarn                                                         | false                                                        | (User submitting the job) |
 
-# Yarn Secure Container
+## Yarn Secure Container
 
 > Secure Containers work only in the context of **secured YARN clusters**
 >
@@ -68,9 +66,7 @@ Container 必须以提交应用的用户执行。
 
 用户和用户组配置示例：**NodeManager以 yarn 用户启动，yarn所属组为 users 和 hadoop，users组包含yarn和其它用户（应用提交者，如alice），且 alice 不属于 hadoop 组**。
 
-
-
-## 前提
+### 前提
 
 Container executor **必须能够访问container需要的本地文件和目录**（比如配置文件，jars，共享对象等），应该设置为 755。
 
@@ -78,11 +74,11 @@ Container executor **必须能够访问container需要的本地文件和目录**
 
 - NodeManager如果不是以root用户启动，需要配置**/sys/fs/cgroup中的权限必须该用户可读写**；
 
-## LinuxContainerExecutor
+### LinuxContainerExecutor
 
 <code>LinuxContainerExecutor</code> 使用外部程序 `container-executor`启动container，可以执行`setuid`访问权限。
 
-## 配置
+### 配置
 
 ```xml
 <property>

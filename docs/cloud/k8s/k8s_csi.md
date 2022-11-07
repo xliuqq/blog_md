@@ -58,9 +58,9 @@ service Identity {
 
 - **NodePublishVolume**：将存储卷**从临时目录mount到目标目录(pod目录)**，Pod创建时才会进行该操作；
 
-- **NodeUnstageVolume**：NodeStageVolume的逆操作，将一个存储卷从临时目录umount掉
+- **NodeUnstageVolume**：NodeStageVolume的逆操作，将一个存储卷从临时目录umount掉（一个节点同一个PVC没有Pod挂载时才会操作）
 
-- **NodeUnpublishVolume**：将存储卷从pod目录umount掉
+- **NodeUnpublishVolume**：将存储卷从pod目录umount掉，Pod删除时会执行
 
 - NodeGetId：返回插件运行的节点的ID
 
