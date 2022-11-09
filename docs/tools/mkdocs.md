@@ -1,16 +1,15 @@
-# 静态网页生成
+# mkdocs
+
+> 一般使用 [material](https://squidfunk.github.io/mkdocs-material/) 样式。
+
+## 安装
+
+```
+pip install mkdocs
+pip install mkdocs-material
+```
 
 
-
-jekyll：基于ruby
-
-hexo：基于nodejs
-
-hugo：基于Go
-
-
-
-## mkdocs（python）
 
 ### 图片
 
