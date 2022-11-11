@@ -9,11 +9,30 @@ pip install mkdocs
 pip install mkdocs-material
 ```
 
+## 配置
+
+### 多语言支持
+
+https://squidfunk.github.io/mkdocs-material/setup/changing-the-language/#site-language-selector
+
+ ```yaml
+ extra:
+   alternate:
+     - name: English
+       link: /en/ 
+       lang: en
+     - name: Deutsch
+       link: /zh/
+       lang: zh
+ ```
+
 
 
 ### 图片
 
 通过在`docs`建立`img`目录，里面放入图片，在md文件中通过`img/a.png`引入。
+
+
 
 ### plugins
 
@@ -30,6 +49,14 @@ https://www.mkdocs.org/
 #### [mkdocs-markdownextradata-plugin](https://github.com/rosscdh/mkdocs-markdownextradata-plugin)
 
 A MkDocs plugin that injects the mkdocs.yml extra variables into the markdown template。
+
+
+
+### 博客支持
+
+https://squidfunk.github.io/mkdocs-material/setup/setting-up-a-blog/#posts
+
+
 
 ### PyMdown Extensions
 

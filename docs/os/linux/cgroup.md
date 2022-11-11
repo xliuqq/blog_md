@@ -281,22 +281,29 @@ bash: fork: retry: Resource temporarily unavailable
 > Linux中每个设备都有一个设备号，设备号由主设备号和次设备号两部分组成。
 
 ```shell
-#显示主设备号和次设备号
-ls -l |grep 设备名 
+#显示GPU的主设备号和次设备号
+$ ls -l /dev | grep nvidia 
+crw-rw-rw-   1 root root    195,   0 Nov  9 13:34 nvidia0
+crw-rw-rw-   1 root root    195,   1 Nov  9 13:34 nvidia1
+crw-rw-rw-   1 root root    195,   2 Nov  9 13:34 nvidia2
+crw-rw-rw-   1 root root    195,   3 Nov  9 13:34 nvidia3
+
 #只显示主设备号
-cat /proc/devices
+$ cat /proc/devices
 ```
 
- cgroup禁用设备的访问
+ cgroup 禁用设备的访问
 
 ```shell
-# the c indicates that /dev/tty is a character device, 5:0 is major and minor numbers of the device. The last w is write permission, so the above command forbids tasks to write to the /dev/tty.
-echo "c 5:0 w" > devices.deny
+# the c indicates that /dev/tty is a character device, 195,0 is major and minor numbers of the device. The last w is write permission, so the above command forbids tasks to write to the /dev/tty.
+$ echo "c 195,0 w" > devices.deny
+
+# 创建进程死循环执行nvidia-smi，记录进程号
+
+# 将进程号写到 tasks 里面，可以发现上面的脚本显示的GPU少了一个
 ```
 
 
-
-### nvidia-smi 如何知道被隔离？（TODO）
 
 
 

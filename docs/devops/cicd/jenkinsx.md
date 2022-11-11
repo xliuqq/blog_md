@@ -14,7 +14,7 @@ Jenkins X 是基于 Kubernetes 的CI&CD平台，使用GO语言开发，作为Jen
 
 [Kuberhealthy](https://github.com/kuberhealthy/kuberhealthy) Periodic health checks of the systems
 
-[Nexus](https://www.sonatype.com/nexus/repository-oss) **[optional]** artifact repository
+[Nexus](./nexus.md) **[optional]** artifact repository
 
 
 

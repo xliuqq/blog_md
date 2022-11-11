@@ -37,3 +37,9 @@ RELU 是人工神经网络中最常用的激活函数（activation function）�
 GELU 与随机正则化有关，因为它是自适应 Dropout 的修正预期（Ba & Frey, 2013）。这表明神经元输出的概率性更高。
 
 <img src="pics/relu_gelu_compare.png" alt="compare" style="zoom:50%;" />
+
+## 梯度消失/梯度爆炸
+
+- 精心设计的权值初始化方法、BatchNorm 或 LayerNorm 这类标准化技术；
+- [ReZero is All You Need: Fast Convergence at Large Depth](https://mp.weixin.qq.com/s/TRGeLzHtY9GbvammTerO5w)；
+

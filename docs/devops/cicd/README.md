@@ -1,4 +1,20 @@
-# CI/CD
+# 整体流程
+
+## 制品库
+
+### [Nexus](./nexus.md)
+
+- NPM；
+- MVN；
+- PYPI；
+- GO；
+- DOCKER；
+- HELM；
+- RAW：可用于前端打包出来的静态文件；
+
+
+
+## CI/CD
 
 Github + Github actions；
 
@@ -13,13 +29,13 @@ Github + travis 持续集成工具； Softagram （pull request reviews and code
 
 
 
-## [Gitlab + Gitlab-ci](./gitlab.md)
+### [Gitlab + Gitlab-ci](./gitlab.md)
 
 持续集成工具；
 
 
 
-## [JenkinsX](./jenkinsx.md)
+### [JenkinsX](./jenkinsx.md)
 
 - K8s CI/CD；
 
@@ -27,7 +43,7 @@ Github + travis 持续集成工具； Softagram （pull request reviews and code
 
   
 
-## [Drone](./drone.md)
+### [Drone](./drone.md)
 
 > Drone is a self-service **Continuous Integration** platform for busy development teams.
 
@@ -36,25 +52,25 @@ Github + travis 持续集成工具； Softagram （pull request reviews and code
 
 
 
-## [ArgoCD](https://github.com/argoproj/argo-cd)
+### [ArgoCD](https://github.com/argoproj/argo-cd)
 
 > Argo CD is a declarative, GitOps **continuous delivery** tool for Kubernetes.
 
 
 
-## Rancher Pipeline
+### Rancher Pipeline
 
 
 
-# ChatOps
+## ChatOps
 
-## Prow
+### Prow
 
-## [JenkinsX Lighthouse](./jenkinsx.md#jenkins-x Lighthouse)
+### [JenkinsX Lighthouse](./jenkinsx.md#jenkins-x Lighthouse)
 
 
 
-# 代码审查
+## 代码审查
 
 ### SonarLint
 
