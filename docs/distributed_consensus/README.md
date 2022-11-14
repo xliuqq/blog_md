@@ -28,3 +28,6 @@ Partition Tolerant：网络分区容错性
 
 ## BASE理论
 
+
+
+TODO：[终于有人把“分布式事务”说清楚了！ (qq.com)](https://mp.weixin.qq.com/s/Rowg-rEQZnaSaupJ9Q7kJw)

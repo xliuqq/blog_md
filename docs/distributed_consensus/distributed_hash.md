@@ -64,6 +64,8 @@ Redis Cluster包含了16384个哈希槽，每个Key通过计算后都会落在�
 
 ## 热点Hash
 
+> [1] [Chen J ,  Chen L ,  Wang S , et al. HotRing: a hotspot-aware in-memory key-value store[C]// File and Storage Technologies. 2020.](./pdf/a hotspot-aware in-memory key-value store.pdf)
+
 内存KVS引擎通常采用**链式哈希**作为索引，访问位于冲突链尾部的数据，需要经过更多的索引跳数：
 
 - **将热点数据放置在冲突链头部**，那么系统对于热点数据的访问将会有更快的响应速度。
@@ -76,4 +78,50 @@ Redis Cluster包含了16384个哈希槽，每个Key通过计算后都会落在�
 <img src="pics/hotring.png" alt="图片" style="zoom:80%;" />
 
 #### 有序环
+
+**在环上，所有数据都会动态变化(更新或删除)，头指针同样也会动态移动，没有标志可以作为遍历的终止判断。**
+
+- key排序：若目标key介于连续两个item的key之间，说明为read miss操作，即可终止返回；
+- key简化：利用tag来减少key的比较开销，字典序：order = (tag, key)
+  - tag是哈希值的一部分，每个key计算的哈希值，前k位用来哈希表的定位，后n-k位作为tag；
+
+<img src="pics/order_hash_compare.jpeg" alt="图片" style="zoom: 67%;" />
+
+以 itemB 举例：
+
+- 链式哈希需要遍历所有数据才能返回read miss。而HotRing在访问itemA与C后，即可确认B read miss。
+
+#### 动态识别与调整
+
+每R次访问为一个周期(R通常设置为5)，第R次访问的线程将进行头指针的调整：
+
+- **随机移动策略**：每R次访问，移动头指针指向第R次访问的item。若已经指向该item，则头指针不移动。该策略的优势是， 不需要额外的元数据开销，且不需要采样过程，响应速度极快。
+
+- **采样分析策略**：每R次访问，尝试启动对应冲突环的采样，统计item的访问频率。若第R次访问的item已经是头指针指向的item，则不启动采样。
+
+采样分析策略：利用了head pointer / next pointer的剩余空间，因为指示地址用48位就够了，这样还有16位：
+
+- head pointer：16位分成1 bit的active位以及15位的total counter位（记录当前这个bucket的访问次数）；
+- next pointer：1 bit Rehash位，1bit Occupied位和14 bit的counter位，Rehash和Counter分别用于并发的rehash和update操作。
+
+<img src="pics/hotring_index.png" alt="在这里插入图片描述" style="zoom:50%;" />
+
+
+TODO：[性能提升2.58倍！阿里最快KV存储引擎揭秘 (qq.com)](https://mp.weixin.qq.com/s/0IKxbt8MDH6Yqu1f00cwSA)
+
+
+
+#### 无锁并发访问
+
+
+
+#### 适应热点数据量的无锁rehash
+
+引擎性能的降低，必然是因为冲突环上存在多个热点。
+
+- 利用访问所需**平均内存访问次数**(access overhead)来替代传统rehash策略的负载因子(load factor)。
+
+在幂率分布场景，若每个冲突环只有一个热点，HotRing可以保证access overhead < 2，即平均每次访问所需内存访问次数小于2。
+
+- 设定access overhead阈值为2，当大于2时，触发rehash。
 

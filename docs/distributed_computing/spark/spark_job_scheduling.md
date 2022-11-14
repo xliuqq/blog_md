@@ -2,6 +2,16 @@
 
 # Spark 作业调度
 
+## 配置参数
+
+> [Spark Scheduler Configuration](https://spark.apache.org/docs/latest/configuration.html#scheduling)
+
+黑名单机制
+
+`spark.excludeOnFailure.enabled`：false，设置为true时会禁止向失败次数过多的executors上调度task；
+
+- 具体的算法参数由各种配置决定；
+
 ## 应用间调度
 
 在多个应用之间调度，但不支持跨应用的内存共享

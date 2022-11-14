@@ -1,5 +1,3 @@
-[toc]
-
 # Apache Dolphin Scheduler
 
 > 分布式易扩展的可视化DAG工作流任务调度系统。
