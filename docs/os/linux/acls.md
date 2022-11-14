@@ -1,5 +1,3 @@
-[toc]
-
 # POSIX ACLs
 
 在 linux下,对一个文件(或者资源)可以进行操作的对象被分为三类: file owner(文件的拥有者)，group(组,注意不一定是文件拥有者所在的组)，other (其他)而对于每一类别又分别定义了read, write and execute/search 权限(这里不讨论SUID, SGID以及Sticky bit的设置)。这种权限控制粒度太粗。

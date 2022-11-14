@@ -18,7 +18,7 @@ sh 参数： **-n 只检查语法错误**，不执行脚本； **-v 运行命令
 
 `$var`与`${var}`是没有区别的，但是用`${ }`会比较精确的界定变量名称的范围
 
-```shell
+``` shell
 PKG_DIR=$(ls)
 for apiName in ${PKG_DIR[*]} ; do echo $apiName; done
 for apiName in ${PKG_DIR} ; do echo $apiName; done
@@ -30,7 +30,7 @@ for apiName in ${PKG_DIR} ; do echo $apiName; done
 
 ### 变量
 
-```bash
+``` bash
 A="hello world"
 ```
 
@@ -39,7 +39,7 @@ A="hello world"
 
 ### for
 
-```shell
+``` shell
 for var in value_list ; do
       ...
 done
@@ -55,7 +55,7 @@ for line in `cat file`; do done
 
 ### while
 
-```shell
+``` shell
 while true
 do
     command
@@ -69,7 +69,7 @@ for (( ; ; ))
 
 ### if
 
-```shell
+``` shell
 if condition_judgement ; then 
 ... 
 elif condition2; then 
@@ -81,7 +81,7 @@ fi
 
 ### case
 
-```shell
+``` shell
 case experssion in
 pattern1)
       ...;;
@@ -94,7 +94,7 @@ esac
 
 ### 数组
 
-```shel
+``` shell
 array_name=(value1 ... valuen)
 ```
 

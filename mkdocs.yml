@@ -17,6 +17,13 @@ theme:
     - navigation.top
   language: 'zh'
 
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+
 nav:
   - 主页: README.md
   - 云原生:
@@ -124,17 +131,17 @@ nav:
         - arthas性能分析: languages/java/performance/arthas.md
         - jvm-profile分布式应用分析: languages/java/performance/jvm_profile.md
       - Native: 
-        - 概览: language/java/native/java_native.md
-        - JNI: language/java/native/jni.md
-        - JNR: language/java/native/jnr.md
+        - 概览: languages/java/native/java_native.md
+        - JNI: languages/java/native/jni.md
+        - JNR: languages/java/native/jnr.md
       - JVM:
-        - 即时编译Jit: language/java/jit.md
-        - jvm规范: language/java/jvm.md
-        - 字节码: language/java/bytecode.md
-      - 反射: language/java/reflection.md
-      - SPI: language/java/spi.md
-      - 测试: language/java/test.md
-      - 类加载器: language/java/classloader.md
+        - 即时编译Jit: languages/java/jit.md
+        - jvm规范: languages/java/jvm.md
+        - 字节码: languages/java/bytecode.md
+      - 反射: languages/java/reflection.md
+      - SPI: languages/java/spi.md
+      - 测试: languages/java/test.md
+      - 类加载器: languages/java/classloader.md
     - Python:
       - 三方包:
         - java和Python互相访问: languages/python/packages/java_python.md
@@ -173,8 +180,29 @@ nav:
         - 编程: distributed_computing/gpu/cuda/hip.md
   - 操作系统:
     - Linux 知识:
+      - 基础: os/linux/basic.md
+      - acls: os/linux/acls.md
+      - bash: os/linux/bash.md
       - cgroup: os/linux/cgroup.md
+      - chmod: os/linux/chmod.md
+      - chroot: os/linux/chroot.md
+      - firewall: os/linux/firewall.md
+      - ip: os/liunx/ip.md
+      - journald: os/linux/journald.md
+      - log: os/linux/log_and_rotate.md
       - namespace: os/linux/namespace.md
+      - network: os/linux/network.md
+      - proc: os/linux/proc.md
+      - ramdisk: os/linux/ramdisk.md
+      - rsync: os/linux/rsync.md
+      - services: os/linux/services.md
+      - tuning: os/linux/tuning.md
+      - updatedb: os/linux/updatedb.md
+      - 进程快照: os/linux/process_snapshot.md
+      - yum: os/linux/yum.md
+    - Linux Shell:
+      - basic: os/linux/shell/basic.md
+      - args: os/linux/shell/args.md
 
   - 机器学习:
     - 图像视频:

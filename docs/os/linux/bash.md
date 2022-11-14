@@ -89,6 +89,18 @@ shell首先加载`/etc/profile`，然后再尝试依次去加载下列三个配�
 
 远程执行脚本时，进行登录，读取/etc/profile配置。`ssh user@remote bash -l script.sh`
 
+
+
+**ssh connection refused**
+
+```shell
+# 先查看ssh进程是否存在，不存在则启动
+ps -ef | grep ssh
+sudo /etc/init.d/ssh start
+```
+
+
+
 ## Sh 软链接
 
 sh 是 bash的软链接。
