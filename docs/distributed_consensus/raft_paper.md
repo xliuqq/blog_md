@@ -1,5 +1,3 @@
-[toc]
-
 # Raft 算法
 
 
@@ -9,7 +7,7 @@ Raft 实现一致性的方式是：首先选举出一个集群领导者，然后
 
 节点的状态：*Leader*、*Follower*和*Candidate*。状态流转图示：
 
-<img src="E:\personal\blog_md\distributed_consensus\pics\raft_state_flow.png" alt="img" style="zoom:80%;" />
+<img src="pics\raft_state_flow.png" alt="img" style="zoom:80%;" />
 
 Raft 把时间分割成任意长度的任期（term，作为逻辑时钟），任期用**连续的整数**标记，每一段任期从一次选举开始，一个或者多个 candidate 尝试成为 leader ：
 
@@ -18,7 +16,7 @@ Raft 把时间分割成任意长度的任期（term，作为逻辑时钟），�
 - 一个新的任期（包含一次新的选举）会很快重新开始；
 - Raft 保证了在任意一个任期内，最多只有一个 leader 。
 
-![img](E:\personal\blog_md\distributed_consensus\pics\raft_terms.png)
+![img](pics\raft_terms.png)
 
 每一个服务器节点存储一个**当前任期号**，该编号随着时间单调递增：
 
@@ -157,7 +155,7 @@ Raft 的 RPCs 需要接收方将信息持久化地保存到稳定存储中去，
 
 ## 集群成员变更
 
-![img](https://upload-images.jianshu.io/upload_images/1752522-284d88f08ab84f85.png?imageMogr2/auto-orient/strip|imageView2/2/w/529/format/webp)
+![raft_member_change](pics/raft_member_change.png)
 
 > 图示：直接从一种配置转到另一种配置是不安全的，因为各个机器会在不同的时候进行转换。在这个例子中，集群从 3 台机器变成了 5 台。不幸的是，存在这样的一个时间点，同一个任期里两个不同的 leader 会被选出。一个获得旧配置里过半机器的投票，一个获得新配置里过半机器的投票。
 

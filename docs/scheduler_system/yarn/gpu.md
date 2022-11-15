@@ -1,16 +1,22 @@
-[toc]
-
 # Yarn GPU（3.x版本）
 
 ## 前提
 
-- 只支持Nvidia的GPUs调度；
-- YARN NodeManager 所在机器必须预先安装了 Nvidia 驱动器；
+- 只支持Nvidia的GPUs调度（可以自定义插件支持Rocm GPU）；
+- YARN NodeManager 所在机器必须预先安装了 Nvidia Driver；
 - 如果使用 Docker 作为容器的运行时上下文，需要安装 nvidia-docker 1.0。
 
 
 
-注：**GPU资源的隔离，需要使用 LinuxContainerExecutor** (YARN-9419)，当前 GpuResourcePlugin
+注：**GPU资源的隔离，需要使用 LinuxContainerExecutor** (YARN-9419)，
+
+```xml
+<!-- For Capacity Scheduler capacity-scheduler.xml -->
+<property>
+  <name>yarn.scheduler.capacity.resource-calculator</name>
+  <value>org.apache.hadoop.yarn.util.resource.DominantResourceCalculator</value>
+</property>
+```
 
 ## 配置
 
@@ -46,7 +52,7 @@
 
 只有当管理员有特殊要求时，才需要在`yarn-site.xml`配置以下配置。
 
-1）**管理的GPU设备**
+##### 管理的GPU设备
 
 `yarn.nodemanager.resource-plugins.gpu.allowed-gpu-devices`：默认auto。
 
@@ -56,27 +62,27 @@
   - GPU的索引格式为`index:minor_number[,index:minor_number...]`；
   - 示例"0:0,1:1,2:2,3:4"，管理的GPU为MinorNumber为0,1,2,4，其索引为0,1,2,3
 
-2）**发现GPU的命令**
+##### 发现GPU的命令
 
-`yarn.nodemanager.resource-plugins.gpu.path-to-discovery-executables`：nvidia-smi命令的绝对路径
+`yarn.nodemanager.resource-plugins.gpu.path-to-discovery-executables`：auto模式，指定nvidia-smi命令的绝对路径
 
-3）**Docker插件相关的配置**
+##### Docker插件相关的配置
 
 当用户需要在Docker容器中运行GPU应用程序时，可以自定义配置。如果管理员遵循nvidia-docker的默认安装/配置，则不需要它们。
 
 `yarn.nodemanager.resource-plugins.gpu.docker-plugin`：默认 nvidia-docker-v1
 
-为GPU指定docker命令插件。默认使用Nvidia docker V1.0, V2.x可以使用`nvidia -docker-v2`。
+- 为GPU指定docker命令插件。默认使用Nvidia docker V1.0, V2.x可以使用`nvidia -docker-v2`。
 
 `yarn.nodemanager.resource-plugins.gpu.docker-plugin.nvidia-docker-v1.endpoint`：默认http://localhost:3476/v1.0/docker/cli
 
-指定nvidia-docker-plugin的end point。请查看文档:https://github.com/NVIDIA/nvidia-docker/wiki了解更多细节。
+- 指定nvidia-docker-plugin的end point。请查看文档:https://github.com/NVIDIA/nvidia-docker/wiki了解更多细节。
 
-4) **CGroups mount**
+##### CGroups mount
 
 GPU隔离使用**CGroup设备控制器对每个GPU设备**进行隔离。接下来的配置应该添加到**yarn-site.xml来自动挂载CGroup子设备**，否则管理员必须手动创建device子文件夹来使用这个特性。
 
-`yarn.nodemanager.linux-container-executor.cgroups.mount`：默认false
+`yarn.nodemanager.linux-container-executor.cgroups.mount`：默认true
 
 #### container-executor.cfg
 
