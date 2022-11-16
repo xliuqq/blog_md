@@ -78,8 +78,12 @@ nav:
     - 调度的策略: scheduler_system/scheduler.md
     - Yarn:
       - 架构: scheduler_system/yarn/arch.md
+      - GPU调度: scheduler_system/yarn/gpu.md
+      - 自定义设备支持: scheduler_system/yarn/yarn_pluggable_device_framework.md
     - DophinScheduler: scheduler_system/apache_dolphin_scheduler.md
-
+  - 分布式共识/一致性:
+    - 一致性: distributed_consensus/consistency.md
+    - 共识: distributed_consensus/consensus.md
   - 代码内功:
     - 设计原则: code_guide/design_principle.md
     - 代码整洁之道: code_guide/clean_code.md
@@ -127,8 +131,11 @@ nav:
       
   - 编程语言:      
     - Java:
+      - Effective java: languages/java/effective_java.md
       - 性能:
+        - 常见问题分析: languages/java/performance/analysis.md
         - arthas性能分析: languages/java/performance/arthas.md
+        - cpu profiler: languages/java/performance/cpu_profiler.md
         - jvm-profile分布式应用分析: languages/java/performance/jvm_profile.md
       - Native: 
         - 概览: languages/java/native/java_native.md
@@ -138,10 +145,14 @@ nav:
         - 即时编译Jit: languages/java/jit.md
         - jvm规范: languages/java/jvm.md
         - 字节码: languages/java/bytecode.md
+      - Agent: languages/java/agent.md
+      - 序列化: languages/java/serialize.md
       - 反射: languages/java/reflection.md
       - SPI: languages/java/spi.md
       - 测试: languages/java/test.md
       - 类加载器: languages/java/classloader.md
+      - 命令行工具: languages/java/cmd_tools.md
+      - 版本: languages/java/version.md
     - Python:
       - 三方包:
         - java和Python互相访问: languages/python/packages/java_python.md

@@ -1,14 +1,8 @@
-# 分析问题
-
-> 参考：https://zhuanlan.zhihu.com/p/145180618
+# 常见问题分析
 
 ## CPU
 
-业务逻辑问题(死循环)、频繁gc以及上下文切换过多。
-
-### jstack分析cpu问题
-
-查询占用cpu高的线程
+### 查询占用cpu高的线程
 
 - `top` 查看占用比较高的进程，再`top -H -p pid`来找到cpu使用率比较高的一些线程；
 - `printf '%x\n' pid`得到 nid，`jstack pid |grep 'nid' -C5 –color`查看对应堆栈信息；
@@ -34,6 +28,8 @@
 `pidstat -p pid -w [interval] [samples]`对特定的pid进行监控
 
 ![pidstat](pics/pidstat.png)
+
+
 
 ## 磁盘
 

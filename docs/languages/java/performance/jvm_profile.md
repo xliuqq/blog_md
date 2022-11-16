@@ -26,7 +26,7 @@ Uber JVM Profiler还提供了高级的分析功能，可以**跟踪用户代码�
 
 默认的输出有**ConsoleOutputReporter**，**FileOutputReporter** 和 **KafkaOutputReporter**。
 
-maven编译的时候可以指定profile，支持RedisOutputReporter 和 InfluxDBOutputReporter 。
+maven编译的时候可以指定profile，支持 RedisOutputReporter 和 InfluxDBOutputReporter 。
 
 #### Spark使用
 

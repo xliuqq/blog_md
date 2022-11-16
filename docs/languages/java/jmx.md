@@ -1,5 +1,3 @@
-[toc]
-
 # JMX
 
 **JMX(Java Management Extensions)是一个为应用程序植入管理功能的框架**。JMX是一套标准的代理和服务，主要用于对JAVA应用程序和JVM进行监控和管理。
@@ -25,14 +23,6 @@ JConsole 和 JVisualVM 中能够监控到JAVA应用程序和JVM的相关信息�
 -Dcom.sun.management.jmxremote.ssl=false              指定是否使用 SSL 通讯
 -Dcom.sun.management.jmxremote.authenticate=false     指定是否需要密码验证
 ```
-
--Dcom.sun.management.jmxremote=true  -Djava.rmi.server.hostname=192.168.1.2 -Dcom.sun.management.jmxremote.port=29094 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false
-
-## MBean
-
-
-
-
 
 ## MXBean
 

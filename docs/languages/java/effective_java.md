@@ -1,7 +1,3 @@
-[toc]
-
-
-
 # Effective Java
 
 > Link : [Effective Java 3rd](pdf/Effective Java_3rd_2018.pdf)
