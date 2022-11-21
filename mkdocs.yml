@@ -181,6 +181,9 @@ nav:
     - Spark:
       - Spark on Yarn: distributed_computing/spark/spark_yarn.md
       - Spark Yarn RestAPI: distributed_computing/spark/spark_yarn_rest.md
+      - Spark Metrics: distributed_computing/spark/spark_monitor.md
+      - Spark 调优: distributed_computing/spark/spark_optimize.md
+      - Spark Shuffle: distributed_computing/spark/spark_shuffle.md
 
     - GPU编程:
       - 介绍: distributed_computing/gpu/arch.md
