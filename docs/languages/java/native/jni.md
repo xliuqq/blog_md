@@ -1,5 +1,3 @@
-[TOC]
-
 # JNI(Java Native Interface)
 
 通过使用 Java本地接口书写程序，可以确保代码在不同的平台上方便移植。
@@ -601,17 +599,11 @@ After an exception has been raised, the native code must first clear the excepti
 
 
 
-## 学习
-
-### [libHDFS BUG](https://issues.apache.org/jira/browse/HDFS-13585)
-
-当在Java中通过JNI调用libhdfs访问hdfs时，出现 Java -> C++ -> Java的调用栈，libhdfs在C++ pthread线程销毁时注册了JNIEnv的DetachCurrentThread，但是会在整个Java进程运行结束后JVM异常退出（hs_err文件）。
-
-- 但是当调用libhdfs的Java是new Thread时，不会造成JVM异常退出；
+## 注意
 
 ### Java调用C++再调用Java
 
-**在java调用C++代码时在C++代码中调用了AttachCurrentThread方法来获取JNIEnv，此时JNIEnv已经通过参数传递进来，你不需要再次AttachCurrentThread来获取。在释放时就会报错。** 
+**在java调用C++代码时在C++代码中调用了AttachCurrentThread方法来获取JNIEnv，此时JNIEnv已经通过参数传递进来，不需要再次AttachCurrentThread来获取。在释放时就会报错。** 
 
 ```c++
 void cpp2jni(int msg){
@@ -645,4 +637,4 @@ void cpp2jni(int msg){
 
 - 如果c++中没有处理异常，那么会导致jvm的崩溃；
 - 如果c++中正确处理了异常，则jvm可以正常运行；
-- c++中如果不是异常的错误，如数组越界，则无法try-catch捕获，JVM会崩溃。
+- c++中如果不是异常的错误，如**数组越界，则无法try-catch捕获**，JVM会崩溃。

@@ -1,10 +1,4 @@
-[toc]
-
-# Native Libraries Guide
-
-
-
-## Native Hadoop Library
+# Native Hadoop Library
 
 **libhadoop.so**  要求：>zlib-1.2, >gzip-1.2
 
@@ -14,13 +8,13 @@
 
 
 
-### 下载
+## 下载
 
 发行版的预编译的是**32位的i386 linux**本地hadoop库。
 
 
 
-### 编译
+## 编译
 
 ANSI C 源代码，使用GNU autotools工具链。
 
@@ -41,7 +35,7 @@ mvn package -Pdist,native -DskipTests -Dtar
 
 
 
-### 运行时
+## 运行时
 
 `bin/hadoop`脚本保证native hadoop库在库搜索路径上，通过**-Djava.library.path=<path>** 指定动态库位置
 
@@ -51,7 +45,7 @@ INFO util.NativeCodeLoader - **Unable to load native-hadoop library** for your p
 
 
 
-### 检查
+## 检查
 
 NativeLibraryChecker是一个检查本地库是否正确加载的工具
 
@@ -70,7 +64,7 @@ NativeLibraryChecker是一个检查本地库是否正确加载的工具
 
 
 
-### 本地共享库
+## 本地共享库
 
 使用 DistributedCache 分发和链接库文件：
 
@@ -84,3 +78,33 @@ NativeLibraryChecker是一个检查本地库是否正确加载的工具
    ```
 
 3. MapReduce任务可以使用：`System.loadLibrary("mylib.so");`
+
+
+
+## [libHDFS BUG](https://issues.apache.org/jira/browse/HDFS-13585)
+
+当在Java中通过JNI调用libhdfs访问hdfs时，出现 **Java -> C++ -> Java** 的调用栈，libhdfs在C++ pthread线程销毁时注册了JNIEnv的DetachCurrentThread，但是会在整个Java进程运行结束后JVM异常退出（hs_err文件），具体可见 [JNI的"Java调用C++再调用Java"](../../../languages/java/native/jni.md)。
+
+- 但是**当调用 libhdfs的Java是new Thread时，不会造成JVM异常退出**；
+- scala 要采用 `new Thread ()`的形式，而不能是`new Thread {}`的形式（JVM仍会Crash）；
+
+
+
+## 使用
+
+编译cpp文件命令
+
+```shell
+$ g++ -shared -fPIC -I${HADOOP_HOME}/include -L${HADOOP_HOME}/lib/native -lhdfs -L${JDK_HOME}/jre/lib/amd64/server -ljvm  -I ${JDK_HOME}/include/ -I ${JDK_HOME}/include/linux/ jni.cpp -o libjni.so
+```
+
+运行时需要如下的相关变量和参数：
+
+```shell
+export HADOOP_PREFIX=/home/experiment/workspace/hadoop/
+export HADOOP_HOME=$HADOOP_PREFIX
+export CLASSPATH=$($HADOOP_PREFIX/bin/hadoop classpath --glob)
+export LD_LIBRARY_PATH=/home/experiment/workspace/hadoop/lib/native:/home/common/jdk/jre/lib/amd64/server
+export LD_LIBRARY_PATH=/home/experiment/workspace/hadoop/lib/native:/home/common/jdk/jre/lib/amd64/server:.
+```
+

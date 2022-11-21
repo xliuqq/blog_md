@@ -79,6 +79,30 @@ Prometheus社区提供了远程读写两个接口，使用一些社区的时序�
 
 ## 部署
 
+yaml 配置
+
+```yaml
+global:
+  scrape_interval:     15s # By default, scrape targets every 15 seconds.
+
+  # Attach these labels to any time series or alerts when communicating with
+  # external systems (federation, remote storage, Alertmanager).
+  external_labels:
+    monitor: 'codelab-monitor'
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['localhost:9090']
+```
+
+
+
 ```shell
 docker pull prom/node-exporter
 docker run -d -p 9100:9100 \
@@ -93,3 +117,44 @@ docker run  -d \
   -v /home/workspace/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml  \
   prom/prometheus
 ```
+
+
+
+## Gateway
+
+客户端使用push的方式上报监控数据到`pushgateway`，`prometheus`会定期从`pushgateway`拉取数据。
+
+场景：
+
+- Prometheus 采用 pull 模式，可能由于不在一个子网或者防火墙原因，Prometheus 无法拉取数据；
+- 没有端口可以暴露metrics，或者Job启动周期太短；
+
+劣势：
+
+- gateway会成为瓶颈，单点故障；
+- 丢失自动的实例监控监控；
+- 必须手动删除任何过时的指标，或者自己自动执行这个生命周期同步。
+
+
+
+### 配置
+
+`/etc/prometheus/prometheus.yml`
+
+```yaml
+  - job_name: "pushgateway"	
+    honor_labels: true			#检测是否有重复的标签
+    file_sd_configs:
+    - files:
+      - targets/pushgateway/*.json
+      refresh_interval: 5m				#服务发现间隔
+```
+
+从 pushgateway 抓取的指标的`instance` label 为 pushgateway 的主机和端口配置。
+
+
+
+## 自实现
+
+https://github.com/prometheus/client_java#exporting
+
