@@ -72,7 +72,7 @@ nav:
         - 镜像搬运工具: cloud/virtualize/docker/skopeo.md
         - FAQ: cloud/virtualize/docker/faqs.md
       - containerd: cloud/virtualize/containerd/containerd.md
-      - gpu虚拟化: cloud/virtualize/gpu_virtualize.md
+      - gpu虚拟化: cloud/virtualize/gpu.md
   - 调度系统:
     - 概念: scheduler_system/README.md
     - 调度的策略: scheduler_system/scheduler.md

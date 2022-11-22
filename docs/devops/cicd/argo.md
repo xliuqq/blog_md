@@ -1,4 +1,6 @@
-# Argo
+# [Argo](https://argoproj.github.io/)
+
+> Open source tools for Kubernetes to run workflows, manage clusters, and do GitOps right.
 
 ## 组件
 
@@ -14,6 +16,36 @@
 > Application definitions, configurations, and environments should be declarative and version controlled. 
 >
 > Application deployment and lifecycle management should be automated, auditable, and easy to understand.
+
+
+
+### 功能
+
+- 支持多种多个 Git 源仓库；
+- 支持多个K8s环境；
+
+
+
+- ？如何获取镜像，进行构建；
+
+
+
+支持的k8s manifests方式：
+
+- kustomize 应用；
+- helm charts；
+- jsonnnet 文件；
+- 特定目录下的YAML/json manifests；
+- 配置为配置管理插件的任何自定义配置管理工具
+
+
+
+### 使用
+
+```shell
+kubectl create namespace argocd 
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+```
 
 
 
@@ -37,3 +69,4 @@
 10. Custom Trigger / Build Your Own Trigger
 11. Apache OpenWhisk
 12. Log Trigger
+

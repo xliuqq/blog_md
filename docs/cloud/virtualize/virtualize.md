@@ -21,7 +21,7 @@ Kubernetes 只需支持 containerd 等high-level container runtime即可。
 
 <img src="./pics/runtime_compare.jpg" alt="img" style="zoom:67%;" />
 
-Docker Vs ContainerD Vs crio
+**Docker Vs ContainerD Vs crio**
 
 <img src="pics/docker_containerd_crio.png" alt="image" style="zoom:50%;" />
 

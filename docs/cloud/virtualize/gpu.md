@@ -1,4 +1,39 @@
-# GPU虚拟化
+# GPU
+
+## GPU 使用
+
+docker 原生可以通过 ``--device /dev/nvidia0:/dev/nvidia0`的方式，支持GPU使用和隔离，但是无法对GPU可用性做判断。
+
+### Nvidia GPU
+
+
+
+### 原理
+
+[libnvidia-container](https://github.com/NVIDIA/libnvidia-container)
+
+- 提供一个库和简单的CLI工具，以**实现在容器当中支持使用GPU设备的目标**。
+
+[nvidia-container-toolkit](https://github.com/NVIDIA/nvidia-container-toolkit)
+
+- 包含 [nvidia-container-runtime](https://github.com/NVIDIA/nvidia-container-runtime) 和 [nvidia-docker](https://github.com/NVIDIA/nvidia-docker)；
+- 实现`runC prestart hook`接口的脚本：该脚本在runC创建一个容器之后，启动该容器之前调用，其主要作用就是修改与容器相关联的config.json，注入一些在容器中使用NVIDIA GPU设备所需要的一些信息（比如：需要挂载哪些GPU设备到容器当中）；
+- 将容器runC spec作为输入，然后将`nvidia-container-toolkit`脚本作为一个`prestart hook`注入到runC spec中，将修改后的runC spec交给runC处理。
+- CUDA Runtime API和CUDA Libraries通常跟应用程序一起打包到镜像里，而CUDA Driver API是在宿主机里，需要将其挂载到容器里才能被使用。
+
+<img src="pics/image-20221122103847948.png" alt="image-20221122103847948" style="zoom: 67%;" />
+
+
+
+正常创建一个容器的流程：
+
+> docker --> dockerd --> containerd–> containerd-shim -->runc --> container-process
+
+创建一个使用GPU的容器
+
+> docker–> dockerd --> containerd --> containerd-shim–> nvidia-container-runtime --> nvidia-container-runtime-hook --> libnvidia-container --> runc – > container-process
+
+## GPU 虚拟化
 
 GPU 天然适合向量计算。常用场景及 API：
 
@@ -8,14 +43,14 @@ GPU 天然适合向量计算。常用场景及 API：
 | 媒体编解码   | VAAPI，VDPAU           |
 | 深度学习计算 | Cuda，OpenCL           |
 
-## 背景
+### 背景
 
 基本痛点：
 
 - 容器的GPU利用率不够高，特别是推理任务；
 - 为了提高GPU的利用率、避免算力浪费，需要在单个GPU上运行多个容器；
 
-### 方案
+### 相关技术
 
 常见的NVIDIA GPU虚拟化技术方案有：
 
@@ -68,9 +103,9 @@ GPU 天然适合向量计算。常用场景及 API：
 
 #### 使用场景
 
-1. 显存、计算单元利用率低的情况，如在一张GPU卡上运行10个tf-serving。
-2. 需要大量小显卡的情况，如教学场景把一张GPU提供给多个学生使用、云平台提供小GPU实例。
-3. 物理显存不足的情况，可以开启虚拟显存，如大batch、大模型的训练
+1. 显存、计算单元利用率低的情况，如在一张GPU卡上运行10个tf-serving；
+2. 需要大量小显卡的情况，如教学场景把一张GPU提供给多个学生使用、云平台提供小GPU实例；
+3. 物理显存不足的情况，可以开启虚拟显存（超过的部分会放到内存里，对性能有一定的影响），如大batch、大模型的训练；
 
 #### 功能
 
@@ -89,7 +124,9 @@ GPU 天然适合向量计算。常用场景及 API：
 - 开启虚拟显存时，如果某张物理GPU的显存已用满，而这张GPU上还有空余的vGPU，此时分配到这些vGPU上的任务会失败。
 - 目前仅支持计算任务，不支持视频编解码处理。
 
-### 
+
+
+#### 使用
 
 
 
