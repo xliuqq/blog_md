@@ -38,7 +38,11 @@
 - 特定目录下的YAML/json manifests；
 - 配置为配置管理插件的任何自定义配置管理工具
 
+### 架构
 
+- 作为`kubernetes controller`；
+
+<img src="pics/argocd_architecture.png" alt="Argo CD Architecture" style="zoom: 80%;" />
 
 ### 使用
 
