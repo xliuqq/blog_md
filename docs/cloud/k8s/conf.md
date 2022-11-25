@@ -146,3 +146,32 @@ kustomize 最简实践（TODO）
 
 https://www.jianshu.com/p/837d7ae77818
 
+
+
+## 修改NodePort范围
+
+>  默认范围是 30000-32767。
+
+使用 kubeadm 安装 K8S 集群的情况下，修改`/etc/kubernetes/manifests/kube-apiserver.yaml`文件，向其中添加 `--service-node-port-range=20000-22767` （定义需要的端口范围）
+
+重启kube-apiserver
+
+```bash
+# 获得 apiserver 的 pod 名字
+export apiserver_pods=$(kubectl get pods --selector=component=kube-apiserver -n kube-system --output=jsonpath={.items..metadata.name})
+# 删除 apiserver 的 pod
+kubectl delete pod $apiserver_pods -n kube-system
+```
+
+验证结果
+
+- 执行以下命令查看相关pod
+
+```bash
+kubectl describe pod $apiserver_pods -n kube-system
+```
+
+注意
+
+- 对于已经创建的NodePort类型的Service，需要删除重新创建
+- 如果集群有多个 Master 节点，需要逐个修改每个节点上的 /etc/kubernetes/manifests/kube-apiserver.yaml 文件，并重启 apiserver

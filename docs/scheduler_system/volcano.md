@@ -18,11 +18,14 @@ Volcano支持各种调度策略，包括：
 - Backfill
 - Resource Reservation
 
+局限：
 
+- 部署形式为如果多调度器形式（与Kubernetes原生调度器共存），则可能出现和原生调度器的资源调度冲突问题，因此更适合于在专有集群部署；
+- 当前版本中**不支持多级层次化**的资源队列，使得在企业多租户场景下不能够很好的进行映射。
 
 ## 架构
 
-![image](./pics/volcano_arch_2.PNG)
+<img src="./pics/volcano_arch_2.PNG" alt="image" style="zoom:67%;" />
 
 Volcano由scheduler、controllermanager、admission和vcctl组成:
 
@@ -35,7 +38,7 @@ Volcano由scheduler、controllermanager、admission和vcctl组成:
 
 负责Pod调度的组件，它由一系列action和plugin组成。action定义了调度各环节中需要执行的动作；plugin根据不同场景提供了action 中算法的具体实现细节。
 
-![Volcano scheduler工作流](./pics/volcano_scheduler.PNG)
+<img src="./pics/volcano_scheduler.PNG" alt="Volcano scheduler工作流" style="zoom:80%;" />
 
 工作流程如下：
 
@@ -53,7 +56,7 @@ Volcano由scheduler、controllermanager、admission和vcctl组成:
 
 强关联pod的集合，主要用于批处理工作负载场景，比如Tensorflow中的一组ps和worker。
 
-![status-DAG](pics/status-DAG.png)
+<img src="pics/status-DAG.png" alt="status-DAG" style="zoom:80%;" />
 
 ### Queue
 
