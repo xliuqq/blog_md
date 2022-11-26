@@ -1,18 +1,22 @@
 # Docker
 
-> 参考书籍：《Docker 容器与容器云》
+> 参考书籍：《Docker 容器与容器云》，《深入剖析Kubenetes》
 
-同一台机器上的所有容器共享主机操作系统的内核。
+docker  =  image + cgroup + namespace
 
-- 如果应用程序需要配置内核参数、加载额外内核模块、与内核直接交互，是全局可见的。
-
-
+- image 解决的是打包问题，相对于传统Paas，**保证开发/生产环境的一致性**；
+  - 完整的文件系统：rootfs（chroot）；
+  - 自定义的打包流程：Dockerfile；
+- cgroup 和 namespace 提供运行的沙盒，是Linux的机制，跟传统Paas一致；
 
 ## 基础知识
 
 - 镜像是多层存储，每一层的东西并不会在下一层被删除，会一直跟随着镜像；
 - 命令行工具docker与Docker daemon建立通信，Docker daemon是Docker守护进程，负责接收并分发执行Docker命令；
 - docker命令执行需要获取root权限，绑定属于root的Unix Socket；
+- 同一台机器上的所有容器共享主机操作系统的内核。
+
+  - 如果应用程序需要配置内核参数、加载额外内核模块、与内核直接交互，是全局可见的。
 
 
 
