@@ -52,9 +52,20 @@ Master组件的YAML文件会被生成在`/etc/kubernetes/manifests`路径下；
 
 ### expose
 
-对deployment提供service
+将资源暴露为service对外访问，支持： pod（po），service（svc），replication controller（rc），deployment（deploy），replica set（rs）
 
-- `kubectl expose deployment webapp`
+`kubectl expose  pod hc-base-jupyter-pod --port=8888 --target-port=8888  --type=NodePort -n ai-education`
+
+- `--port`: 容器内服务端口
+- `--target-port`：集群内部容器开放端口
+- `--type`：服务暴露类型，一般选择NodePort，会自动分配一个外部访问的port
+- `--name`：名称（可选）
+
+### port-forward
+
+通过**端口转发映射本地端口到指定的应用（Pod）端口**
+
+`kubectl port-forward svc/yunikorn-service 9889:9889 -n yunikorn`
 
 ### delete
 
