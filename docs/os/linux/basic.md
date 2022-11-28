@@ -45,11 +45,18 @@ mount 命令用来挂载文件系统。其基本命令格式为：
 **type**：指定挂载的文件系统类型，一般不用指定，mount 命令能够自行判断。
 **options**：指定挂载参数，比如 ro 表示以只读方式挂载文件系统。 
 
-**绑定挂载**
+### 绑定挂载
 
 ```bash
 # --bind 将两个目录连接起来，将/host挂载到/test上，对/test的访问和修改都是在/host上
 $ mount --bind /host /test
+```
+
+### 联合挂载
+
+```shell
+# 将A和B目录挂载到一个公共的目录C上
+$ mount -t aufs -o dirs=./A:./B none ./C
 ```
 
 

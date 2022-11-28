@@ -159,3 +159,26 @@ kube-proxy会为Service创建一系列Iptables规则，其中包含Iptables自�
 ```
 iptables -t nat -L -n
 ```
+
+## BR_FILTER
+
+`br_netfiler`作用：br_netfilter模块可以**使 iptables 规则可以在 Linux Bridges** 上面工作，用于将桥接的流量转发至iptables链。
+
+- **如果没加载，影响同node内的pod之间通过service来通信；**
+
+- 因为iptables是在三层的，而linux bridge是在二层的。当pod发出的流量经过service来转发后是到同一个node上的pod，那么此时两个pod都是桥接在cni网桥上的，那么就会直接通过网桥来传递流量，但是此时流量的处理就不会up call到三层的iptables规则，从而导致转发异常；
+
+启用 bridge-nf-call-iptables 这个内核参数 (置为 1)，表示 bridge 设备在二层转发时也去调用 iptables 配置的三层规则 (包含 conntrack)
+
+- 每个 Pod 的网卡都是 veth 设备，veth pair 的**另一端连上宿主机上的网桥**；
+
+- 由于网桥是虚拟的二层设备，**同节点的 Pod 之间通信直接走二层转发**，跨节点通信才会经过宿主机 eth0；
+
+不管是 iptables 还是 ipvs 转发模式，Kubernetes 中访问 Service 都会进行 **DNAT，将原本访问 ClusterIP:Port 的数据包 DNAT 成 Service 的某个 Endpoint (PodIP:Port)**，然后内核将**连接信息插入 conntrack 表**以记录连接，目的端回包的时候内核从 conntrack 表匹配连接并**反向 NAT**，这样原路返回形成一个完整的连接链路:
+
+<img src="pics/br_filter_reason.png" alt="image-20221126154144562" style="zoom: 25%;" />
+
+导致问题：（常见的问题现象就是偶现 DNS 解析失败）
+
+1、Pod 访问 Service，**目的 IP 是 Cluster IP，不是网桥内的地址，走三层转发**，会被 DNAT 成 PodIP:Port；
+2、如果 DNAT 后是转发到了同节点上的 Pod，**目的 Pod 回包时发现目的 IP 在同一网桥上，就直接走二层转发**，没有调用 conntrack，导致**回包时没有原路返回**，客户端与服务端的通信就不在一个 “频道” 上，**不认为处在同一个连接**，也就无法正常通信。

@@ -41,13 +41,13 @@ minikube start --disk-size="10g"  --image-mirror-country="cn"  --image-repositor
 
 
 
-## Kind（测试环境）
+## Kind
 
 > Kubernetes IN Docker - local clusters for testing Kubernetes.
 >
 > kind is a tool for running local Kubernetes clusters using Docker container "nodes". kind was primarily designed for testing Kubernetes itself, but may be used for local development or CI.
 
-
+测试环境
 
 ## [MicroK8s](https://github.com/canonical/microk8s)
 

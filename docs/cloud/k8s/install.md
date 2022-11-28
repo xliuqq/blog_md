@@ -1,10 +1,19 @@
 # 部署
 
-> Kubernetes原生的可扩展性受制于list/watch的长连接消耗，生产环境能够稳定支持的节点规模是1000左右。
+> Kubernetes原生的可扩展性受制于`list/watch`的长连接消耗，生产环境能够稳定支持的节点规模是1000左右。
 
-目前为止，在容器里运行`kubelet`依然没有非常稳妥的解决办法（因为`kubelet`需要设置容器的namespace），不建议在生产环境中直接使用。
+目前为止，在容器里运行`kubelet`依然没有非常稳妥的解决办法（因为`kubelet`需要设置容器的namespace），不建议在生产环境中直接使用（测试环境可以使用[KIND](./release_compare.md#Kind)）。
 
 ## 系统配置（所有节点）
+
+### 时钟同步
+
+```shell
+$ yum install chrony -y
+$ systemctl start chronyd
+$ systemctl enable chronyd
+$ chronyc sources	
+```
 
 ### 关闭selinux
 
@@ -33,6 +42,31 @@ systemctl stop firewalld
 systemctl disable firewalld 
 ```
 
+### 网络配置
+
+> br_netfiler作用：br_netfilter模块可以**使 iptables 规则可以在 Linux Bridges** 上面工作，用于将桥接的流量转发至iptables链。
+>
+> - 如果没加载，影响同node内的pod之间通过service来通信，具体原因可见[k8s_network](./k8s_network#BR_FILTER)
+
+```shell
+# 加载br_netfilter模块，可通过lsmod | grep br_netfilter检查是否加载
+modprobe br_netfilter
+
+# 绑定非本机 IP （ip_nonlocal_bind）
+# 将Linux系统作为路由或者VPN服务就必须要开启IP转发功能（ip_forward）
+# ip_foward=1 将一个接口的流量转发到另外一个接口，该配置是 Linux 内核将流量从容器路由到外部所必须
+vim /etc/sysctl.d/kubernetes.conf
+  net.bridge.bridge-nf-call-ip6tables = 1
+  net.bridge.bridge-nf-call-iptables = 1  
+  net.ipv4.ip_nonlocal_bind = 1
+  net.ipv4.ip_forward = 1
+  vm.swappiness = 0  
+
+sysctl -p /etc/sysctl.d/kubernetes.conf  
+```
+
+
+
 ### 加载ipvs模块
 
 **默认情况下，kube-proxy将在kubeadm部署的集群中以`iptables`模式运行；(需确认）**
@@ -54,23 +88,6 @@ chmod +x /etc/sysconfig/modules/ipvs.modules && bash /etc/sysconfig/modules/ipvs
 
 ### 其它配置
 
-配置内核参数
-
-```bash
-# 绑定非本机 IP （ip_nonlocal_bind）
-# 将Linux系统作为路由或者VPN服务就必须要开启IP转发功能（ip_forward）
-vim /etc/sysctl.d/kubernetes.conf
-  net.bridge.bridge-nf-call-ip6tables = 1
-  net.bridge.bridge-nf-call-iptables = 1  
-  net.ipv4.ip_nonlocal_bind = 1
-  net.ipv4.ip_forward = 1
-  vm.swappiness = 0  
-
-sysctl -p /etc/sysctl.d/kubernetes.conf 
-# 如果出错
-modprobe br_netfilter 
-```
-
 所有用户的打开文件数
 
 ```bash
@@ -80,7 +97,11 @@ echo "* hard nofile 65536" >> /etc/security/limits.conf
 
 
 
-## 安装docker（所有节点)
+## 安装容器运行时（所有节点)
+
+### Docker Engine
+
+> Docker Engine 没有实现 [CRI](https://kubernetes.io/zh-cn/docs/concepts/architecture/cri/)， 而这是容器运行时在 Kubernetes 中工作所需要的。 为此，必须安装一个额外的服务 [cri-dockerd](https://github.com/Mirantis/cri-dockerd)。 cri-dockerd 是一个基于传统的内置 Docker 引擎支持的项目， 它在 1.24 版本从 kubelet 中[移除](https://kubernetes.io/zh-cn/dockershim)。
 
 1）配置yum源
 
@@ -99,6 +120,7 @@ yum -y install docker-ce
 
 ```bash
 mkdir /etc/docker 
+# 修改`docker Cgroup Driver`为`systemd`,`overlay2`默认存储驱动；
 vim /etc/docker/daemon.json
  {   "exec-opts": ["native.cgroupdriver=systemd"],
      "log-driver": "json-file", 
@@ -110,24 +132,11 @@ vim /etc/docker/daemon.json
       "overlay2.override_kernel_check=true"
     ],
      "registry-mirrors": [
-        "https://1nj0zren.mirror.aliyuncs.com",
-        "https://docker.mirrors.ustc.edu.cn",
-        "http://f1361db2.m.daocloud.io",
+        "http://hub-mirror.c.163.com",
         "https://registry.docker-cn.com"
     ]
 
 } 
-```
-
-修改`docker Cgroup Driver`为`systemd`（不用修改，上面已经配置）
-
-```bash
-# # 将/usr/lib/systemd/system/docker.service文件中的这一行 ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
-# # 修改为 ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock --exec-opt native.cgroupdriver=systemd
-# 如果不修改，在添加 worker 节点时可能会碰到如下错误
-# [WARNING IsDockerSystemdCheck]: detected "cgroupfs" as the Docker cgroup driver. The recommended driver is "systemd". 
-# Please follow the guide at https://kubernetes.io/docs/setup/cri/
-sed -i "s#^ExecStart=/usr/bin/dockerd.*#ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock --exec-opt native.cgroupdriver=systemd#g" /usr/lib/systemd/system/docker.service 
 ```
 
 4）启动docker
@@ -137,11 +146,34 @@ systemctl enable docker
 systemctl start docker 
 ```
 
+5）安装 cri-dockerd
+
+[Mirantis/cri-dockerd (github.com)](https://github.com/Mirantis/cri-dockerd)
+
+### Containerd
+
+1）安装 containerd
+
+[containerd/getting-started.md at main · containerd/containerd (github.com)](https://github.com/containerd/containerd/blob/main/docs/getting-started.md)
+
+2）配置 `systemd` cgroup 驱动
+
+在 `/etc/containerd/config.toml` 中设置：(配置完后重启`sudo systemctl restart containerd`)
+
+```
+[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+  ...
+  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+    SystemdCgroup = true
+```
+
 ## kubeadmin 安装 k8s
 
-### 安装kubeadm（所有节点)
+在宿主机运行`kubelet`、`kubadmin`和`kubectl`，使用容器部署其他Kubenetes组件。
 
-- 配置 k8s 的yum repo
+### 安装kubeadm/kubelet/kubectl（所有节点)
+
+- 配置 k8s 的 yum repo
 
 ```bash
 cat <<EOF > /etc/yum.repos.d/kubernetes.repo
@@ -154,24 +186,35 @@ repo_gpgcheck=0
 gpgkey=http://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg
        http://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
 EOF
+
+# 重新构建缓存索引
+yum clean all 
+yum makecache fast
 ```
 
 - 安装 kubelet, kubeadm, kubectl
+  - `kubeadm`：用来初始化集群的指令。
+  - `kubelet`：在集群中的每个节点上用来启动 Pod 和容器等。
+  - `kubectl`：用来与集群通信的命令行工具
+
 
 ```bash
-# 自动安装依赖kubelet和kubectl
-yum install kubeadm-1.21.1
+yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+# disableexcludes=kubernetes：禁掉除了这个kubernetes之外的别的仓库
 ```
 
 - 启动 kubelet
 
 ```bash
-systemctl enable kubelet && systemctl start kubelet 
+# 开机自启并立即启动
+sudo systemctl enable --now kubelet
+# 重新安装（或第一次安装）k8s，未经过kubeadm init 或者 kubeadm join后，
+# kubelet会不断重启，这个是正常现象……，执行init或join后问题会自动解决
 ```
 
-### 初始化Master（仅master节点）
+### 初始化（仅master节点）
 
-创建 `kubeadm-config.yaml`，
+推荐使用yaml进行初始化：示例 `kubeadm-config.yaml`
 
 ```yaml
 apiVersion: kubeadm.k8s.io/v1beta2
@@ -198,13 +241,21 @@ networking:
 
 ```
 
-- 初始化
+执行命令
 
 ```shell 
-kubeadm init --config=kubeadm-config.yaml --upload-certs
+#kubeadm init \
+#  --apiserver-advertise-address=192.168.0.113 \
+#  --image-repository registry.aliyuncs.com/google_containers \
+#  --kubernetes-version v1.22.1 \
+#  --service-cidr=10.1.0.0/16 \
+#  --pod-network-cidr=10.244.0.0/16
+ 
+# 将控制平面证书上传到 kubeadm-certs Secret。
+$ kubeadm init --config=kubeadm-config.yaml --upload-certs
 ```
 
-- 初始化 root 用户的 kubectl 配置
+- 初始化 kubectl ，供特定用户使用
 
 ```bash
 rm -rf $HOME/.kube/
@@ -213,12 +264,12 @@ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
-- 安装 calico（网络）
+### Pod网络插件安装（仅Master）
+
+CNI 插件 calico
 
 ```bash
-# 数据存储在Kubernetes API Datastore服务中
 curl https://docs.projectcalico.org/manifests/calico.yaml -o calico.yaml
-# 还是
 kubectl apply -f calico.yaml # configmap/calico-config created 
 # 查看
 kubectl get pod --all-namespaces
@@ -230,7 +281,9 @@ kubectl get pod --all-namespaces
 
 ### 部署node节点
 
-主节点（Master）获取 join 参数
+> `kubeadm init` 创建了一个有效期为 24 小时的令牌（引导令牌用于在即将加入集群的节点和主节点间建立双向认证），在命令的Output中显示。
+
+主节点（Master）获取 join 参数（创建新的令牌，默认24小时后自动删除）
 
 ```bash
 $ kubeadm token create --print-join-command
@@ -240,7 +293,7 @@ kubeadm join 192.168.174.129:6443 --token a95vmc.yy4p8btqoa7e5dwd     --discover
 在 从节点 输入刚才获取的join参数输出，执行join命令
 
 ```bash
-$ kubeadm join 192.168.174.129:6443 --token 46q0ei.ivbs1u1n2a3tayma     --discovery-token-ca-cert-hash sha256:7c43918ee287d21fe9b70e4868e2e0fdd8c5f6b829a825822aecdb8d207494fc 
+kubeadm join 192.168.174.129:6443 --token a95vmc.yy4p8btqoa7e5dwd     --discovery-token-ca-cert-hash sha256:7c43918ee287d21fe9b70e4868e2e0fdd8c5f6b829a825822aecdb8d207494fc 
 ```
 
 查看节点状态
@@ -256,9 +309,9 @@ node132   Ready    <none>                 105s   v1.21.3
 
 
 
-### kube-proxy开启ipvs（在master节点执行就行）
+### kube-proxy开启ipvs（master节点执行）
 
-修改ConfigMap的`kube-system/kube-proxy`中的`config.conf`，`mode: "ipvs"`
+修改`ConfigMap`的`kube-system/kube-proxy`中的`config.conf`，`mode: "ipvs"`
 
 ```bash
 kubectl edit cm kube-proxy -n kube-system 
@@ -270,82 +323,17 @@ kubectl edit cm kube-proxy -n kube-system
 kubectl get pod -n kube-system | grep kube-proxy | awk '{system("kubectl delete pod "$1" -n kube-system")}'
 ```
 
+### cgroup 驱动配置
 
+> 确保容器运行时和 kubelet 所使用的是相同的 cgroup 驱动。
 
-## 存储配置
+1.22 版本之后，kubeadmin 安装时默认 kubelet 是 sytemmd cgroup 驱动；
+
+### 存储配置
 
 见 [K8s 部署 CephFS](./k8s_rook_ceph.md)
 
-## Dashborad部署
-
-部署和查看
-
-```bash
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.3.1/aio/deploy/recommended.yaml
-# 查看
-kubectl get pods -n kubernetes-dashboard
-# 配置代理，接受所有地址的访问
-kubectl  proxy --address="172.16.2.131" --port=8001 --accept-hosts="^.*"
-```
-
-```bash
-# 查看kubernetes-dashboard的token
-kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep kubernetes-dashboard | awk '{print $1}')
-```
-
-该token可能因为kubernetes-dashboard 这个账户的角色权限不够，界面数据出问题。
-
-**创建dashboard-adminuser.yaml**（未尝试）
-
-```yaml
-cat > dashboard-adminuser.yaml << EOF
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: admin-user
-  namespace: kubernetes-dashboard
-
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: admin-user
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cluster-admin
-subjects:
-- kind: ServiceAccount
-  name: admin-user
-  namespace: kubernetes-dashboard  
-EOF
-```
-
-
-
-```bash
-# 创建了一个叫 admin-user 的服务账号，并放在kubernetes-dashboard 命名空间下，并将 cluster-admin 角色绑定到admin-user账户，这样admin-user账户就有了管理员的权限。默认情况下，kubeadm创建集群时已经创建了cluster-admin角色，我们直接绑定即可。
-kubectl apply -f dashboard-adminuser.yaml
-# 查看admin-user账户的token
-kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep admin-user | awk '{print $1}')
-
-```
-
-
-
-## Master节点执行Pod配置
-
-默认情况下，Master节点是不允许运行用户Pod的。通过[`Taint/Toleration`机制](./conf.md#Taint/Toleration)，可以在Master节点部署用户Pods。
-
-删除Master的Taint
-
-```bash
-kubectl taint nodes --all node-role.kubernetes.io/master-
-```
-
-
-
-## 问题
+### 问题
 
 下载过程中可能会出现报错信息提示镜像：
 
@@ -359,3 +347,36 @@ kubectl taint nodes --all node-role.kubernetes.io/master-
 docker tag $IMAGE_ID registry.aliyuncs.com/google_containers/coredns/coredns:v1.8.0
 ```
 
+
+
+## 清理
+
+1）先将节点设置为维护模式(k8s-node1是节点名称)
+
+```bash
+$ kubectl drain k8s-node1 --delete-local-data --force --ignore-daemonsets
+```
+
+2）在删除节点之前，请重置 kubeadm 安装的状态：
+
+```bash
+$ kubeadm reset
+```
+
+3）重置过程不会重置或清除 iptables 规则或 IPVS 表。如果你希望重置 iptables，则必须手动进行：
+
+```bash
+$ iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X
+```
+
+4）如果要重置 IPVS 表，则必须运行以下命令：
+
+```bash
+$ ipvsadm -C
+```
+
+5）现在删除节点：
+
+```bash
+$ kubectl delete node k8s-node1
+```
