@@ -375,17 +375,13 @@ Fluid 默认安装webhook的Deployment，对Pods的create/update进行回调，�
   > Registered webhook handler      {"path": "/mutate-fluid-io-v1alpha1-schedulepod"}
 
 - 如果是 serverlesss 模式，则进行 **FUSE 容器注入**；
+
+  - 将 PVC 的 volume 替换成Fuse容器的路径；
+
 - 如果不是 serverless 模式，则进行`RequireNodeWithFuse`，`PreferNodesWithCache`，`MountPropagationInjector`；
   - `RequireNodeWithFuse`：fuse的global 和 selector的注入Pod；
   - `PreferNodesWithCache`：pod的节点亲和性调度设置，调度到具备`commonLabel（fluid.io/s-default-demo=true）`的节点；
   - `MountPropagationInjector`：pod进行`MountPropagation`配置为`HostToContainer`
-
-### RequireNodeWithFuse
-
-对 FUSE 的 global 和 selector 进行判断，两者只能有一个起作用：
-
-- global 为 false，选择具有common label的节点；
-- global 为 true，考虑nodeselector进行调度；
 
 
 
