@@ -4,7 +4,7 @@
 
 默认情况下，Master节点是不允许运行用户Pod的。通过`Taint/Toleration`机制，可以在Master节点部署用户Pods。
 
-**原理**：一旦某个节点被加上一个Taint，即”染上污点“，那么 运行，除非个别节点声明自己能够容忍”污点”，即声明了“Toleration”。
+**原理**：节点被加上一个Taint（染上“污点“），如果节点未声明自己能够容忍该”污点”（Toleration），则Pod不能在上面运行。
 
 节点加上“污点”的命令：
 
@@ -29,7 +29,7 @@ spec:
       effect: "NoSchedule"
 ```
 
-节点删除“污点”的命令：
+节点删除“污点”的命令：让Master节点可以运行Pod
 
 ```bash
 # 删除所有节点的node-role.kubernetes.io/master的Taint（最后的减号表示删除）

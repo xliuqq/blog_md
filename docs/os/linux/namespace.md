@@ -149,6 +149,8 @@ Mount Namespace跟其它Namespace使用不同的地方：
 chroot $HOME/test /bin/bash
 ```
 
+
+
 ## Linux C API（使用）
 
 ### 创建NameSpace

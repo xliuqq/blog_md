@@ -1,35 +1,38 @@
 # Docker
 
-> 参考书籍：《Docker 容器与容器云》
+> 参考书籍：《Docker 容器与容器云》，《深入剖析Kubenetes》
 
-同一台机器上的所有容器共享主机操作系统的内核。
+docker  =  image + cgroup + namespace
 
-- 如果应用程序需要配置内核参数、加载额外内核模块、与内核直接交互，是全局可见的。
-
-
+- image 解决的是打包问题，相对于传统Paas，**保证开发/生产环境的一致性**；
+  - 完整的文件系统：rootfs（chroot）；
+  - 自定义的打包流程：Dockerfile；
+- cgroup 和 namespace 提供运行的沙盒，是Linux的机制，跟传统Paas一致；
 
 ## 基础知识
 
 - 镜像是多层存储，每一层的东西并不会在下一层被删除，会一直跟随着镜像；
 - 命令行工具docker与Docker daemon建立通信，Docker daemon是Docker守护进程，负责接收并分发执行Docker命令；
 - docker命令执行需要获取root权限，绑定属于root的Unix Socket；
+- 同一台机器上的所有容器共享主机操作系统的内核。
 
+  - 如果应用程序需要配置内核参数、加载额外内核模块、与内核直接交互，是全局可见的。
 
+- docker镜像运行时，会先创建一个容器初始化进程（dockerinit），完成根目录准备、设备挂载等初始化操作，在通过`execv()`系统调用让应用进程取代自己成为容器`PID=1`的进程；
 
 ## 镜像文件
 
 Docker使用了Linux本身的bootfs，只需要安装自己所需的rootfs。
+
+> - 容器Volume里的信息不会被`docker commit`提交，但是挂载点目录会出现在新的镜像中。
+>
+> - 镜像的层放在`/var/lib/docker/aufs/diff`目录下，被联合挂载在`/var/lib/docker/aufs/mnt`中。
 
 ### 联合挂载
 
 镜像设计过程中引入了层（layer）的概念，制作镜像的每一步都会生成一个层，形成增量的rootfs；
 
 - UnionFS：将**不同位置的目录联合挂载（union mount）到同一个目录**下；
-
-
-### 只读层
-
-readonly + whiteout
 
 #### 读写层
 
@@ -42,6 +45,10 @@ docker commit和push指令保存修改过的可读写层，形成新的镜像，
 Init层是一个以`-init`结尾的层，夹在只读层和可读写层之间，用于存放`/etc/hosts`、`/etc/resolv.conf`等信息；
 
 - 这些文件本来属于Ubuntu镜像的一部分，但是用户会在启动容器时修改他们，但是这些修改不具备普适性，不应该被commit。
+
+#### 只读层
+
+readonly + whiteout
 
 ### 存储驱动
 
@@ -122,6 +129,8 @@ $ sudo systemctl restart docker.service
 - **AUDIT_EDIT**：审计日志写入
 
 ## 资源限制
+
+> CPU/Memroy 在容器内是看到限制的，还是宿主机的所有信息？
 
 ### 基于[`cgroup`](../../../os/linux/cgroup.md)限制
 

@@ -11,6 +11,8 @@ cgroup，其本身的作用只是任务跟踪。但其它系统（比如cpusets�
 - 资源统计：统计系统的资源使用量，如CPU使用时长、内存用量等，适用于计费；
 - 任务控制：对任务执行进行**挂起、恢复**等操作；
 
+
+
 ## 版本(v1/v2)
 
 Linux 中有两个 cgroup 版本：cgroup v1 和 cgroup v2。cgroup v2 是 Linux `cgroup` API 的下一个版本。
@@ -190,7 +192,23 @@ $ cgcreate -g cpuset:/subgroup
 $ cgdelete cpuset,memory:/subgroup
 ```
 
+## seccomp
 
+linuxkernel从2.6.23版本开始所支持的一种安全机制。
+
+在Linux系统里，大量的系统调用（systemcall）直接暴露给用户态程序。但是，并不是所有的系统调用都被需要，而且不安全的代码滥用系统调用会对系统造成安全威胁。**通过seccomp限制程序使用某些系统调用**，这样可以减少系统的暴露面，同时是程序进入一种“安全”的状态。
+
+1. *从*Linux3.8开始，可以利用`/proc/[pid]/status`中的Seccomp字段查看。如果没有seccomp字段，说明内核不支持seccomp*。*
+
+
+
+## 驱动
+
+**systemd和cgroupfs都是CGroup管理器，而systemd是大多数Linux发行版原生的。**
+
+- **同时使用cgroupfs和systemd的节点，在资源紧张时会变得不稳定。**
+
+当选择systemd作为Linux发行版的init system时，init proccess生成并使用root控制组（/sys/fs/cgroup），并充当CGroup管理器。
 
 ## 使用示例
 
@@ -274,9 +292,7 @@ bash: fork: retry: Resource temporarily unavailable
 bash: fork: retry: Resource temporarily unavailable
 ```
 
-
-
-## 如何支持GPU
+### 如何支持GPU
 
 > Linux中每个设备都有一个设备号，设备号由主设备号和次设备号两部分组成。
 
@@ -302,15 +318,3 @@ $ echo "c 195,0 w" > devices.deny
 
 # 将进程号写到 tasks 里面，可以发现上面的脚本显示的GPU少了一个
 ```
-
-
-
-
-
-## seccomp
-
-linuxkernel从2.6.23版本开始所支持的一种安全机制。
-
-在Linux系统里，大量的系统调用（systemcall）直接暴露给用户态程序。但是，并不是所有的系统调用都被需要，而且不安全的代码滥用系统调用会对系统造成安全威胁。**通过seccomp限制程序使用某些系统调用**，这样可以减少系统的暴露面，同时是程序进入一种“安全”的状态。
-
-1. *从*Linux3.8开始，可以利用`/proc/[pid]/status`中的Seccomp字段查看。如果没有seccomp字段，说明内核不支持seccomp*。*
