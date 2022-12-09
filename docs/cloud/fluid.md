@@ -43,9 +43,9 @@ DataSet的亲和性和Pod的亲和性冲突了怎么处理？
 
 **原理和流程：**
 
-- DataSet声明数据集的来源，**Runtime选择node打标签进行worker调度**；
-- APP 通过 PVC 获取数据，PVC通过CSI-Plugin获取数据，进行`/runtime-mnt`的文件操作，触发FUSE容器通过Alluxio Worker中获取数据；
-
+- DataSet声明数据集的来源，**Runtime选择node打标签由K8s进行worker调度**；
+- CSI-Plugin作为Deamonset挂载宿主机的`/runtime-mnt`，当Pod挂载PVC时，将对应的`/runtime-mnt`的子目录bind挂载到容器；
+- APP Pod 获取数据是，会触发宿主机`/runtime-mnt`的文件操作，触发FUSE容器通过Alluxio Worker中获取数据；
   - PVC的数据读取通过CSI-Plugin和FUSE实现，**CSI-Plugin 和 FUSE DaemonSet都挂载宿主机的相同目录（/runtime-mnt）**；
   - FUSE DaemonSet的本地挂载目录为`/runtime-mnt/alluxio/default/demo`，后两个为*dataset  namespace*和*name*；
   - Alluxio Worker 根据 DataSet 中声明的远程路径，进行数据操作；
@@ -89,14 +89,41 @@ Dataset的生命周期流程如图所示：
   - 支持多个Mount，会根据名字，建立不同的文件目录；
 
 - `owner`：定义用户，设置权限，uid/gid；
+
 - **`nodeAffinity`：缓存的节点亲和性（限制runtime的worker的节点选择）；**
+
 - `tolerations`：pod's tolerations；
+
 - `accessModes`：Array，"ReadWriteOnce"、"ReadOnlyMany"、"ReadWriteMany"
+
 - `runtimes`：支持数据集的运行时，如AlluxioRuntimes；
+
 - `placement`：
+
 - `dataRestoreLocation`：加载backuped的dataset的路径；
   - 数据集加载时，将不再从UFS中加载metadata并统计UFS TOTAL SIZE等信息，而是从备份文件中恢复
+  
+- `mounts`：`path`字段表示 runtime 的mount路径，如果不指定则为 `/{name}`
 
+  - 下例中：`alluxio mount fs`看到
+
+    ```shell
+    https://mirrors.bit.edu.cn/apache/spark  on  /spark  (web, ...)
+    /underFSStorage                          on  /       (local, ...)
+    ```
+  
+  - 如果指定 `path='/'`，则
+  
+    ```shell
+    https://mirrors.bit.edu.cn/apache/spark  on  /  (web ...)
+    ```
+  
+  - 如果指定`path='/for'`，则
+  
+    ```shell
+    https://mirrors.bit.edu.cn/apache/spark  on  /for  (web, ...)
+    /underFSStorage                          on  /       (local, ...)
+    ```
 
 ```yaml
 apiVersion: data.fluid.io/v1alpha1
