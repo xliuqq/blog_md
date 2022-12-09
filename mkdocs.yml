@@ -157,25 +157,37 @@ nav:
       - 三方包:
         - java和Python互相访问: languages/python/packages/java_python.md
         
+  - 数据查询:
+    - SQL系统对比: data_query/sql_compare.md
+    - SQL 基础知识:
+      - 基础: data_query/basic.md
+      - 索引: data_query/index.md
+    - 统一SQL-openLooKong-: data_query/apache_openlookong.md
+    - 统一SQL-Presto:
+      - 安装: data_query/presto/install.md
+      - 介绍: data_query/presto/presto.md
+      - 数据类型: data_query/presto/data_types.md
+      - 语法: data_query/presto/syntax.md
+      - Raptorx和Presto on Spark: data_query/presto/presto_scale.md  
+    - 基准测试(TPC): data_query/tpc.md
   - 数据系统:
     - 消息队列:
-      - Apache Pulsar: data_store/messagequeue/pulsar/apache_pulsar.md
-    - 数据同步:
-      - 概念: data_manage/data_synch/README.md
-      - CDC: data_manage/data_synch/cdc.md
-    - 数据查询:
-      - Presto:
-        - 安装: ./data_query/presto/install.md
-        - 介绍: ./data_query/presto/presto.md
-        - 数据类型: ./data_query/presto/data_types.md
-        - 语法: ./data_query/presto/syntax.md
-        - Raptorx和Presto on Spark: ./data_query/presto/presto_scale.md  
+      - Apache Pulsar: data_system/messagequeue/pulsar/apache_pulsar.md
+    - 数据管理:
+      - 数据集成:
+        - 数据同步: data_system/data_manage/data_integration/README.md
+        - CDC: data_system/data_manage/data_integration/cdc.md
+        - seatunnel: data_system/data_manage/data_integration/seatunnel.md
+        - chunjun: data_system/data_manage/data_integration/chunjun.md
+        - tis: data_system/data_manage/data_integration/tis.md
+        - bitsail: data_system/data_manage/data_integration/bitsail.md
+      - 数据集成框架(InLong): data_system/data_manager/Apache_InLong.md
     - 数据湖:
       - Apache Hudi:
-        - 原理: data_store/data_lake/apache_hudi/hudi.md
+        - 原理: data_system/data_lake/apache_hudi/hudi.md
         - 服务:
-          - 压缩（Compaction）: data_store/data_lake/apache_hudi/compaction.md
-          - 聚簇（clustering）: data_store/data_lake/apache_hudi/clustering.md
+          - 压缩（Compaction）: data_system/data_lake/apache_hudi/compaction.md
+          - 聚簇（clustering）: data_system/data_lake/apache_hudi/clustering.md
 
   - 计算引擎:
     - Spark:

@@ -1,46 +1,44 @@
 # Apache InLong
 
-> Apache InLong（应龙）是一个一站式海量数据集成框架，将数据采集、聚合、存储、排序数据处理的全流程整合在一起，提供自动、安全、可靠和高性能的数据传输能力，同时支持批和流，方便业务构建基于流式的数据分析、建模和应用。
+> Apache InLong（应龙）是一个一站式海量数据集成框架，将**数据采集、聚合、存储、排序数据处理的全流程**整合在一起，提供自动、安全、可靠和高性能的数据传输能力，同时支持批和流，方便业务构建基于流式的数据分析、建模和应用。
 
 开源的ETL解决方案。
 
 ## 架构
 
+- 通过 Flink Source/Sink 支持数据采集和存储；
+
 <img src="pics/inlong-structure-zh.png" alt="Apache InLong" style="zoom: 75%;" />
-
-<img src="pics/griffin_arch.png" alt="Apache InLong" style="zoom: 67%;" />
-
-<img src="pics/inlong_manager.png" alt="img" style="zoom:75%;" />
 
 ## 模块
 
-#### inlong-agent
+### inlong-agent
 
 数据采集Agent。从指定目录或文件读取常规日志、逐条上报
 
-#### inlong-dataproxy
+### inlong-dataproxy
 
 支持数据发送阻塞和落盘重发，可以将接收到的数据转发到不同的MQ（消息队列）
 
-#### inlong-tubemq
+### inlong-tubemq
 
 腾讯自研的消息队列服务，用户大数据场景下海量数据的高性能存储和传输
 
-#### inlong-sort
+### inlong-sort
 
 对从不同MQ消费到的数据进行ETL处理，然后汇聚并写入Hive、ClickHouse、HBase、Iceberg等存储系统。
 
 或者，对从不同数据源读取的数据进行ETL处理，然后写入到指定的MQ（从ExtractNode写入LoadNode）
 
-#### inlong-manager
+### inlong-manager
 
 提供元数据、任务流、权限、OpenAPI等的数据服务管控能力
 
-#### inlong-dashboard
+### inlong-dashboard
 
 管理数据接入的前端页面
 
-#### inlong-audit
+### inlong-audit
 
 对InLong系统的Agent、DataProxy、Sort模块的入流量、出流量进行实时审计对账
 
