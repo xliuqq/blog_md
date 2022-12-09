@@ -1,0 +1,5986 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="计算机体系的知识">
+      
+      
+        <meta name="author" content="LiuZhiqiang(刘志强）">
+      
+      
+        <link rel="canonical" href="https://xliuqq.github.io/blog_md/distributed_computing/spark/profile_tools.html">
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
+    
+    
+      
+        <title>Profile tools - XLiu知识空间</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.975780f9.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.2505c338.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#4051b5">
+        
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../index.html" title="XLiu知识空间" class="md-header__button md-logo" aria-label="XLiu知识空间" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            XLiu知识空间
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Profile tools
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../index.html" class="md-tabs__link">
+      主页
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../cloud/cloud_native.html" class="md-tabs__link">
+        云原生
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../scheduler_system/index.html" class="md-tabs__link">
+        调度系统
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../distributed_consensus/consistency.html" class="md-tabs__link">
+        分布式共识/一致性
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../code_guide/design_principle.html" class="md-tabs__link">
+        代码内功
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../languages/java/effective_java.html" class="md-tabs__link">
+        编程语言
+      </a>
+    </li>
+  
+
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../data_query/sql_compare.html" class="md-tabs__link">
+        数据查询
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../data_system/messagequeue/pulsar/apache_pulsar.html" class="md-tabs__link">
+        数据系统
+      </a>
+    </li>
+  
+
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="spark_yarn.html" class="md-tabs__link">
+        计算引擎
+      </a>
+    </li>
+  
+
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../os/linux/basic.html" class="md-tabs__link">
+        操作系统
+      </a>
+    </li>
+  
+
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../machine_learning/imagevideo/image_feature.html" class="md-tabs__link">
+        机器学习
+      </a>
+    </li>
+  
+
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../devops/devops.html" class="md-tabs__link">
+        Devops
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../cs/cs_basic.html" class="md-tabs__link">
+        CS系统知识
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../web/backend/api_manager.html" class="md-tabs__link">
+        Web服务
+      </a>
+    </li>
+  
+
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../tools/static_web_generator.md" class="md-tabs__link">
+        工具
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../index.html" title="XLiu知识空间" class="md-nav__button md-logo" aria-label="XLiu知识空间" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    XLiu知识空间
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../index.html" class="md-nav__link">
+        主页
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          云原生
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="云原生" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          云原生
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/cloud_native.html" class="md-nav__link">
+        概念
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/fluid.html" class="md-nav__link">
+        Fluid
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/Istio.html" class="md-nav__link">
+        ServiceMesh
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud.argo.md" class="md-nav__link">
+        argo
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_5" type="checkbox" id="__nav_2_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_5">
+          Serverless
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Serverless" data-md-level="2">
+        <label class="md-nav__title" for="__nav_2_5">
+          <span class="md-nav__icon md-icon"></span>
+          Serverless
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/serverless/serverless.html" class="md-nav__link">
+        概念
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/serverless/knative.html" class="md-nav__link">
+        knative
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/serverless/openfaas.html" class="md-nav__link">
+        openfaas
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_6" type="checkbox" id="__nav_2_6" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_6">
+          云边协同（TODO）
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="云边协同（TODO）" data-md-level="2">
+        <label class="md-nav__title" for="__nav_2_6">
+          <span class="md-nav__icon md-icon"></span>
+          云边协同（TODO）
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/cloud_edge/kubeedge.html" class="md-nav__link">
+        KubeEdge
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/cloud_edge/baetyl.html" class="md-nav__link">
+        baetyl
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/cloud_edge/openyurt.html" class="md-nav__link">
+        OpenYurt
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/cloud_edge/mqtt.html" class="md-nav__link">
+        mqtt协议
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_7" type="checkbox" id="__nav_2_7" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_7">
+          自定义镜像
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="自定义镜像" data-md-level="2">
+        <label class="md-nav__title" for="__nav_2_7">
+          <span class="md-nav__icon md-icon"></span>
+          自定义镜像
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/images/web_centos.html" class="md-nav__link">
+        浏览器操作系统
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_8" type="checkbox" id="__nav_2_8" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_8">
+          K8s
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="K8s" data-md-level="2">
+        <label class="md-nav__title" for="__nav_2_8">
+          <span class="md-nav__icon md-icon"></span>
+          K8s
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_8_1" type="checkbox" id="__nav_2_8_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_8_1">
+          安装
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="安装" data-md-level="3">
+        <label class="md-nav__title" for="__nav_2_8_1">
+          <span class="md-nav__icon md-icon"></span>
+          安装
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/k8s/install.html" class="md-nav__link">
+        K8s集群安装
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/k8s/k8s_rook_ceph.html" class="md-nav__link">
+        rook-ceph存储安装
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/k8s/release_compare.html" class="md-nav__link">
+        发行版
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/k8s/k8s.html" class="md-nav__link">
+        概念
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/k8s/conf.html" class="md-nav__link">
+        配置
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/k8s/cmd_usage.html" class="md-nav__link">
+        使用
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/k8s/k8s_resource.html" class="md-nav__link">
+        资源类型
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/k8s/authnz.html" class="md-nav__link">
+        权限
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/k8s/helm.html" class="md-nav__link">
+        Helm
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/k8s/habor.html" class="md-nav__link">
+        镜像仓库
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_8_9" type="checkbox" id="__nav_2_8_9" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_8_9">
+          CRD
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="CRD" data-md-level="3">
+        <label class="md-nav__title" for="__nav_2_8_9">
+          <span class="md-nav__icon md-icon"></span>
+          CRD
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/k8s/crds_native.html" class="md-nav__link">
+        native
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/k8s/crds_java.html" class="md-nav__link">
+        java operator
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/k8s/crds_kubebuild.html" class="md-nav__link">
+        kubebuild
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/k8s/crds_operator_sdk.html" class="md-nav__link">
+        operator sdk
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/k8s/res_manage.md" class="md-nav__link">
+        资源管理
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/k8s/k8s_network.html" class="md-nav__link">
+        网络
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/k8s/k8s_csi.html" class="md-nav__link">
+        CSI机制
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/k8s/k8s_scheduler.html" class="md-nav__link">
+        调度
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/k8s/KubeSphere.html" class="md-nav__link">
+        开源管理软件
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_9" type="checkbox" id="__nav_2_9" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_9">
+          虚拟化
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="虚拟化" data-md-level="2">
+        <label class="md-nav__title" for="__nav_2_9">
+          <span class="md-nav__icon md-icon"></span>
+          虚拟化
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/virtualize/virtualize.html" class="md-nav__link">
+        容器生态
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_9_2" type="checkbox" id="__nav_2_9_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_9_2">
+          docker
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="docker" data-md-level="3">
+        <label class="md-nav__title" for="__nav_2_9_2">
+          <span class="md-nav__icon md-icon"></span>
+          docker
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/virtualize/docker/docker.html" class="md-nav__link">
+        概念
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/virtualize/docker/usage.html" class="md-nav__link">
+        使用
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/virtualize/docker/skopeo.md" class="md-nav__link">
+        镜像搬运工具
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/virtualize/docker/faqs.html" class="md-nav__link">
+        FAQ
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/virtualize/containerd/containerd.html" class="md-nav__link">
+        containerd
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/virtualize/gpu.html" class="md-nav__link">
+        gpu虚拟化
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          调度系统
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="调度系统" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          调度系统
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../scheduler_system/index.html" class="md-nav__link">
+        概念
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../scheduler_system/scheduler.html" class="md-nav__link">
+        调度的策略
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3" type="checkbox" id="__nav_3_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_3">
+          Yarn
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Yarn" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_3">
+          <span class="md-nav__icon md-icon"></span>
+          Yarn
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../scheduler_system/yarn/arch.html" class="md-nav__link">
+        架构
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../scheduler_system/yarn/gpu.html" class="md-nav__link">
+        GPU调度
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../scheduler_system/yarn/yarn_pluggable_device_framework.html" class="md-nav__link">
+        自定义设备支持
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../scheduler_system/apache_dolphin_scheduler.html" class="md-nav__link">
+        DophinScheduler
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          分布式共识/一致性
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="分布式共识/一致性" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          分布式共识/一致性
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../distributed_consensus/consistency.html" class="md-nav__link">
+        一致性
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../distributed_consensus/consensus.html" class="md-nav__link">
+        共识
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5">
+          代码内功
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="代码内功" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          代码内功
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_principle.html" class="md-nav__link">
+        设计原则
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/clean_code.html" class="md-nav__link">
+        代码整洁之道
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/refactor.html" class="md-nav__link">
+        重构
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_4" type="checkbox" id="__nav_5_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_4">
+          设计模式
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="设计模式" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_4">
+          <span class="md-nav__icon md-icon"></span>
+          设计模式
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/index.html" class="md-nav__link">
+        导览
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_4_2" type="checkbox" id="__nav_5_4_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_4_2">
+          创建型模式
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="创建型模式" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_4_2">
+          <span class="md-nav__icon md-icon"></span>
+          创建型模式
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/factory.html" class="md-nav__link">
+        （TODO）工厂模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/abstract_factory.html" class="md-nav__link">
+        抽象工厂
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/singleton.html" class="md-nav__link">
+        单例
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/builder.html" class="md-nav__link">
+        构造者模式
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_4_3" type="checkbox" id="__nav_5_4_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_4_3">
+          结构型模式
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="结构型模式" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_4_3">
+          <span class="md-nav__icon md-icon"></span>
+          结构型模式
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/adapter.html" class="md-nav__link">
+        适配器模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/bridge.html" class="md-nav__link">
+        桥接模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/composite.md" class="md-nav__link">
+        组合模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/decorator.html" class="md-nav__link">
+        装饰模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/facade.html" class="md-nav__link">
+        外观模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/flyweight.html" class="md-nav__link">
+        享元模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/proxy.html" class="md-nav__link">
+        代理模式
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_4_4" type="checkbox" id="__nav_5_4_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_4_4">
+          行为型模式
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="行为型模式" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_4_4">
+          <span class="md-nav__icon md-icon"></span>
+          行为型模式
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/chain.html" class="md-nav__link">
+        职责链模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/command.html" class="md-nav__link">
+        命令模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/interpret.html" class="md-nav__link">
+        解释器模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/iterator.html" class="md-nav__link">
+        迭代器模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/medium.html" class="md-nav__link">
+        中介者模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/menmento.md" class="md-nav__link">
+        备忘录模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/observer.html" class="md-nav__link">
+        观察者模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/state.html" class="md-nav__link">
+        状态模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/strategy.html" class="md-nav__link">
+        策略模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/template.html" class="md-nav__link">
+        模板方法
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/visitor.html" class="md-nav__link">
+        访问者模式
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_4_5" type="checkbox" id="__nav_5_4_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_4_5">
+          分布式应用设计模式
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="分布式应用设计模式" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_4_5">
+          <span class="md-nav__icon md-icon"></span>
+          分布式应用设计模式
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/design_pattern/sidecar.html" class="md-nav__link">
+        边车模式
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_5" type="checkbox" id="__nav_5_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_5">
+          数据结构
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="数据结构" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_5">
+          <span class="md-nav__icon md-icon"></span>
+          数据结构
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/data_structure/array.html" class="md-nav__link">
+        数组
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/data_structure/queue.html" class="md-nav__link">
+        队列
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/data_structure/list.html" class="md-nav__link">
+        列表
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/data_structure/tree.html" class="md-nav__link">
+        树
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/data_structure/bloom_filter.html" class="md-nav__link">
+        布隆过滤器
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/data_structure/ping_pong_buffer.html" class="md-nav__link">
+        Ping-Pong-Buffer
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6" type="checkbox" id="__nav_5_6" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_6">
+          算法
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="算法" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_6">
+          <span class="md-nav__icon md-icon"></span>
+          算法
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/algs/common.html" class="md-nav__link">
+        常用算法
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/algs/load_balance.html" class="md-nav__link">
+        负载均衡算法
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_guide/algs/applications.html" class="md-nav__link">
+        算法应用
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6">
+          编程语言
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="编程语言" data-md-level="1">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          编程语言
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6_1" type="checkbox" id="__nav_6_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6_1">
+          Java
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Java" data-md-level="2">
+        <label class="md-nav__title" for="__nav_6_1">
+          <span class="md-nav__icon md-icon"></span>
+          Java
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../languages/java/effective_java.html" class="md-nav__link">
+        Effective java
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6_1_2" type="checkbox" id="__nav_6_1_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6_1_2">
+          性能
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="性能" data-md-level="3">
+        <label class="md-nav__title" for="__nav_6_1_2">
+          <span class="md-nav__icon md-icon"></span>
+          性能
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../languages/java/performance/analysis.html" class="md-nav__link">
+        常见问题分析
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../languages/java/performance/arthas.html" class="md-nav__link">
+        arthas性能分析
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../languages/java/performance/cpu_profiler.html" class="md-nav__link">
+        cpu profiler
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../languages/java/performance/jvm_profile.html" class="md-nav__link">
+        jvm-profile分布式应用分析
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6_1_3" type="checkbox" id="__nav_6_1_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6_1_3">
+          Native
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Native" data-md-level="3">
+        <label class="md-nav__title" for="__nav_6_1_3">
+          <span class="md-nav__icon md-icon"></span>
+          Native
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../languages/java/native/java_native.html" class="md-nav__link">
+        概览
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../languages/java/native/jni.html" class="md-nav__link">
+        JNI
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../languages/java/native/jnr.html" class="md-nav__link">
+        JNR
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6_1_4" type="checkbox" id="__nav_6_1_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6_1_4">
+          JVM
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="JVM" data-md-level="3">
+        <label class="md-nav__title" for="__nav_6_1_4">
+          <span class="md-nav__icon md-icon"></span>
+          JVM
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../languages/java/jit.html" class="md-nav__link">
+        即时编译Jit
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../languages/java/jvm.html" class="md-nav__link">
+        jvm规范
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../languages/java/bytecode.html" class="md-nav__link">
+        字节码
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../languages/java/agent.html" class="md-nav__link">
+        Agent
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../languages/java/serialize.html" class="md-nav__link">
+        序列化
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../languages/java/reflection.html" class="md-nav__link">
+        反射
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../languages/java/spi.html" class="md-nav__link">
+        SPI
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../languages/java/test.html" class="md-nav__link">
+        测试
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../languages/java/classloader.html" class="md-nav__link">
+        类加载器
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../languages/java/cmd_tools.html" class="md-nav__link">
+        命令行工具
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../languages/java/version.html" class="md-nav__link">
+        版本
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6_2" type="checkbox" id="__nav_6_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6_2">
+          Python
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Python" data-md-level="2">
+        <label class="md-nav__title" for="__nav_6_2">
+          <span class="md-nav__icon md-icon"></span>
+          Python
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6_2_1" type="checkbox" id="__nav_6_2_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6_2_1">
+          三方包
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="三方包" data-md-level="3">
+        <label class="md-nav__title" for="__nav_6_2_1">
+          <span class="md-nav__icon md-icon"></span>
+          三方包
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../languages/python/packages/java_python.html" class="md-nav__link">
+        java和Python互相访问
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7" type="checkbox" id="__nav_7" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_7">
+          数据查询
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="数据查询" data-md-level="1">
+        <label class="md-nav__title" for="__nav_7">
+          <span class="md-nav__icon md-icon"></span>
+          数据查询
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_query/sql_compare.html" class="md-nav__link">
+        SQL系统对比
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7_2" type="checkbox" id="__nav_7_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_7_2">
+          SQL 基础知识
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="SQL 基础知识" data-md-level="2">
+        <label class="md-nav__title" for="__nav_7_2">
+          <span class="md-nav__icon md-icon"></span>
+          SQL 基础知识
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_query/basic.html" class="md-nav__link">
+        基础
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_query/index.html" class="md-nav__link">
+        索引
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_query/apache_openlookong.md" class="md-nav__link">
+        统一SQL-openLooKong-
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7_4" type="checkbox" id="__nav_7_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_7_4">
+          统一SQL-Presto
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="统一SQL-Presto" data-md-level="2">
+        <label class="md-nav__title" for="__nav_7_4">
+          <span class="md-nav__icon md-icon"></span>
+          统一SQL-Presto
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_query/presto/install.html" class="md-nav__link">
+        安装
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_query/presto/presto.html" class="md-nav__link">
+        介绍
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_query/presto/data_types.html" class="md-nav__link">
+        数据类型
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_query/presto/syntax.html" class="md-nav__link">
+        语法
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_query/presto/presto_scale.html" class="md-nav__link">
+        Raptorx和Presto on Spark
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_query/tpc.md" class="md-nav__link">
+        基准测试(TPC)
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8">
+          数据系统
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="数据系统" data-md-level="1">
+        <label class="md-nav__title" for="__nav_8">
+          <span class="md-nav__icon md-icon"></span>
+          数据系统
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8_1" type="checkbox" id="__nav_8_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8_1">
+          消息队列
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="消息队列" data-md-level="2">
+        <label class="md-nav__title" for="__nav_8_1">
+          <span class="md-nav__icon md-icon"></span>
+          消息队列
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_system/messagequeue/pulsar/apache_pulsar.html" class="md-nav__link">
+        Apache Pulsar
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8_2" type="checkbox" id="__nav_8_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8_2">
+          数据管理
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="数据管理" data-md-level="2">
+        <label class="md-nav__title" for="__nav_8_2">
+          <span class="md-nav__icon md-icon"></span>
+          数据管理
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8_2_1" type="checkbox" id="__nav_8_2_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8_2_1">
+          数据集成
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="数据集成" data-md-level="3">
+        <label class="md-nav__title" for="__nav_8_2_1">
+          <span class="md-nav__icon md-icon"></span>
+          数据集成
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_system/data_manage/data_integration/index.html" class="md-nav__link">
+        数据同步
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_system/data_manage/data_integration/cdc.md" class="md-nav__link">
+        CDC
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_system/data_manage/data_integration/seatunnel.html" class="md-nav__link">
+        seatunnel
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_system/data_manage/data_integration/chunjun.html" class="md-nav__link">
+        chunjun
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_system/data_manage/data_integration/tis.html" class="md-nav__link">
+        tis
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_system/data_manage/data_integration/bitsail.html" class="md-nav__link">
+        bitsail
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_system/data_manager/Apache_InLong.md" class="md-nav__link">
+        数据集成框架(InLong)
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8_3" type="checkbox" id="__nav_8_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8_3">
+          数据湖
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="数据湖" data-md-level="2">
+        <label class="md-nav__title" for="__nav_8_3">
+          <span class="md-nav__icon md-icon"></span>
+          数据湖
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8_3_1" type="checkbox" id="__nav_8_3_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8_3_1">
+          Apache Hudi
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Apache Hudi" data-md-level="3">
+        <label class="md-nav__title" for="__nav_8_3_1">
+          <span class="md-nav__icon md-icon"></span>
+          Apache Hudi
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_system/data_lake/apache_hudi/hudi.html" class="md-nav__link">
+        原理
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8_3_1_2" type="checkbox" id="__nav_8_3_1_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8_3_1_2">
+          服务
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="服务" data-md-level="4">
+        <label class="md-nav__title" for="__nav_8_3_1_2">
+          <span class="md-nav__icon md-icon"></span>
+          服务
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_system/data_lake/apache_hudi/compaction.html" class="md-nav__link">
+        压缩（Compaction）
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_system/data_lake/apache_hudi/clustering.html" class="md-nav__link">
+        聚簇（clustering）
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_9">
+          计算引擎
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="计算引擎" data-md-level="1">
+        <label class="md-nav__title" for="__nav_9">
+          <span class="md-nav__icon md-icon"></span>
+          计算引擎
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9_1" type="checkbox" id="__nav_9_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_9_1">
+          Spark
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Spark" data-md-level="2">
+        <label class="md-nav__title" for="__nav_9_1">
+          <span class="md-nav__icon md-icon"></span>
+          Spark
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="spark_yarn.html" class="md-nav__link">
+        Spark on Yarn
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="spark_yarn_rest.html" class="md-nav__link">
+        Spark Yarn RestAPI
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="spark_monitor.html" class="md-nav__link">
+        Spark Metrics
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="spark_optimize.html" class="md-nav__link">
+        Spark 调优
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="spark_shuffle.html" class="md-nav__link">
+        Spark Shuffle
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9_2" type="checkbox" id="__nav_9_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_9_2">
+          GPU编程
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="GPU编程" data-md-level="2">
+        <label class="md-nav__title" for="__nav_9_2">
+          <span class="md-nav__icon md-icon"></span>
+          GPU编程
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gpu/arch.html" class="md-nav__link">
+        介绍
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9_2_2" type="checkbox" id="__nav_9_2_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_9_2_2">
+          Cuda
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Cuda" data-md-level="3">
+        <label class="md-nav__title" for="__nav_9_2_2">
+          <span class="md-nav__icon md-icon"></span>
+          Cuda
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gpu/cuda/install.html" class="md-nav__link">
+        安装
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gpu/cuda/program.md" class="md-nav__link">
+        编程
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9_2_3" type="checkbox" id="__nav_9_2_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_9_2_3">
+          Rocm
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Rocm" data-md-level="3">
+        <label class="md-nav__title" for="__nav_9_2_3">
+          <span class="md-nav__icon md-icon"></span>
+          Rocm
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gpu/cuda/hip.md" class="md-nav__link">
+        编程
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10" type="checkbox" id="__nav_10" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_10">
+          操作系统
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="操作系统" data-md-level="1">
+        <label class="md-nav__title" for="__nav_10">
+          <span class="md-nav__icon md-icon"></span>
+          操作系统
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10_1" type="checkbox" id="__nav_10_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_10_1">
+          Linux 知识
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Linux 知识" data-md-level="2">
+        <label class="md-nav__title" for="__nav_10_1">
+          <span class="md-nav__icon md-icon"></span>
+          Linux 知识
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/linux/basic.html" class="md-nav__link">
+        基础
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/linux/acls.html" class="md-nav__link">
+        acls
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/linux/bash.html" class="md-nav__link">
+        bash
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/linux/cgroup.html" class="md-nav__link">
+        cgroup
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/linux/chmod.html" class="md-nav__link">
+        chmod
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/linux/chroot.html" class="md-nav__link">
+        chroot
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/linux/firewall.html" class="md-nav__link">
+        firewall
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/liunx/ip.md" class="md-nav__link">
+        ip
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/linux/journald.md" class="md-nav__link">
+        journald
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/linux/log_and_rotate.html" class="md-nav__link">
+        log
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/linux/namespace.html" class="md-nav__link">
+        namespace
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/linux/network.html" class="md-nav__link">
+        network
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/linux/proc.html" class="md-nav__link">
+        proc
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/linux/ramdisk.html" class="md-nav__link">
+        ramdisk
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/linux/rsync.html" class="md-nav__link">
+        rsync
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/linux/services.html" class="md-nav__link">
+        services
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/linux/tuning.html" class="md-nav__link">
+        tuning
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/linux/updatedb.html" class="md-nav__link">
+        updatedb
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/linux/process_snapshot.html" class="md-nav__link">
+        进程快照
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/linux/yum.html" class="md-nav__link">
+        yum
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10_2" type="checkbox" id="__nav_10_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_10_2">
+          Linux Shell
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Linux Shell" data-md-level="2">
+        <label class="md-nav__title" for="__nav_10_2">
+          <span class="md-nav__icon md-icon"></span>
+          Linux Shell
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/linux/shell/basic.html" class="md-nav__link">
+        basic
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../os/linux/shell/args.html" class="md-nav__link">
+        args
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_11" type="checkbox" id="__nav_11" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_11">
+          机器学习
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="机器学习" data-md-level="1">
+        <label class="md-nav__title" for="__nav_11">
+          <span class="md-nav__icon md-icon"></span>
+          机器学习
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_11_1" type="checkbox" id="__nav_11_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_11_1">
+          图像视频
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="图像视频" data-md-level="2">
+        <label class="md-nav__title" for="__nav_11_1">
+          <span class="md-nav__icon md-icon"></span>
+          图像视频
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../machine_learning/imagevideo/image_feature.html" class="md-nav__link">
+        图像特征
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_11_2" type="checkbox" id="__nav_11_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_11_2">
+          自然语言处理NLP
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="自然语言处理NLP" data-md-level="2">
+        <label class="md-nav__title" for="__nav_11_2">
+          <span class="md-nav__icon md-icon"></span>
+          自然语言处理NLP
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../machine_learning/nlp/chatbot.html" class="md-nav__link">
+        动手做聊天机器人(TODO)
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../machine_learning/ai_demo/tools.html" class="md-nav__link">
+        示例案例
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_12" type="checkbox" id="__nav_12" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_12">
+          Devops
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Devops" data-md-level="1">
+        <label class="md-nav__title" for="__nav_12">
+          <span class="md-nav__icon md-icon"></span>
+          Devops
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/devops.html" class="md-nav__link">
+        概览
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_12_2" type="checkbox" id="__nav_12_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_12_2">
+          CI/CD
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="CI/CD" data-md-level="2">
+        <label class="md-nav__title" for="__nav_12_2">
+          <span class="md-nav__icon md-icon"></span>
+          CI/CD
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devoos/ci/README.md" class="md-nav__link">
+        概览
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/ci/gitlab.md" class="md-nav__link">
+        Gitlab
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/ci/commit_format.md" class="md-nav__link">
+        Commit规范
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/ci/release_changelog.md" class="md-nav__link">
+        版本自动发布
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/ansible.html" class="md-nav__link">
+        Ansible(部署)
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/prometheus.html" class="md-nav__link">
+        Prometheus(时序数据存储)
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/ansible.html" class="md-nav__link">
+        Grafana(数据可视化)
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_12_6" type="checkbox" id="__nav_12_6" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_12_6">
+          数据来源
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="数据来源" data-md-level="2">
+        <label class="md-nav__title" for="__nav_12_6">
+          <span class="md-nav__icon md-icon"></span>
+          数据来源
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/log_collector.html" class="md-nav__link">
+        日志收集
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/monitor.html" class="md-nav__link">
+        节点监控
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_12_7" type="checkbox" id="__nav_12_7" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_12_7">
+          部署
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="部署" data-md-level="2">
+        <label class="md-nav__title" for="__nav_12_7">
+          <span class="md-nav__icon md-icon"></span>
+          部署
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/sealer.html" class="md-nav__link">
+        K8s集群交付
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_13" type="checkbox" id="__nav_13" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_13">
+          CS系统知识
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="CS系统知识" data-md-level="1">
+        <label class="md-nav__title" for="__nav_13">
+          <span class="md-nav__icon md-icon"></span>
+          CS系统知识
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cs/cs_basic.html" class="md-nav__link">
+        基础
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cs/cs_os.md" class="md-nav__link">
+        操作系统
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cs/cs_network.html" class="md-nav__link">
+        网络
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cs/cs_db.html" class="md-nav__link">
+        数据库
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cs/software_engineering.html" class="md-nav__link">
+        软件工程
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_14" type="checkbox" id="__nav_14" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_14">
+          Web服务
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Web服务" data-md-level="1">
+        <label class="md-nav__title" for="__nav_14">
+          <span class="md-nav__icon md-icon"></span>
+          Web服务
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_14_1" type="checkbox" id="__nav_14_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_14_1">
+          后端
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="后端" data-md-level="2">
+        <label class="md-nav__title" for="__nav_14_1">
+          <span class="md-nav__icon md-icon"></span>
+          后端
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../web/backend/api_manager.html" class="md-nav__link">
+        接口管理设计
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../web/backend/db_flush.html" class="md-nav__link">
+        刷库
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_14_2" type="checkbox" id="__nav_14_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_14_2">
+          分布式追踪
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="分布式追踪" data-md-level="2">
+        <label class="md-nav__title" for="__nav_14_2">
+          <span class="md-nav__icon md-icon"></span>
+          分布式追踪
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../web/trace/tracing.html" class="md-nav__link">
+        概览
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_15" type="checkbox" id="__nav_15" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_15">
+          工具
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="工具" data-md-level="1">
+        <label class="md-nav__title" for="__nav_15">
+          <span class="md-nav__icon md-icon"></span>
+          工具
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/static_web_generator.md" class="md-nav__link">
+        静态网页生成
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_15_2" type="checkbox" id="__nav_15_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_15_2">
+          maven
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="maven" data-md-level="2">
+        <label class="md-nav__title" for="__nav_15_2">
+          <span class="md-nav__icon md-icon"></span>
+          maven
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/maven/index.html" class="md-nav__link">
+        基础
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/maven/plugins.html" class="md-nav__link">
+        插件
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_15_3" type="checkbox" id="__nav_15_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_15_3">
+          markdown
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="markdown" data-md-level="2">
+        <label class="md-nav__title" for="__nav_15_3">
+          <span class="md-nav__icon md-icon"></span>
+          markdown
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/markdown/math.html" class="md-nav__link">
+        公式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/markdown/typora.html" class="md-nav__link">
+        Typora
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/licenses.html" class="md-nav__link">
+        开源协议声明
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#spark" class="md-nav__link">
+    Spark 原生
+  </a>
+  
+    <nav class="md-nav" aria-label="Spark 原生">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#spark-metrics" class="md-nav__link">
+    Spark Metrics
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advanced-instrumentation" class="md-nav__link">
+    Advanced Instrumentation
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#uber-jvm-profiler" class="md-nav__link">
+    Uber JVM Profiler
+  </a>
+  
+    <nav class="md-nav" aria-label="Uber JVM Profiler">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    问题分析
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    需要的监控功能
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-fatso" class="md-nav__link">
+    The Fatso（瓶颈点）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-straggler" class="md-nav__link">
+    The Straggler（拖后腿者）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-slacker" class="md-nav__link">
+    The Slacker（懒惰者）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-heckler" class="md-nav__link">
+    The Heckler
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sparklens" class="md-nav__link">
+    Sparklens
+  </a>
+  
+    <nav class="md-nav" aria-label="Sparklens">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    前言
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sparklens_1" class="md-nav__link">
+    一、什么是 Sparklens
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sparklens_2" class="md-nav__link">
+    二、如何使用Sparklens
+  </a>
+  
+    <nav class="md-nav" aria-label="二、如何使用Sparklens">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-job" class="md-nav__link">
+    1、和 Job 一起运行
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2job" class="md-nav__link">
+    2、Job 跑完之后使用
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3event-log" class="md-nav__link">
+    3、从event-log里面获取
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sparklens_3" class="md-nav__link">
+    三、Sparklens 报告提供的详细性能指标
+  </a>
+  
+    <nav class="md-nav" aria-label="三、Sparklens 报告提供的详细性能指标">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    1、基于任务的汇总指标
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    2、任务运行时长
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3spark" class="md-nav__link">
+    3、Spark 是否高效
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    4、理想应用程序运行时间的估计
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    5、最佳执行者数量
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    6、计算资源使用情况
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7" class="md-nav__link">
+    7、各阶段参数
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8" class="md-nav__link">
+    8、每阶段指标
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sparklens-ui" class="md-nav__link">
+    四、Sparklens UI
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#streaming" class="md-nav__link">
+    五、使用 Streaming 流应用程序
+  </a>
+  
+    <nav class="md-nav" aria-label="五、使用 Streaming 流应用程序">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#streaming-pipeline" class="md-nav__link">
+    一、Streaming Pipeline 状态
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    二、如何获取报告？
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#streaminglens" class="md-nav__link">
+    三、Streaminglens 报告提供的信息
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#streaminglens_1" class="md-nav__link">
+    四、怎样使用 Streaminglens ？
+  </a>
+  
+    <nav class="md-nav" aria-label="四、怎样使用 Streaminglens ？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-streaminglens-spark" class="md-nav__link">
+    1、添加 streaminglens 包至 Spark 任务中
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-streaminglens" class="md-nav__link">
+    2、初始化 streaminglens
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    3、使用自定义的报告
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-streaminglens" class="md-nav__link">
+    4、配置 StreamingLens 选项
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-streaminglens" class="md-nav__link">
+    5. 停止 Streaminglens
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sparklens-on-spark-3x" class="md-nav__link">
+    六、Sparklens on Spark 3.X
+  </a>
+  
+    <nav class="md-nav" aria-label="六、Sparklens on Spark 3.X">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1_1" class="md-nav__link">
+    1、获取源码并进行编译
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2_1" class="md-nav__link">
+    2、打包
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3_1" class="md-nav__link">
+    3、提交任务
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<p>[toc]</p>
+<h1 id="_1">性能分析工具</h1>
+<h2 id="spark">Spark 原生</h2>
+<h3 id="spark-metrics">Spark Metrics</h3>
+<h3 id="advanced-instrumentation">Advanced Instrumentation</h3>
+<p>分析Spark jobs的工具:  <strong>对于多作业同时运行，难以分析每个应用的性能；</strong></p>
+<ul>
+<li>集群级别的监控工具：如 <a href="http://ganglia.sourceforge.net/">Ganglia</a>, 提供集群整体利用率和资源瓶颈分析；</li>
+<li>OS分析工具：如 <a href="http://dag.wieers.com/home-made/dstat/">dstat</a>, <a href="http://linux.die.net/man/1/iostat">iostat</a>, 和 <a href="http://linux.die.net/man/1/iotop">iotop</a>；</li>
+<li>JVM系列工具：如 <code>jstack</code>提供栈分析, <code>jmap</code>分析堆快照，<code>jstat</code> 报告时间序列的统计信息， <code>jconsole</code>，<code>jvisualvm</code>，<code>jmc</code>等。</li>
+</ul>
+<p>Spark提供插件API，支持在应用中添加<code>custom instrumentation code</code>：</p>
+<ul>
+<li><code>spark.plugins</code></li>
+<li><code>spark.plugins.defaultList</code></li>
+</ul>
+<p>支持“,”分隔的类名（实现 <code>org.apache.spark.api.plugin.SparkPlugin</code> 接口）。</p>
+<ul>
+<li>确保自定义的plugin的jar包，spark应用可见；</li>
+</ul>
+<h2 id="uber-jvm-profiler">Uber JVM Profiler</h2>
+<p>见 <a href="../../languages/java/performance/jvm_profile.html">spark的executor的性能分析使用</a></p>
+<h3 id="_2">问题分析</h3>
+<p>https://github.com/g1thubhub/phil_stopwatch</p>
+<p>https://g1thubhub.github.io/4-bigdata-riddles</p>
+<h3 id="_3">需要的监控功能</h3>
+<p>横轴：</p>
+<ul>
+<li><strong>时间</strong></li>
+<li><strong>Stage的开始和结束节点</strong>；（Spark Timeline）</li>
+<li><strong>Task的开始和结束节点</strong>；（Spark Timeline，但是没有整合所有Stage的Task的同一个视图）</li>
+</ul>
+<p>时间作为横轴：</p>
+<ul>
+<li><strong>进程的CPU使用率</strong>；（非常有用）</li>
+<li><strong>进程的内存使用率，堆和非堆内存</strong>；（分配合适的内存）</li>
+<li><strong>同一时间并发的任务数</strong>；<strong>任务的执行时序图</strong>；</li>
+<li>节点的CPU使用率；（监控软件可看）</li>
+<li>节点的内存使用率；（监控软件可看）</li>
+</ul>
+<h3 id="the-fatso">The Fatso（瓶颈点）</h3>
+<p>需要对 JVM 进行<strong>堆栈进行profile</strong>，找出耗时的函数。</p>
+<h3 id="the-straggler">The Straggler（拖后腿者）</h3>
+<p>通过Task的开始和结束时间，可以找出Straggler。</p>
+<p>通过同一时间的并发任务数，可以找出Straggler（有的时间只有极少数并发）。</p>
+<h3 id="the-slacker">The Slacker（懒惰者）</h3>
+<p>cpu利用率低？系统大部分空闲，stage是和外部DB或者HDFS进行交互，没有使用足够的写分区。</p>
+<p>通过CPU profile和火焰图，可以看出<strong>函数耗时但CPU利用率不高，在做IO</strong>的事情。</p>
+<h3 id="the-heckler">The Heckler</h3>
+<p>第三方库中比较重的对象创建使用方式：</p>
+<ul>
+<li>每条记录创建一个，map</li>
+<li>每个分区创建一个，mapPartition</li>
+<li>多线程安全，则Broadcast，每个executor一个</li>
+</ul>
+<p>从日志中截取信息，正则匹配，获取Top N进行展示；</p>
+<p>崩溃的原因通常不是很明显，需要对日志文件进行筛选，从日志中就截取错误信息，按时间顺序倒排显示</p>
+<h2 id="sparklens">Sparklens</h2>
+<h3 id="_4">前言</h3>
+<blockquote>
+<p>2021/10/18</p>
+</blockquote>
+<p>造成 Spark 任务性能低下的原因主要有 3 个：</p>
+<ul>
+<li>Driver 计算时间长；</li>
+<li>存在任务倾斜；</li>
+<li>任务数不够，存在并行度问题；</li>
+</ul>
+<p>根据情况，可以实现两个优化目标：</p>
+<ul>
+<li>减少应用程序的运行时间；</li>
+<li>通过使用更少的资源使其更好地工作；</li>
+</ul>
+<p>​       任何 Spark 应用程序的性能都可通过 Yarn Web UI 或 Spark Web UI 来观察，但没有提供详细指标。现有多种工具可用于 Spark 性能监控，提供了更详细的应用程序性能细节：</p>
+<ul>
+<li><a href="https://github.com/qubole/Sparklens">Sparklens</a></li>
+<li><a href="https://github.com/qubole/Sparklens">Sparklint</a>：最新版本2018年</li>
+<li><a href="https://github.com/linkedin/dr-elephant">Dr. Elephant</a>：A job and flow-level performance monitoring and tuning tool for Apache Hadoop and Apache Spark</li>
+<li><a href="https://github.com/ibm-research-ireland/sparkoscope">SparkOscope</a> ：最新版本2017年</li>
+</ul>
+<h3 id="sparklens_1">一、什么是 Sparklens</h3>
+<p>Sparklens 是一个内置 Spark Scheduler 模拟器的 Spark 分析和性能预测工具。</p>
+<p>Sparklens 作用：</p>
+<ul>
+<li>使用户更容易理解 Spark 任务的可伸缩性限制。</li>
+<li>有助于了解给定 Spark 任务使用的计算资源的效率。</li>
+<li>提供 Spark 任务各个阶段的各种信息。</li>
+<li>提供了可用于优化的后续步骤的想法。</li>
+<li>有助于将 Spark 应用程序调优作为一种定义明确的方法/过程。</li>
+</ul>
+<h3 id="sparklens_2">二、如何使用Sparklens</h3>
+<p>可以通过以下方式使用 Sparklens：</p>
+<ul>
+<li>和 Spark 任务一同运行；</li>
+<li>在 Spark 任务运行后运行；</li>
+<li>从 event-log 里获取报告；</li>
+</ul>
+<p><code>sparklens_2.11-0.3.2.jar</code> 以 scala-2.11 编译，确保Scala和Java版本与Spark集群所需的版本相对应。目前支持，Java 7/8、Scala 2.11.8和Spark 2.X。  </p>
+<p>以下操作基于 Spark 2.4.4、Java 8、Scala 2.11.8</p>
+<h4 id="1-job">1、和 Job 一起运行</h4>
+<p>​       这种方式是指当你的job在运行的时候，Sparklens 会实时的开始收集job的运行信息，最后打印结果。</p>
+<p>​       只要你的节点能联网，那么只需要在使用 <code>spark-submit</code> 或 <code>spark-shell</code> 时，加上如下两行（如果没有网，你也可以从网上下载 package 之后打包运行）：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>--packages qubole:sparklens:0.3.2-s_2.11
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>--conf spark.extraListeners=com.qubole.sparklens.QuboleJobListener
+</code></pre></div>
+<p>例：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>spark-submit \
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>--master spark://hadoop004:7077 \
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>--packages qubole:sparklens:0.3.2-s_2.11 \
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>--conf spark.extraListeners=com.qubole.sparklens.QuboleJobListener \
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>--class sparksqltest.SparkSQLtest SparkSQLtest.jar
+</code></pre></div>
+<p>或</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>spark-shell \
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>--master spark://hadoop004:7077 \
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>--packages qubole:sparklens:0.3.2-s_2.11 \
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>--conf spark.extraListeners=com.qubole.sparklens.QuboleJobListener
+</code></pre></div>
+<h4 id="2job">2、Job 跑完之后使用</h4>
+<p>​       你可以选择不在任务运行时运行 Sparklens，但在任务运行后使用 Sparklens。这种方式会在你的 job 运行时生成一个 Json 文件，路径默认是 /tmp/Sparklens。如果你想要设置自己的路径，可以通过配置 spark.sparklens.data.dir 来完成。</p>
+<ol>
+<li>首先你需要在运行你自己的 spark job 的时候在提交命令里面加上：</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>--packages qubole:sparklens:0.3.2-s_2.11
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>--conf spark.extraListeners=com.qubole.sparklens.QuboleJobListener
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>--conf spark.sparklens.reporting.disabled=true
+</code></pre></div>
+<ol>
+<li>之后根据生成的 Json 文件，另外启动一个 Job 来获取分析你的 Sparklens 的报告结果：</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>spark-submit \
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>--packages qubole:sparklens:0.3.1-s_2.11 \
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>--class com.qubole.sparklens.app.ReporterApp qubole-dummy-arg &lt;filename&gt;
+</code></pre></div>
+<p>例，之前所示 spark 任务离线运行 Sparklens：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>spark-submit \
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>--master spark://hadoop004:7077 \
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>--packages qubole:sparklens:0.3.2-s_2.11 \
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>--conf spark.extraListeners=com.qubole.sparklens.QuboleJobListener \
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>--conf spark.sparklens.reporting.disabled=true \
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>--conf spark.sparklens.data.dir=/home/hadoop \
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>--class sparksqltest.SparkSQLtest SparkSQLtest.jar
+</code></pre></div>
+<p>通过控制台日志可查看生成的 Json 文件保存路径：</p>
+<blockquote>
+<p>Saving sparkLens data to /home/hadoop/app-20211012144030-0017.sparklens.json</p>
+</blockquote>
+<p>启动一个 Job 来获取分析你的 Sparklens 的报告结果：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>spark-submit \
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>--packages qubole:sparklens:0.3.2-s_2.11 \
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>--class com.qubole.sparklens.app.ReporterApp qubole-dummy-arg /home/hadoop/app-20211012144030-0017.sparklens.json
+</code></pre></div>
+<h4 id="3event-log">3、从event-log里面获取</h4>
+<p>​       这种方式就是根据 event log 来生成 Sparklens 的报告，当然你需要在你的 spark job 里面 enable event-log。这种方法支持 event log 文件所支持的任何文件形式：<strong>text、 snappy、lz4、lzf</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>spark-submit \
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>--packages qubole:sparklens:0.3.1-s_2.11 \
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>--class com.qubole.sparklens.app.ReporterApp qubole-dummy-arg &lt;filename&gt; source=history
+</code></pre></div>
+<p>也可以使用以下命令将事件历史文件转换为Sparklens Json文件:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>spark-submit \
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>--packages qubole:sparklens:0.3.2-s_2.11 \
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>--class com.qubole.sparklens.app.EventHistoryToSparklensJson qubole-dummy-arg &lt;srcDir&gt; &lt;targetDir&gt;
+</code></pre></div>
+<p>例，之前所示 spark 任务从 event-log 里获取 Sparklens 的报告：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>spark-submit \
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>--master spark://hadoop004:7077 \
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>--conf spark.eventLog.enabled=true \
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>--conf spark.eventLog.dir=/home/hadoop/data \
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>--class sparksqltest.SparkSQLtest SparkSQLtest.jar
+</code></pre></div>
+<p>从event-log里面获取 Sparklens 的报告：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>spark-submit \
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>--packages qubole:sparklens:0.3.2-s_2.11 \
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>--class com.qubole.sparklens.app.ReporterApp qubole-dummy-arg /home/hadoop/data/app-20211012145019-0018 source=history
+</code></pre></div>
+<p>将事件历史文件转换为 Sparklens Json 文件:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>spark-submit \
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>--packages qubole:sparklens:0.3.2-s_2.11 \
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>--class com.qubole.sparklens.app.EventHistoryToSparklensJson qubole-dummy-arg /home/hadoop/data/app-20211012145019-0018 /home/hadoop/data
+</code></pre></div>
+<h3 id="sparklens_3">三、Sparklens 报告提供的详细性能指标</h3>
+<p>Sparklens 报告提供非常详细的的性能指标：</p>
+<h4 id="1">1、基于任务的汇总指标</h4>
+<p><img alt="8" src="pics/8.png" /></p>
+<h4 id="2">2、任务运行时长</h4>
+<p>​       job/stage 时间表，显示作业中并行阶段是如何调度的。这使得在作业级别很容易可视化带有阶段依赖性的DAG。</p>
+<p><img alt="6" src="pics/6.png" /></p>
+<h4 id="3spark">3、Spark 是否高效</h4>
+<p>​       Spark任务的总时间可以分为花费在驱动程序上的时间和花费在执行程序上的时间。当 Spark 应用程序在驱动程序上花费太多时间时，就会浪费执行程序的计算时间。</p>
+<p><img alt="3" src="pics/3.png" /></p>
+<table>
+<thead>
+<tr>
+<th>列名</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Driver WallClock</td>
+<td>驱动程序完成执行所需的总时间。</td>
+</tr>
+<tr>
+<td>Executors WallClock</td>
+<td>所有 executors 完成其执行所花费的总时间。</td>
+</tr>
+<tr>
+<td>Total WallClock</td>
+<td>Driver WallClock + Executors WallClock</td>
+</tr>
+</tbody>
+</table>
+<h4 id="4">4、理想应用程序运行时间的估计</h4>
+<p>​       理想的应用程序时间是通过假设应用程序的所有阶段的数据的理想分区（任务 = 核心和无偏斜）来计算的。</p>
+<p><img alt="2" src="pics/2.png" /></p>
+<h4 id="5">5、最佳执行者数量</h4>
+<p>​       可以看到在任何给定时间有多少个 executor 可用。Sparklens 绘制了应用程序中不同 Spark 作业使用的执行程序，以及可以在相同的挂钟时间内完成相同工作的最少数量的执行程序（理想情况）。</p>
+<p><img alt="1" src="pics/1.png" /></p>
+<h4 id="6">6、计算资源使用情况</h4>
+<p>​       它告诉我们有多少分配给应用程序的计算资源根本没有使用。</p>
+<p><img alt="4" src="pics/4.png" /></p>
+<h4 id="7">7、各阶段参数</h4>
+<p>​       许多有趣的阶段参数，如输入、输出、Shuffle输入和每个阶段的Shuffle输出。</p>
+<p>​       OneCoreComputeHours 可用，每个阶段使用它来发现低效的阶段。</p>
+<p><img alt="7" src="pics/7.png" /></p>
+<h4 id="8">8、每阶段指标</h4>
+<p>​       由于缺乏任务或偏差，执行器也可能浪费计算时间。</p>
+<p><img alt="5" src="pics/5.png" /></p>
+<p>其中：</p>
+<table>
+<thead>
+<tr>
+<th align="left">列名</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">PRatio</td>
+<td>stage 中任务数除以核数，表示 stage 中的并行度。PRatio &gt; 1 =&gt; 任务过多，PRatio &lt; 1 =&gt; 内核过多。</td>
+</tr>
+<tr>
+<td align="left">TaskSkew</td>
+<td>stage 中最大任务的持续时间除以中位数任务的持续时间，表示 stage 中的倾斜程度。越低越好。</td>
+</tr>
+<tr>
+<td align="left">TaskStageSke</td>
+<td>stage 中最大任务的持续时间除以该阶段的总持续时间。表示最大任务对 stage 的时间影响。越低越好。</td>
+</tr>
+<tr>
+<td align="left">OIRatio</td>
+<td>输出与输入比。stage 的总输出(结果+ shuffle 输出)除以总输入(输入数据+ shuffle 输入)。</td>
+</tr>
+</tbody>
+</table>
+<p>下面这些指标代表了这个阶段的时间分布：</p>
+<table>
+<thead>
+<tr>
+<th align="left">列名</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">ShuffleWrite</td>
+<td>在 stage 阶段中所有任务进行 shuffle 写入所花费的百分比。</td>
+</tr>
+<tr>
+<td align="left">ReadFetch</td>
+<td>在 stage 阶段中所有任务进行 shuffle 读所花费的百分比。</td>
+</tr>
+<tr>
+<td align="left">GC</td>
+<td>在 stage 阶段中所有任务进行 GC 所花费的百分比。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sparklens-ui">四、Sparklens UI</h3>
+<p>​       所有上述参数也可以通过 Sparklens UI 以图形方式观察，将得到的 Sparklens Json 文件上传至 http://sparklens.qubole.com/，即得到一份 Sparklens UI 图形界面。</p>
+<p>Sparklens UI 包括五个关键组件：</p>
+<ul>
+<li>效率统计；</li>
+<li>模拟；</li>
+<li>每阶段指标；</li>
+<li>理想执行器；</li>
+<li>聚合指标。</li>
+</ul>
+<p><img alt="9" src="pics/9.png" /></p>
+<h3 id="streaming">五、使用 Streaming 流应用程序</h3>
+<p>​   Streaminglens 是运行在微批处理模式下的 Spark 结构化流应用程序的分析工具。由于每个微批的执行计划是相同的，可以不断地从以前的微批学习，以预测下一个微批的理想 spark 集群配置。Streaminglens 每5分钟分析最后一个微批处理的执行运行，给出流管道健康状况的总体概念。</p>
+<p>​   在分析过程中，Streaminglens计算完成微批处理的临界时间。Critical Time是指在无限个执行器的情况下， Spark 作业完成所需的最小时间。</p>
+<p>​   根据关键时间、实际批处理运行时间的比较，streaminglens决定流管道的状态为<code>Optimum</code>, <code>Underprovisioned</code>, <code>Overprovisioned</code> or <code>Unhealthy</code>，并给出适当的建议来调优 spark 集群。</p>
+<h4 id="streaming-pipeline">一、Streaming Pipeline 状态</h4>
+<table>
+<thead>
+<tr>
+<th>状态</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No New Batches</td>
+<td>管道中没有新的数据。如果这种状态在数据摄入后仍然存在，可能会有一些批处理被卡住，请检查Spark UI。</td>
+</tr>
+<tr>
+<td>Overprovisioned</td>
+<td>批处理完成时间远远少于预期的SLA，因此您可以降低集群规模以降低成本。另一方面，如果你看到这个状态，但流是滞后的，降低触发间隔或检查具体的建议。</td>
+</tr>
+<tr>
+<td>Optimum</td>
+<td>流媒体管道正在轻松地满足SLA。</td>
+</tr>
+<tr>
+<td>Underprovisioned</td>
+<td>您需要升级集群来匹配预期的微批处理SLA。</td>
+</tr>
+<tr>
+<td>Unhealthy</td>
+<td>您需要通过改变spark集群或管道配置来增加Source级别的摄入。</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_5">二、如何获取报告？</h4>
+<p>可以通过以下方式获取 Streaminglens 报告：</p>
+<ul>
+<li>打印在Spark Application的驱动日志中。</li>
+<li>Streaminglens 通过 Dropwizard 发布其指标。您可以通过Apache Spark中任何受支持的指标集查看这些指标。</li>
+<li>您可以使用自己的自定义报告器，以每一小时查看流管道的聚合运行状况和建议。</li>
+</ul>
+<h4 id="streaminglens">三、Streaminglens 报告提供的信息</h4>
+<p>Streaminglens在分析了上一个微批的执行后提供以下报告：</p>
+<ul>
+<li>批量运行时间，临界时间和触发间隔的比较；</li>
+<li>流管道的状态为<code>Underprovisioned</code>, <code>Optimum</code>, <code>Overprovisioned</code> or <code>Unhealthy</code>。</li>
+<li>每一小时对流管道进行聚合状态，并提供建议，以防管道不是最优的。</li>
+</ul>
+<p>驱动程序日志中的一个示例如下所示：</p>
+<p><img alt="1" src="pics/1-16345268106571.png" /></p>
+<h4 id="streaminglens_1">四、怎样使用 Streaminglens ？</h4>
+<h5 id="1-streaminglens-spark">1、添加 streaminglens 包至 Spark 任务中</h5>
+<p>​       通过使用<code>--packages</code>命令行选项，可以将 Streaminglens jar 添加到通过 Spark -shell 或 Spark -submit 启动的Spark作业中。例如：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>spark-shell --packages com.qubole:spark-streaminglens_2.11:0.5.3
+</code></pre></div>
+<p>或</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>spark-submit \
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>--master spark://hadoop004:7077 \
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>--packages com.qubole:spark-streaminglens_2.11:0.5.3 \
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>--class SparkStreamingWordCount SparkStreamingtest.jar
+</code></pre></div>
+<p>或者，可以从https://mvnrepository.com/artifact/com.qubole/spark-streaminglens_2.11/0.5.3中下载 jar，使用<code>--jars</code>选项将它添加到 spark-submit 命令行选项中，例：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>spark-submit \
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>--class spark://hadoop004:7077 \
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>--jars /home/hadoop/spark-streaminglens_2.11-0.5.3.jar \
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>--class StructuredStreamingWordCount SparkStreamingtest.jar 
+</code></pre></div>
+<h5 id="2-streaminglens">2、初始化 streaminglens</h5>
+<p>需要通过以下方式初始化 streaminglens </p>
+<ol>
+<li>添加环境依赖</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nt">&lt;dependency&gt;</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a> <span class="nt">&lt;groupId&gt;</span>com.qubole<span class="nt">&lt;/groupId&gt;</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a> <span class="nt">&lt;artifactId&gt;</span>spark-streaminglens_2.11<span class="nt">&lt;/artifactId&gt;</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a> <span class="nt">&lt;version&gt;</span>0.5.3<span class="nt">&lt;/version&gt;</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div>
+<ol>
+<li>初始化 streaminglens </li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">import</span><span class="w"> </span><span class="nn">com</span><span class="p">.</span><span class="nn">qubole</span><span class="p">.</span><span class="nn">spark</span><span class="p">.</span><span class="nn">streaminglens</span><span class="p">.</span><span class="n">_</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="kd">var</span><span class="w"> </span><span class="n">options</span><span class="p">:</span><span class="w"> </span><span class="nc">Map</span><span class="p">[</span><span class="nc">String</span><span class="p">,</span><span class="w"> </span><span class="nc">String</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Map</span><span class="p">();</span><span class="w"></span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="n">options</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;streamingLens.analysisIntervalMinutes&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s">&quot;1&quot;</span><span class="p">);</span><span class="w"></span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="kd">val</span><span class="w"> </span><span class="n">streamingLens</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="nc">StreamingLens</span><span class="p">(</span><span class="n">spark</span><span class="p">,</span><span class="n">options</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<h5 id="3">3、使用自定义的报告</h5>
+<p>可以使用自己的自定义报告器来报告流管道的聚合运行状况和相关建议。只需编写类继承<code>streaminglen7sreporterinterface</code> ，并通过<code>streamingLens.reporter.className</code>选项传递类名，并将<code>streamingLens.reporter.enabled</code>设置为true。还可以通过<code>streamingLens.reporter.intervalMinutes</code>选项配置报告频率。默认情况下，聚合运行状况和建议每一小时报告一次。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kd">var</span><span class="w"> </span><span class="n">options</span><span class="p">:</span><span class="w"> </span><span class="nc">Map</span><span class="p">[</span><span class="nc">String</span><span class="p">,</span><span class="w"> </span><span class="nc">String</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Map</span><span class="p">();</span><span class="w"></span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="n">options</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;streamingLens.reporter.className&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s">&quot;streamingLensreport&quot;</span><span class="p">);</span><span class="w"></span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">options</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;streamingLens.reporter.enabled&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">);</span><span class="w"></span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="n">options</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;streamingLens.reporter.intervalMinutes&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s">&quot;60&quot;</span><span class="p">);</span><span class="w"></span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="kd">val</span><span class="w"> </span><span class="n">streamingLens</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="nc">StreamingLens</span><span class="p">(</span><span class="n">spark</span><span class="p">,</span><span class="n">options</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<h5 id="4-streaminglens">4、配置 StreamingLens 选项</h5>
+<p>Streaminglens 支持多种配置选项：</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th align="center">默认</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>streamingLens.analysisIntervalMinutes</code></td>
+<td align="center">5 mins</td>
+<td>微批次分析的频率。</td>
+</tr>
+<tr>
+<td><code>streamingLens.criticalPathAnalysis. overProvisionPercentage</code></td>
+<td align="center">0.3 (or 30%)</td>
+<td>将 spark 集群视为 over-provisoned 状态的百分比，例如:如果批处理运行时间小于预期微批SLA的30%，则认为集群状态为 over-provisoned。</td>
+</tr>
+<tr>
+<td><code>streamingLens.criticalPathAnalysis. underProvisionPercentage</code></td>
+<td align="center">0.7 (or 70%)</td>
+<td>将 spark 集群视为 under-provisioned 状态的百分比，例如:如果批处理运行时间超过预期微批SLA的70%，则认为集群状态为 under-provisioned。</td>
+</tr>
+<tr>
+<td><code>streamingLens.criticalPathAnalysis. criticalPathPercentage</code></td>
+<td align="center">0.7 (or 70%)</td>
+<td>考虑 spark 应用程序配置不正确的百分比，例如:如果关键时间超过预期微批SLA的70%，则认为管道不健康， spark 集群配置不正确。</td>
+</tr>
+<tr>
+<td><code>streamingLens.minBatches</code></td>
+<td align="center">1</td>
+<td>在进行下一次分析之前必须完成的最少批次。</td>
+</tr>
+<tr>
+<td><code>streamingLens.maxResultsRetention</code></td>
+<td align="center">30</td>
+<td>要保留在内存中的分析结果的数量。</td>
+</tr>
+<tr>
+<td><code>streamingLens.maxBatchesRetention</code></td>
+<td align="center">10</td>
+<td>在内存中保留度量的批数。</td>
+</tr>
+<tr>
+<td><code>streamingLens.maxAnalysisTimeSeconds</code></td>
+<td align="center">5</td>
+<td>在超时分析之前等待的秒数。</td>
+</tr>
+<tr>
+<td><code>streamingLens.maxRetries</code></td>
+<td align="center">3</td>
+<td>在分析过程中发生错误时的重试次数。</td>
+</tr>
+<tr>
+<td><code>streamingLens.shouldLogResults</code></td>
+<td align="center">true</td>
+<td>是否在spark driver日志中打印分析结果。</td>
+</tr>
+<tr>
+<td><code>streamingLens.reporter.enabled</code></td>
+<td align="center">false</td>
+<td>是否在任何自定义输出中转储分析结果。</td>
+</tr>
+<tr>
+<td><code>streamingLens.expectedMicroBatchSLAMillis</code></td>
+<td align="center">1000 * 60 * 2</td>
+<td>SLA的时间间隔，单位为毫秒。</td>
+</tr>
+<tr>
+<td><code>streamingLens.reporter.className</code></td>
+<td align="center"></td>
+<td>报告器类的完全解析的 classname 。</td>
+</tr>
+<tr>
+<td><code>streamingLens.reporter.discountFactor</code></td>
+<td align="center">0.95</td>
+<td>在计算聚合状态时，将早期微批次打折的指数因子。</td>
+</tr>
+<tr>
+<td><code>streamingLens.reporter.intervalMinutes</code></td>
+<td align="center">60</td>
+<td>报告流查询运行状况的频率。</td>
+</tr>
+</tbody>
+</table>
+<h5 id="5-streaminglens">5. 停止 Streaminglens</h5>
+<p>可以停止 streaminglens 在一个运行的spark应用程序使用以下 streaminglens API:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>streamingLens.stopStreamingLens()
+</code></pre></div>
+<h3 id="sparklens-on-spark-3x">六、Sparklens on Spark 3.X</h3>
+<p>环境版本：Hadoop 3.3.1、Spark 3.1.2、Java 8、Scala 2.12.10</p>
+<h4 id="1_1">1、获取源码并进行编译</h4>
+<ol>
+<li>文件 build.sbt</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>scalaVersion := &quot;2.11.8&quot;
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>crossScalaVersions := Seq(&quot;2.10.6&quot;, &quot;2.11.8&quot;)
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>spName := &quot;qubole/sparklens&quot;
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>sparkVersion := &quot;2.0.0&quot;
+</code></pre></div>
+<p>改为</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>scalaVersion := &quot;2.12.10&quot;
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>crossScalaVersions := Seq(&quot;2.10.6&quot;, &quot;2.11.8&quot;, &quot;2.12.10&quot;)
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>spName := &quot;qubole/sparklens&quot;
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>sparkVersion := &quot;3.1.1&quot;
+</code></pre></div>
+<ol>
+<li>文件 project/plugins.sbt</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>resolvers += &quot;Spark Package Main Repo&quot; at &quot;https://dl.bintray.com/spark-packages/maven&quot;
+</code></pre></div>
+<p>改为</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>resolvers += &quot;Spark Package Main Repo&quot; at &quot;https://repos.spark-packages.org&quot;
+</code></pre></div>
+<ol>
+<li>文件 src/main/scala/com/qubole/sparklens/QuboleJobListener.scala</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">failedStages</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="s">s&quot;&quot;&quot; Stage </span><span class="si">${</span><span class="n">si</span><span class="p">.</span><span class="n">stageId</span><span class="si">}</span><span class="s"> attempt </span><span class="si">${</span><span class="n">si</span><span class="p">.</span><span class="n">attemptId</span><span class="si">}</span><span class="s"> in job </span><span class="si">${</span><span class="n">stageIDToJobID</span><span class="p">(</span><span class="n">si</span><span class="p">.</span><span class="n">stageId</span><span class="p">)</span><span class="si">}</span><span class="s"> failed.</span>
+</code></pre></div>
+<p>改为</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">failedStages</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="s">s&quot;&quot;&quot; Stage </span><span class="si">${</span><span class="n">si</span><span class="p">.</span><span class="n">stageId</span><span class="si">}</span><span class="s"> attempt </span><span class="si">${</span><span class="n">si</span><span class="p">.</span><span class="n">attemptNumber</span><span class="si">}</span><span class="s"> in job </span><span class="si">${</span><span class="n">stageIDToJobID</span><span class="p">(</span><span class="n">si</span><span class="p">.</span><span class="n">stageId</span><span class="p">)</span><span class="si">}</span><span class="s"> failed.</span>
+</code></pre></div>
+<ol>
+<li>文件 src/main/scala/com/qubole/sparklens/helper/HDFSConfigHelper.scala</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">sparkConfOptional</span><span class="p">.</span><span class="n">isDefined</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="w"> </span><span class="nc">SparkHadoopUtil</span><span class="p">.</span><span class="n">get</span><span class="p">.</span><span class="n">newConfiguration</span><span class="p">(</span><span class="n">sparkConfOptional</span><span class="p">.</span><span class="n">get</span><span class="p">)</span><span class="w"></span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="n">sparkConf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="nc">SparkConf</span><span class="p">()</span><span class="w"></span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="w"> </span><span class="nc">SparkHadoopUtil</span><span class="p">.</span><span class="n">get</span><span class="p">.</span><span class="n">newConfiguration</span><span class="p">(</span><span class="n">sparkConf</span><span class="p">)</span><span class="w"></span>
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>改为</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="c1">// After Spark 3.0.0 SparkHadoopUtil is made private to make it work only within the spark</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="c1">// using reflection code here to access the newConfiguration method of the SparkHadoopUtil</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="kd">val</span><span class="w"> </span><span class="n">sparkHadoopUtilClass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Class</span><span class="p">.</span><span class="n">forName</span><span class="p">(</span><span class="s">&quot;org.apache.spark.deploy.SparkHadoopUtil&quot;</span><span class="p">)</span><span class="w"></span>
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="kd">val</span><span class="w"> </span><span class="n">sparkHadoopUtil</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sparkHadoopUtilClass</span><span class="p">.</span><span class="n">newInstance</span><span class="p">()</span><span class="w"></span>
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="kd">val</span><span class="w"> </span><span class="n">newConfigurationMethod</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sparkHadoopUtilClass</span><span class="p">.</span><span class="n">getMethod</span><span class="p">(</span><span class="s">&quot;newConfiguration&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">classOf</span><span class="p">[</span><span class="nc">SparkConf</span><span class="p">])</span><span class="w"></span>
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">sparkConfOptional</span><span class="p">.</span><span class="n">isDefined</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="w"> </span><span class="n">newConfigurationMethod</span><span class="p">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">sparkHadoopUtil</span><span class="p">,</span><span class="w"> </span><span class="n">sparkConfOptional</span><span class="p">.</span><span class="n">get</span><span class="p">).</span><span class="k">asInstanceOf</span><span class="p">[</span><span class="nc">Configuration</span><span class="p">]</span><span class="w"></span>
+<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="n">sparkConf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="nc">SparkConf</span><span class="p">()</span><span class="w"></span>
+<a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="w"> </span><span class="n">newConfigurationMethod</span><span class="p">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">sparkHadoopUtil</span><span class="p">,</span><span class="w"> </span><span class="n">sparkConf</span><span class="p">).</span><span class="k">asInstanceOf</span><span class="p">[</span><span class="nc">Configuration</span><span class="p">]</span><span class="w"></span>
+<a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<ol>
+<li>文件 version.sbt</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>version in ThisBuild := &quot;0.3.2&quot;
+</code></pre></div>
+<p>改为</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>version in ThisBuild := &quot;0.4.0&quot;
+</code></pre></div>
+<h4 id="2_1">2、打包</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>sbt compile 
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>sbt package 
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>sbt clean 
+</code></pre></div>
+<h4 id="3_1">3、提交任务</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>spark-submit \
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>--master yarn \
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>--jars sparklens_2.12-0.4.0.jar \
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>--conf spark.extraListeners=com.qubole.sparklens.QuboleJobListener \
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a>--class sparksqltest.SparkSQLtest SparkSQLtest.jar
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>spark-submit \
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>--jars sparklens_2.12-0.4.0.jar \
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>--class com.qubole.sparklens.app.ReporterApp qubole-dummy-arg /tmp/sparklens/application_1634174539117_0001.sparklens.json
+</code></pre></div>
+<p><img alt="10" src="pics/10.png" /></p>
+<p><img alt="11" src="pics/11.png" /></p>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            回到页面顶部
+          </a>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top"], "search": "../../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\s\\-\uff0c\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version.title": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+      
+    
+    
+  </body>
+</html>

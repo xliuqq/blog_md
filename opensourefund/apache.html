@@ -1,0 +1,7342 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="计算机体系的知识">
+      
+      
+        <meta name="author" content="LiuZhiqiang(刘志强）">
+      
+      
+        <link rel="canonical" href="https://xliuqq.github.io/blog_md/opensourefund/apache.html">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
+    
+    
+      
+        <title>Apache - XLiu知识空间</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.975780f9.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.2505c338.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#4051b5">
+        
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#apache2021414" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../index.html" title="XLiu知识空间" class="md-header__button md-logo" aria-label="XLiu知识空间" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            XLiu知识空间
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Apache
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../index.html" class="md-tabs__link">
+      主页
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../cloud/cloud_native.html" class="md-tabs__link">
+        云原生
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../scheduler_system/index.html" class="md-tabs__link">
+        调度系统
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../distributed_consensus/consistency.html" class="md-tabs__link">
+        分布式共识/一致性
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../code_guide/design_principle.html" class="md-tabs__link">
+        代码内功
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../languages/java/effective_java.html" class="md-tabs__link">
+        编程语言
+      </a>
+    </li>
+  
+
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../data_query/sql_compare.html" class="md-tabs__link">
+        数据查询
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../data_system/messagequeue/pulsar/apache_pulsar.html" class="md-tabs__link">
+        数据系统
+      </a>
+    </li>
+  
+
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../distributed_computing/spark/spark_yarn.html" class="md-tabs__link">
+        计算引擎
+      </a>
+    </li>
+  
+
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../os/linux/basic.html" class="md-tabs__link">
+        操作系统
+      </a>
+    </li>
+  
+
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../machine_learning/imagevideo/image_feature.html" class="md-tabs__link">
+        机器学习
+      </a>
+    </li>
+  
+
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../devops/devops.html" class="md-tabs__link">
+        Devops
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../cs/cs_basic.html" class="md-tabs__link">
+        CS系统知识
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../web/backend/api_manager.html" class="md-tabs__link">
+        Web服务
+      </a>
+    </li>
+  
+
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../tools/static_web_generator.md" class="md-tabs__link">
+        工具
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="XLiu知识空间" class="md-nav__button md-logo" aria-label="XLiu知识空间" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    XLiu知识空间
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        主页
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          云原生
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="云原生" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          云原生
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/cloud_native.html" class="md-nav__link">
+        概念
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/fluid.html" class="md-nav__link">
+        Fluid
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/Istio.html" class="md-nav__link">
+        ServiceMesh
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud.argo.md" class="md-nav__link">
+        argo
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_5" type="checkbox" id="__nav_2_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_5">
+          Serverless
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Serverless" data-md-level="2">
+        <label class="md-nav__title" for="__nav_2_5">
+          <span class="md-nav__icon md-icon"></span>
+          Serverless
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/serverless/serverless.html" class="md-nav__link">
+        概念
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/serverless/knative.html" class="md-nav__link">
+        knative
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/serverless/openfaas.html" class="md-nav__link">
+        openfaas
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_6" type="checkbox" id="__nav_2_6" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_6">
+          云边协同（TODO）
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="云边协同（TODO）" data-md-level="2">
+        <label class="md-nav__title" for="__nav_2_6">
+          <span class="md-nav__icon md-icon"></span>
+          云边协同（TODO）
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/cloud_edge/kubeedge.html" class="md-nav__link">
+        KubeEdge
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/cloud_edge/baetyl.html" class="md-nav__link">
+        baetyl
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/cloud_edge/openyurt.html" class="md-nav__link">
+        OpenYurt
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/cloud_edge/mqtt.html" class="md-nav__link">
+        mqtt协议
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_7" type="checkbox" id="__nav_2_7" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_7">
+          自定义镜像
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="自定义镜像" data-md-level="2">
+        <label class="md-nav__title" for="__nav_2_7">
+          <span class="md-nav__icon md-icon"></span>
+          自定义镜像
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/images/web_centos.html" class="md-nav__link">
+        浏览器操作系统
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_8" type="checkbox" id="__nav_2_8" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_8">
+          K8s
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="K8s" data-md-level="2">
+        <label class="md-nav__title" for="__nav_2_8">
+          <span class="md-nav__icon md-icon"></span>
+          K8s
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_8_1" type="checkbox" id="__nav_2_8_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_8_1">
+          安装
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="安装" data-md-level="3">
+        <label class="md-nav__title" for="__nav_2_8_1">
+          <span class="md-nav__icon md-icon"></span>
+          安装
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/k8s/install.html" class="md-nav__link">
+        K8s集群安装
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/k8s/k8s_rook_ceph.html" class="md-nav__link">
+        rook-ceph存储安装
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/k8s/release_compare.html" class="md-nav__link">
+        发行版
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/k8s/k8s.html" class="md-nav__link">
+        概念
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/k8s/conf.html" class="md-nav__link">
+        配置
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/k8s/cmd_usage.html" class="md-nav__link">
+        使用
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/k8s/k8s_resource.html" class="md-nav__link">
+        资源类型
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/k8s/authnz.html" class="md-nav__link">
+        权限
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/k8s/helm.html" class="md-nav__link">
+        Helm
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/k8s/habor.html" class="md-nav__link">
+        镜像仓库
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_8_9" type="checkbox" id="__nav_2_8_9" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_8_9">
+          CRD
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="CRD" data-md-level="3">
+        <label class="md-nav__title" for="__nav_2_8_9">
+          <span class="md-nav__icon md-icon"></span>
+          CRD
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/k8s/crds_native.html" class="md-nav__link">
+        native
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/k8s/crds_java.html" class="md-nav__link">
+        java operator
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/k8s/crds_kubebuild.html" class="md-nav__link">
+        kubebuild
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/k8s/crds_operator_sdk.html" class="md-nav__link">
+        operator sdk
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/k8s/res_manage.md" class="md-nav__link">
+        资源管理
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/k8s/k8s_network.html" class="md-nav__link">
+        网络
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/k8s/k8s_csi.html" class="md-nav__link">
+        CSI机制
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/k8s/k8s_scheduler.html" class="md-nav__link">
+        调度
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/k8s/KubeSphere.html" class="md-nav__link">
+        开源管理软件
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_9" type="checkbox" id="__nav_2_9" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_9">
+          虚拟化
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="虚拟化" data-md-level="2">
+        <label class="md-nav__title" for="__nav_2_9">
+          <span class="md-nav__icon md-icon"></span>
+          虚拟化
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/virtualize/virtualize.html" class="md-nav__link">
+        容器生态
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_9_2" type="checkbox" id="__nav_2_9_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_9_2">
+          docker
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="docker" data-md-level="3">
+        <label class="md-nav__title" for="__nav_2_9_2">
+          <span class="md-nav__icon md-icon"></span>
+          docker
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/virtualize/docker/docker.html" class="md-nav__link">
+        概念
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/virtualize/docker/usage.html" class="md-nav__link">
+        使用
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/virtualize/docker/skopeo.md" class="md-nav__link">
+        镜像搬运工具
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/virtualize/docker/faqs.html" class="md-nav__link">
+        FAQ
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/virtualize/containerd/containerd.html" class="md-nav__link">
+        containerd
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/virtualize/gpu.html" class="md-nav__link">
+        gpu虚拟化
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          调度系统
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="调度系统" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          调度系统
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scheduler_system/index.html" class="md-nav__link">
+        概念
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scheduler_system/scheduler.html" class="md-nav__link">
+        调度的策略
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3" type="checkbox" id="__nav_3_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_3">
+          Yarn
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Yarn" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_3">
+          <span class="md-nav__icon md-icon"></span>
+          Yarn
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scheduler_system/yarn/arch.html" class="md-nav__link">
+        架构
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scheduler_system/yarn/gpu.html" class="md-nav__link">
+        GPU调度
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scheduler_system/yarn/yarn_pluggable_device_framework.html" class="md-nav__link">
+        自定义设备支持
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scheduler_system/apache_dolphin_scheduler.html" class="md-nav__link">
+        DophinScheduler
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          分布式共识/一致性
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="分布式共识/一致性" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          分布式共识/一致性
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../distributed_consensus/consistency.html" class="md-nav__link">
+        一致性
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../distributed_consensus/consensus.html" class="md-nav__link">
+        共识
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5">
+          代码内功
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="代码内功" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          代码内功
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_principle.html" class="md-nav__link">
+        设计原则
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/clean_code.html" class="md-nav__link">
+        代码整洁之道
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/refactor.html" class="md-nav__link">
+        重构
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_4" type="checkbox" id="__nav_5_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_4">
+          设计模式
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="设计模式" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_4">
+          <span class="md-nav__icon md-icon"></span>
+          设计模式
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/index.html" class="md-nav__link">
+        导览
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_4_2" type="checkbox" id="__nav_5_4_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_4_2">
+          创建型模式
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="创建型模式" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_4_2">
+          <span class="md-nav__icon md-icon"></span>
+          创建型模式
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/factory.html" class="md-nav__link">
+        （TODO）工厂模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/abstract_factory.html" class="md-nav__link">
+        抽象工厂
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/singleton.html" class="md-nav__link">
+        单例
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/builder.html" class="md-nav__link">
+        构造者模式
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_4_3" type="checkbox" id="__nav_5_4_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_4_3">
+          结构型模式
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="结构型模式" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_4_3">
+          <span class="md-nav__icon md-icon"></span>
+          结构型模式
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/adapter.html" class="md-nav__link">
+        适配器模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/bridge.html" class="md-nav__link">
+        桥接模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/composite.md" class="md-nav__link">
+        组合模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/decorator.html" class="md-nav__link">
+        装饰模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/facade.html" class="md-nav__link">
+        外观模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/flyweight.html" class="md-nav__link">
+        享元模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/proxy.html" class="md-nav__link">
+        代理模式
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_4_4" type="checkbox" id="__nav_5_4_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_4_4">
+          行为型模式
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="行为型模式" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_4_4">
+          <span class="md-nav__icon md-icon"></span>
+          行为型模式
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/chain.html" class="md-nav__link">
+        职责链模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/command.html" class="md-nav__link">
+        命令模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/interpret.html" class="md-nav__link">
+        解释器模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/iterator.html" class="md-nav__link">
+        迭代器模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/medium.html" class="md-nav__link">
+        中介者模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/menmento.md" class="md-nav__link">
+        备忘录模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/observer.html" class="md-nav__link">
+        观察者模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/state.html" class="md-nav__link">
+        状态模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/strategy.html" class="md-nav__link">
+        策略模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/template.html" class="md-nav__link">
+        模板方法
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/visitor.html" class="md-nav__link">
+        访问者模式
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_4_5" type="checkbox" id="__nav_5_4_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_4_5">
+          分布式应用设计模式
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="分布式应用设计模式" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_4_5">
+          <span class="md-nav__icon md-icon"></span>
+          分布式应用设计模式
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/design_pattern/sidecar.html" class="md-nav__link">
+        边车模式
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_5" type="checkbox" id="__nav_5_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_5">
+          数据结构
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="数据结构" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_5">
+          <span class="md-nav__icon md-icon"></span>
+          数据结构
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/data_structure/array.html" class="md-nav__link">
+        数组
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/data_structure/queue.html" class="md-nav__link">
+        队列
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/data_structure/list.html" class="md-nav__link">
+        列表
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/data_structure/tree.html" class="md-nav__link">
+        树
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/data_structure/bloom_filter.html" class="md-nav__link">
+        布隆过滤器
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/data_structure/ping_pong_buffer.html" class="md-nav__link">
+        Ping-Pong-Buffer
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6" type="checkbox" id="__nav_5_6" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_6">
+          算法
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="算法" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_6">
+          <span class="md-nav__icon md-icon"></span>
+          算法
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/algs/common.html" class="md-nav__link">
+        常用算法
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/algs/load_balance.html" class="md-nav__link">
+        负载均衡算法
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_guide/algs/applications.html" class="md-nav__link">
+        算法应用
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6">
+          编程语言
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="编程语言" data-md-level="1">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          编程语言
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6_1" type="checkbox" id="__nav_6_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6_1">
+          Java
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Java" data-md-level="2">
+        <label class="md-nav__title" for="__nav_6_1">
+          <span class="md-nav__icon md-icon"></span>
+          Java
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../languages/java/effective_java.html" class="md-nav__link">
+        Effective java
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6_1_2" type="checkbox" id="__nav_6_1_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6_1_2">
+          性能
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="性能" data-md-level="3">
+        <label class="md-nav__title" for="__nav_6_1_2">
+          <span class="md-nav__icon md-icon"></span>
+          性能
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../languages/java/performance/analysis.html" class="md-nav__link">
+        常见问题分析
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../languages/java/performance/arthas.html" class="md-nav__link">
+        arthas性能分析
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../languages/java/performance/cpu_profiler.html" class="md-nav__link">
+        cpu profiler
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../languages/java/performance/jvm_profile.html" class="md-nav__link">
+        jvm-profile分布式应用分析
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6_1_3" type="checkbox" id="__nav_6_1_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6_1_3">
+          Native
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Native" data-md-level="3">
+        <label class="md-nav__title" for="__nav_6_1_3">
+          <span class="md-nav__icon md-icon"></span>
+          Native
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../languages/java/native/java_native.html" class="md-nav__link">
+        概览
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../languages/java/native/jni.html" class="md-nav__link">
+        JNI
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../languages/java/native/jnr.html" class="md-nav__link">
+        JNR
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6_1_4" type="checkbox" id="__nav_6_1_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6_1_4">
+          JVM
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="JVM" data-md-level="3">
+        <label class="md-nav__title" for="__nav_6_1_4">
+          <span class="md-nav__icon md-icon"></span>
+          JVM
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../languages/java/jit.html" class="md-nav__link">
+        即时编译Jit
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../languages/java/jvm.html" class="md-nav__link">
+        jvm规范
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../languages/java/bytecode.html" class="md-nav__link">
+        字节码
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../languages/java/agent.html" class="md-nav__link">
+        Agent
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../languages/java/serialize.html" class="md-nav__link">
+        序列化
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../languages/java/reflection.html" class="md-nav__link">
+        反射
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../languages/java/spi.html" class="md-nav__link">
+        SPI
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../languages/java/test.html" class="md-nav__link">
+        测试
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../languages/java/classloader.html" class="md-nav__link">
+        类加载器
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../languages/java/cmd_tools.html" class="md-nav__link">
+        命令行工具
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../languages/java/version.html" class="md-nav__link">
+        版本
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6_2" type="checkbox" id="__nav_6_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6_2">
+          Python
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Python" data-md-level="2">
+        <label class="md-nav__title" for="__nav_6_2">
+          <span class="md-nav__icon md-icon"></span>
+          Python
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6_2_1" type="checkbox" id="__nav_6_2_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6_2_1">
+          三方包
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="三方包" data-md-level="3">
+        <label class="md-nav__title" for="__nav_6_2_1">
+          <span class="md-nav__icon md-icon"></span>
+          三方包
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../languages/python/packages/java_python.html" class="md-nav__link">
+        java和Python互相访问
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7" type="checkbox" id="__nav_7" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_7">
+          数据查询
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="数据查询" data-md-level="1">
+        <label class="md-nav__title" for="__nav_7">
+          <span class="md-nav__icon md-icon"></span>
+          数据查询
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_query/sql_compare.html" class="md-nav__link">
+        SQL系统对比
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7_2" type="checkbox" id="__nav_7_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_7_2">
+          SQL 基础知识
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="SQL 基础知识" data-md-level="2">
+        <label class="md-nav__title" for="__nav_7_2">
+          <span class="md-nav__icon md-icon"></span>
+          SQL 基础知识
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_query/basic.html" class="md-nav__link">
+        基础
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_query/index.html" class="md-nav__link">
+        索引
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_query/apache_openlookong.md" class="md-nav__link">
+        统一SQL-openLooKong-
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7_4" type="checkbox" id="__nav_7_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_7_4">
+          统一SQL-Presto
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="统一SQL-Presto" data-md-level="2">
+        <label class="md-nav__title" for="__nav_7_4">
+          <span class="md-nav__icon md-icon"></span>
+          统一SQL-Presto
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_query/presto/install.html" class="md-nav__link">
+        安装
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_query/presto/presto.html" class="md-nav__link">
+        介绍
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_query/presto/data_types.html" class="md-nav__link">
+        数据类型
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_query/presto/syntax.html" class="md-nav__link">
+        语法
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_query/presto/presto_scale.html" class="md-nav__link">
+        Raptorx和Presto on Spark
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_query/tpc.md" class="md-nav__link">
+        基准测试(TPC)
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8">
+          数据系统
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="数据系统" data-md-level="1">
+        <label class="md-nav__title" for="__nav_8">
+          <span class="md-nav__icon md-icon"></span>
+          数据系统
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8_1" type="checkbox" id="__nav_8_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8_1">
+          消息队列
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="消息队列" data-md-level="2">
+        <label class="md-nav__title" for="__nav_8_1">
+          <span class="md-nav__icon md-icon"></span>
+          消息队列
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_system/messagequeue/pulsar/apache_pulsar.html" class="md-nav__link">
+        Apache Pulsar
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8_2" type="checkbox" id="__nav_8_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8_2">
+          数据管理
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="数据管理" data-md-level="2">
+        <label class="md-nav__title" for="__nav_8_2">
+          <span class="md-nav__icon md-icon"></span>
+          数据管理
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8_2_1" type="checkbox" id="__nav_8_2_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8_2_1">
+          数据集成
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="数据集成" data-md-level="3">
+        <label class="md-nav__title" for="__nav_8_2_1">
+          <span class="md-nav__icon md-icon"></span>
+          数据集成
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_system/data_manage/data_integration/index.html" class="md-nav__link">
+        数据同步
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_system/data_manage/data_integration/cdc.md" class="md-nav__link">
+        CDC
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_system/data_manage/data_integration/seatunnel.html" class="md-nav__link">
+        seatunnel
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_system/data_manage/data_integration/chunjun.html" class="md-nav__link">
+        chunjun
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_system/data_manage/data_integration/tis.html" class="md-nav__link">
+        tis
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_system/data_manage/data_integration/bitsail.html" class="md-nav__link">
+        bitsail
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_system/data_manager/Apache_InLong.md" class="md-nav__link">
+        数据集成框架(InLong)
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8_3" type="checkbox" id="__nav_8_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8_3">
+          数据湖
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="数据湖" data-md-level="2">
+        <label class="md-nav__title" for="__nav_8_3">
+          <span class="md-nav__icon md-icon"></span>
+          数据湖
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8_3_1" type="checkbox" id="__nav_8_3_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8_3_1">
+          Apache Hudi
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Apache Hudi" data-md-level="3">
+        <label class="md-nav__title" for="__nav_8_3_1">
+          <span class="md-nav__icon md-icon"></span>
+          Apache Hudi
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_system/data_lake/apache_hudi/hudi.html" class="md-nav__link">
+        原理
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8_3_1_2" type="checkbox" id="__nav_8_3_1_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8_3_1_2">
+          服务
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="服务" data-md-level="4">
+        <label class="md-nav__title" for="__nav_8_3_1_2">
+          <span class="md-nav__icon md-icon"></span>
+          服务
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_system/data_lake/apache_hudi/compaction.html" class="md-nav__link">
+        压缩（Compaction）
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_system/data_lake/apache_hudi/clustering.html" class="md-nav__link">
+        聚簇（clustering）
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_9">
+          计算引擎
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="计算引擎" data-md-level="1">
+        <label class="md-nav__title" for="__nav_9">
+          <span class="md-nav__icon md-icon"></span>
+          计算引擎
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9_1" type="checkbox" id="__nav_9_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_9_1">
+          Spark
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Spark" data-md-level="2">
+        <label class="md-nav__title" for="__nav_9_1">
+          <span class="md-nav__icon md-icon"></span>
+          Spark
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../distributed_computing/spark/spark_yarn.html" class="md-nav__link">
+        Spark on Yarn
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../distributed_computing/spark/spark_yarn_rest.html" class="md-nav__link">
+        Spark Yarn RestAPI
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../distributed_computing/spark/spark_monitor.html" class="md-nav__link">
+        Spark Metrics
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../distributed_computing/spark/spark_optimize.html" class="md-nav__link">
+        Spark 调优
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../distributed_computing/spark/spark_shuffle.html" class="md-nav__link">
+        Spark Shuffle
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9_2" type="checkbox" id="__nav_9_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_9_2">
+          GPU编程
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="GPU编程" data-md-level="2">
+        <label class="md-nav__title" for="__nav_9_2">
+          <span class="md-nav__icon md-icon"></span>
+          GPU编程
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../distributed_computing/gpu/arch.html" class="md-nav__link">
+        介绍
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9_2_2" type="checkbox" id="__nav_9_2_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_9_2_2">
+          Cuda
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Cuda" data-md-level="3">
+        <label class="md-nav__title" for="__nav_9_2_2">
+          <span class="md-nav__icon md-icon"></span>
+          Cuda
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../distributed_computing/gpu/cuda/install.html" class="md-nav__link">
+        安装
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../distributed_computing/gpu/cuda/program.md" class="md-nav__link">
+        编程
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9_2_3" type="checkbox" id="__nav_9_2_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_9_2_3">
+          Rocm
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Rocm" data-md-level="3">
+        <label class="md-nav__title" for="__nav_9_2_3">
+          <span class="md-nav__icon md-icon"></span>
+          Rocm
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../distributed_computing/gpu/cuda/hip.md" class="md-nav__link">
+        编程
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10" type="checkbox" id="__nav_10" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_10">
+          操作系统
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="操作系统" data-md-level="1">
+        <label class="md-nav__title" for="__nav_10">
+          <span class="md-nav__icon md-icon"></span>
+          操作系统
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10_1" type="checkbox" id="__nav_10_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_10_1">
+          Linux 知识
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Linux 知识" data-md-level="2">
+        <label class="md-nav__title" for="__nav_10_1">
+          <span class="md-nav__icon md-icon"></span>
+          Linux 知识
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/linux/basic.html" class="md-nav__link">
+        基础
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/linux/acls.html" class="md-nav__link">
+        acls
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/linux/bash.html" class="md-nav__link">
+        bash
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/linux/cgroup.html" class="md-nav__link">
+        cgroup
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/linux/chmod.html" class="md-nav__link">
+        chmod
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/linux/chroot.html" class="md-nav__link">
+        chroot
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/linux/firewall.html" class="md-nav__link">
+        firewall
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/liunx/ip.md" class="md-nav__link">
+        ip
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/linux/journald.md" class="md-nav__link">
+        journald
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/linux/log_and_rotate.html" class="md-nav__link">
+        log
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/linux/namespace.html" class="md-nav__link">
+        namespace
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/linux/network.html" class="md-nav__link">
+        network
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/linux/proc.html" class="md-nav__link">
+        proc
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/linux/ramdisk.html" class="md-nav__link">
+        ramdisk
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/linux/rsync.html" class="md-nav__link">
+        rsync
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/linux/services.html" class="md-nav__link">
+        services
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/linux/tuning.html" class="md-nav__link">
+        tuning
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/linux/updatedb.html" class="md-nav__link">
+        updatedb
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/linux/process_snapshot.html" class="md-nav__link">
+        进程快照
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/linux/yum.html" class="md-nav__link">
+        yum
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10_2" type="checkbox" id="__nav_10_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_10_2">
+          Linux Shell
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Linux Shell" data-md-level="2">
+        <label class="md-nav__title" for="__nav_10_2">
+          <span class="md-nav__icon md-icon"></span>
+          Linux Shell
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/linux/shell/basic.html" class="md-nav__link">
+        basic
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../os/linux/shell/args.html" class="md-nav__link">
+        args
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_11" type="checkbox" id="__nav_11" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_11">
+          机器学习
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="机器学习" data-md-level="1">
+        <label class="md-nav__title" for="__nav_11">
+          <span class="md-nav__icon md-icon"></span>
+          机器学习
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_11_1" type="checkbox" id="__nav_11_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_11_1">
+          图像视频
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="图像视频" data-md-level="2">
+        <label class="md-nav__title" for="__nav_11_1">
+          <span class="md-nav__icon md-icon"></span>
+          图像视频
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../machine_learning/imagevideo/image_feature.html" class="md-nav__link">
+        图像特征
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_11_2" type="checkbox" id="__nav_11_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_11_2">
+          自然语言处理NLP
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="自然语言处理NLP" data-md-level="2">
+        <label class="md-nav__title" for="__nav_11_2">
+          <span class="md-nav__icon md-icon"></span>
+          自然语言处理NLP
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../machine_learning/nlp/chatbot.html" class="md-nav__link">
+        动手做聊天机器人(TODO)
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../machine_learning/ai_demo/tools.html" class="md-nav__link">
+        示例案例
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_12" type="checkbox" id="__nav_12" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_12">
+          Devops
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Devops" data-md-level="1">
+        <label class="md-nav__title" for="__nav_12">
+          <span class="md-nav__icon md-icon"></span>
+          Devops
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devops/devops.html" class="md-nav__link">
+        概览
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_12_2" type="checkbox" id="__nav_12_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_12_2">
+          CI/CD
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="CI/CD" data-md-level="2">
+        <label class="md-nav__title" for="__nav_12_2">
+          <span class="md-nav__icon md-icon"></span>
+          CI/CD
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devoos/ci/README.md" class="md-nav__link">
+        概览
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devops/ci/gitlab.md" class="md-nav__link">
+        Gitlab
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devops/ci/commit_format.md" class="md-nav__link">
+        Commit规范
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devops/ci/release_changelog.md" class="md-nav__link">
+        版本自动发布
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devops/ansible.html" class="md-nav__link">
+        Ansible(部署)
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devops/prometheus.html" class="md-nav__link">
+        Prometheus(时序数据存储)
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devops/ansible.html" class="md-nav__link">
+        Grafana(数据可视化)
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_12_6" type="checkbox" id="__nav_12_6" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_12_6">
+          数据来源
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="数据来源" data-md-level="2">
+        <label class="md-nav__title" for="__nav_12_6">
+          <span class="md-nav__icon md-icon"></span>
+          数据来源
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devops/log_collector.html" class="md-nav__link">
+        日志收集
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devops/monitor.html" class="md-nav__link">
+        节点监控
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_12_7" type="checkbox" id="__nav_12_7" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_12_7">
+          部署
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="部署" data-md-level="2">
+        <label class="md-nav__title" for="__nav_12_7">
+          <span class="md-nav__icon md-icon"></span>
+          部署
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devops/sealer.html" class="md-nav__link">
+        K8s集群交付
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_13" type="checkbox" id="__nav_13" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_13">
+          CS系统知识
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="CS系统知识" data-md-level="1">
+        <label class="md-nav__title" for="__nav_13">
+          <span class="md-nav__icon md-icon"></span>
+          CS系统知识
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cs/cs_basic.html" class="md-nav__link">
+        基础
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cs/cs_os.md" class="md-nav__link">
+        操作系统
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cs/cs_network.html" class="md-nav__link">
+        网络
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cs/cs_db.html" class="md-nav__link">
+        数据库
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cs/software_engineering.html" class="md-nav__link">
+        软件工程
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_14" type="checkbox" id="__nav_14" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_14">
+          Web服务
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Web服务" data-md-level="1">
+        <label class="md-nav__title" for="__nav_14">
+          <span class="md-nav__icon md-icon"></span>
+          Web服务
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_14_1" type="checkbox" id="__nav_14_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_14_1">
+          后端
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="后端" data-md-level="2">
+        <label class="md-nav__title" for="__nav_14_1">
+          <span class="md-nav__icon md-icon"></span>
+          后端
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../web/backend/api_manager.html" class="md-nav__link">
+        接口管理设计
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../web/backend/db_flush.html" class="md-nav__link">
+        刷库
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_14_2" type="checkbox" id="__nav_14_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_14_2">
+          分布式追踪
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="分布式追踪" data-md-level="2">
+        <label class="md-nav__title" for="__nav_14_2">
+          <span class="md-nav__icon md-icon"></span>
+          分布式追踪
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../web/trace/tracing.html" class="md-nav__link">
+        概览
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_15" type="checkbox" id="__nav_15" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_15">
+          工具
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="工具" data-md-level="1">
+        <label class="md-nav__title" for="__nav_15">
+          <span class="md-nav__icon md-icon"></span>
+          工具
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/static_web_generator.md" class="md-nav__link">
+        静态网页生成
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_15_2" type="checkbox" id="__nav_15_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_15_2">
+          maven
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="maven" data-md-level="2">
+        <label class="md-nav__title" for="__nav_15_2">
+          <span class="md-nav__icon md-icon"></span>
+          maven
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/maven/index.html" class="md-nav__link">
+        基础
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/maven/plugins.html" class="md-nav__link">
+        插件
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_15_3" type="checkbox" id="__nav_15_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_15_3">
+          markdown
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="markdown" data-md-level="2">
+        <label class="md-nav__title" for="__nav_15_3">
+          <span class="md-nav__icon md-icon"></span>
+          markdown
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/markdown/math.html" class="md-nav__link">
+        公式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/markdown/typora.html" class="md-nav__link">
+        Typora
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/licenses.html" class="md-nav__link">
+        开源协议声明
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    有意义
+  </a>
+  
+    <nav class="md-nav" aria-label="有意义">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#accumulokv" class="md-nav__link">
+    Accumulo（分布式KV存储）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#activemq" class="md-nav__link">
+    ActiveMQ（消息队列）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#airflow" class="md-nav__link">
+    Airflow（调度和监控工作流）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ambari-hadoop" class="md-nav__link">
+    Ambari （Hadoop管理监控工具）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ant" class="md-nav__link">
+    Ant（构建工具）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#apisixapi" class="md-nav__link">
+    ApiSix（云原生的API服务网关）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#archivamaven" class="md-nav__link">
+    Archiva（远程资源库maven等管理软件）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#arrow" class="md-nav__link">
+    Arrow（跨语言的内存数据格式）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#asterixdb-bdms" class="md-nav__link">
+    AsterixDB（大数据管理系统 (BDMS））
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#atlas" class="md-nav__link">
+    Atlas（大数据的元数据管理和数据治理平台）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#avro" class="md-nav__link">
+    Avro（行式序列化）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#axis2web" class="md-nav__link">
+    Axis2（Web服务的核心支援引擎）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bahirsparkflink" class="md-nav__link">
+    Bahir（Spark/Flink扩展）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#beam" class="md-nav__link">
+    Beam（统一编程模型的批流一体的数据处理）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bloodhound" class="md-nav__link">
+    BloodHound（项目的进展和缺陷跟踪）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bookkeeper" class="md-nav__link">
+    Bookkeeper（扩展、高可用、低延迟的存储服务）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#brooklyn" class="md-nav__link">
+    Brooklyn（多数据中心的应用程序的蓝图和管理平台）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#brpcrpc" class="md-nav__link">
+    Brpc（百度的RPC开源）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#buildrmavengradle" class="md-nav__link">
+    Buildr（项目构建系统，类似Maven/Gradle）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bvaljavabean" class="md-nav__link">
+    Bval（JavaBean数据验证）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#calcite-sql" class="md-nav__link">
+    Calcite （开源SQL解析工具）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#carbondata" class="md-nav__link">
+    CarbonData（索引列式数据格式）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cassandranosql" class="md-nav__link">
+    Cassandra（NOSQL数据库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cayennejava-orm" class="md-nav__link">
+    Cayenne（Java ORM 框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cloudstack" class="md-nav__link">
+    CloudStack（高可用性及扩展性的云计算平台）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cocoonweb" class="md-nav__link">
+    Cocoon（Web开发框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#couchdb" class="md-nav__link">
+    CouchDB（开源的面向文档的数据库管理系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#commonsjava" class="md-nav__link">
+    Commons（常用的Java类库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cordova" class="md-nav__link">
+    Cordova（跨平台的移动应用程序开发框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#crail" class="md-nav__link">
+    Crail（分布式数据处理工作负载中快速共享临时数据）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#creadur-rat" class="md-nav__link">
+    Creadur Rat（检查软件许可证发行的准确性和高效性的工具）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#creadur-tentacles" class="md-nav__link">
+    Creadur Tentacles（对上传到临时存储库的批量组件进行审计）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#creadur-whisker" class="md-nav__link">
+    Creadur Whisker（应用程序对其发行版内容的许可特征建模。）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ctakes" class="md-nav__link">
+    CTakes（临床的文本分析和知识提取系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#curatorzookeeper" class="md-nav__link">
+    Curator（Zookeeper的封装类库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cxfservice" class="md-nav__link">
+    CXF（开源的Service框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#daffodildfdl" class="md-nav__link">
+    Daffodil（数据格式描述语言DFDL开源实现）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datafuhadoop" class="md-nav__link">
+    DataFu（Hadoop类库集合）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datalab" class="md-nav__link">
+    DataLab（数据实验平台）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datasketches" class="md-nav__link">
+    DataSketches（高性能大数据流算法库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deltaspikecontexts-dependency-injection-extensions" class="md-nav__link">
+    DeltaSpike（Contexts &amp; Dependency Injection Extensions）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#derby" class="md-nav__link">
+    Derby（关系型数据库，可内嵌）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#directoryfortressserverstudioldapkerberos" class="md-nav__link">
+    Directory&amp;Fortress&amp;Server&amp;Studio（LDAP和Kerberos标准实现）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dolphinschedulerdag" class="md-nav__link">
+    DolphinScheduler（分布式可视化DAG工作流任务调度系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dorismppolap" class="md-nav__link">
+    Doris（MPP数据仓库，OLAP）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#drillmpp" class="md-nav__link">
+    Drill（分布式MPP查询系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#druidolap" class="md-nav__link">
+    Druid（OLAP数据仓库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dubbojava-rpc" class="md-nav__link">
+    Dubbo（Java RPC框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#echartsjs" class="md-nav__link">
+    ECharts（JS可视化库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#empire-dbhibernatemybatis" class="md-nav__link">
+    Empire-db（关系型数据持久化组件，类似Hibernate/Mybatis）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#eventmeshservicemesh" class="md-nav__link">
+    EventMesh（云原生基础服务，类似ServiceMesh）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fineract" class="md-nav__link">
+    Fineract（核心银行系统平台化建设）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flagon" class="md-nav__link">
+    Flagon（测试平台）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flexweb" class="md-nav__link">
+    Flex（跨平台的Web开发框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flink" class="md-nav__link">
+    Flink（实时流处理系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flume" class="md-nav__link">
+    Flume（日志收集系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fluogoogle" class="md-nav__link">
+    Fluo（Google搜索引擎的开源实现）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#freemarker" class="md-nav__link">
+    FreeMarker（模板引擎类库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#geoderedis" class="md-nav__link">
+    Geode（缓存等数据管理平台，类似分布式缓存Redis）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#geronimojavaee-web" class="md-nav__link">
+    Geronimo（JavaEE Web服务）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#giraphhadoop" class="md-nav__link">
+    Giraph（基于Hadoop的分布式迭代图处理系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gobblinhadoop" class="md-nav__link">
+    Gobblin（Hadoop 通用数据摄取框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#goraorm" class="md-nav__link">
+    Gora（ORM框架，为大数据提供内存数据模型与数据的持久化）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#griffin" class="md-nav__link">
+    Griffin（大数据的数据质量解决方案）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#groovy-jvm" class="md-nav__link">
+    Groovy（基于 JVM 平台的动态/敏捷编程语言）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#guacamoleweb" class="md-nav__link">
+    Guacamole（基于Web的远程桌面）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gump" class="md-nav__link">
+    Gump（持续集成工具）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hadoop-mapreducehadoop" class="md-nav__link">
+    Hadoop MapReduce（Hadoop计算框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hadoop-hdfshadoop" class="md-nav__link">
+    Hadoop HDFS（Hadoop分布式文件系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hadoop-yarnhadoop" class="md-nav__link">
+    Hadoop Yarn（Hadoop集群资源管理）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hawqmpphadoop-sql" class="md-nav__link">
+    HAWQ（MPP的Hadoop SQL分析平台）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hbasenosqlkv" class="md-nav__link">
+    HBase（NOSQL，KV数据库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#helix" class="md-nav__link">
+    Helix（集群管理框架，用于自动化的分区、复制和资源分布）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#heron" class="md-nav__link">
+    Heron（分布式流处理）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hivehadoop" class="md-nav__link">
+    Hive（Hadoop数据仓库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hivemallhivesparkpig" class="md-nav__link">
+    Hivemall（机器学习库，Hive/Spark/Pig）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hop" class="md-nav__link">
+    Hop（数据编排工具）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#httpserverweb" class="md-nav__link">
+    HttpServer（Web服务器）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#httpcomponents-clientcorehttp" class="md-nav__link">
+    HttpComponents Client/Core（HTTP 协议的客户端/服务器编程工具包）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hudi" class="md-nav__link">
+    Hudi（数据湖）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iceberg" class="md-nav__link">
+    Iceberg（表格式，数据湖）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ignite" class="md-nav__link">
+    Ignite（分布式数据库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#impalampp-sql" class="md-nav__link">
+    Impala（MPP SQL查询）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iotdb" class="md-nav__link">
+    IoTDB（物联网数据库，收集、存储、管理与分析）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#isis-java" class="md-nav__link">
+    Isis（领域驱动应用的 java 框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ivyant" class="md-nav__link">
+    Ivy（项目依赖管理工具，与Ant集成）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jackrabbitjava" class="md-nav__link">
+    Jackrabbit（Java内容仓库规范的实现）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jamesjava" class="md-nav__link">
+    JAMES（Java企业邮箱服务）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jclouds-java" class="md-nav__link">
+    jclouds（云计算 Java 开发工具包）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jena-web-java" class="md-nav__link">
+    Jena（构建语义 Web 程序的 Java 框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jmeterweb" class="md-nav__link">
+    JMeter（Web测试工具）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#johnzon-jsonp-java" class="md-nav__link">
+    Johnzon（解析和创建 JSONP 的 Java 库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#joshuajava" class="md-nav__link">
+    Joshua（Java统计机器翻译平台）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jspwikiwiki" class="md-nav__link">
+    JSPWiki（Wiki服务）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#juneau-pojo-rest-api" class="md-nav__link">
+    Juneau（编组 POJO和开发 REST微服务和 API）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kafka-" class="md-nav__link">
+    Kafka（分布式消息订阅-发布）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kerbyjava-kerberos" class="md-nav__link">
+    Kerby（Java Kerberos）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kibble" class="md-nav__link">
+    Kibble（可视化活动报告分析平台）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#knoxhadoop" class="md-nav__link">
+    Knox（Hadoop 部署交互的应用网关）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kudu" class="md-nav__link">
+    Kudu（列式存储系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kylin" class="md-nav__link">
+    Kylin（大数据分析型数据仓库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#libcloudpython" class="md-nav__link">
+    Libcloud（Python访问云计算服务的统一接口）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#liminal" class="md-nav__link">
+    Liminal（机器学习编制平台）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#livyapache-sparkrest" class="md-nav__link">
+    Livy（基于Apache Spark的REST服务）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logging" class="md-nav__link">
+    Logging（日志记录）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lucene-pylucenepython-api" class="md-nav__link">
+    Lucene / PyLucene（搜索引擎库/Python API）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#madlibsql" class="md-nav__link">
+    MADlib（基于SQL的数据库内置的可扩展机的器学习库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mahout" class="md-nav__link">
+    Mahout（大数据机器学习库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manifoldcfjava" class="md-nav__link">
+    ManifoldCF（JAVA实现的爬虫框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#marvin-ai" class="md-nav__link">
+    Marvin-AI（机器学习操作的平台）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#maven" class="md-nav__link">
+    Maven（项目开发/管理框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#maven-doxia" class="md-nav__link">
+    Maven Doxia（内容生成框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mesos" class="md-nav__link">
+    Mesos（集群资源管理框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metamodel" class="md-nav__link">
+    MetaModel（统一的查询语言类库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#milagro" class="md-nav__link">
+    Milagro（分布式安全认证系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mina" class="md-nav__link">
+    Mina（网络应用框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mina-ftpserverftpmina" class="md-nav__link">
+    Mina FtpServer（Ftp服务器，基于MINA）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mina-sshdjava-sshmina" class="md-nav__link">
+    Mina SSHD（Java SSH客户端和服务端，基于MINA）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mnemonicspark" class="md-nav__link">
+    Mnemonic（非易失性混合内存存储的库，可与Spark集成）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mxnet" class="md-nav__link">
+    MxNet（深度学习框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nemo" class="md-nav__link">
+    Nemo（多样弹性部署的数据处理系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nifi" class="md-nav__link">
+    NiFi（数据流设计的可靠的数据处理和分发系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nlpcraftnluapi" class="md-nav__link">
+    NLPCraft（NLU应用的API）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nutch" class="md-nav__link">
+    Nutch（网络爬虫软件）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ofbizerp" class="md-nav__link">
+    OFBiz（开源ERP解决方案）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#olingoodatajava" class="md-nav__link">
+    Olingo（实现开放数据协议(OData)的Java库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ooziehadoop" class="md-nav__link">
+    Oozie（Hadoop工作流调度）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openjpajava" class="md-nav__link">
+    OpenJPA（Java持久化实现）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openmeetings" class="md-nav__link">
+    OpenMeetings（视频会议，及时消息）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#opennlpnlp" class="md-nav__link">
+    OpenNLP（NLP工具类）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openofficems-office" class="md-nav__link">
+    OpenOffice（似于微软MS Office软件跨平台的办公室软件）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openwebbeansjavaee" class="md-nav__link">
+    OpenWebBeans（JavaEE依赖注入）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openwhiskfaas" class="md-nav__link">
+    OpenWhisk（分布式无服务器平台，开源FaaS平台）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#orc" class="md-nav__link">
+    ORC（列式存储格式）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ozonehadoop" class="md-nav__link">
+    Ozone（Hadoop云原生的分布式对象存储）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pagespeed" class="md-nav__link">
+    PageSpeed（网页性能只能优化）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parquet" class="md-nav__link">
+    Parquet（列式存储格式）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pdfboxjavapdf" class="md-nav__link">
+    PDFBox（Java处理PDF的类库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pegasuskv" class="md-nav__link">
+    Pegasus（分布式KV存储系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pinot-olap" class="md-nav__link">
+    Pinot（实时分布式的 OLAP 数据存储和分析系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pivot" class="md-nav__link">
+    Pivot（构建可安装的网络应用）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phoenixsql-on-hbase" class="md-nav__link">
+    Phoenix（SQL on HBase）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pig" class="md-nav__link">
+    Pig（大数据分析系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plc4xapi" class="md-nav__link">
+    PLC4X（可编程逻辑控制器的统一API）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#poims-officejava-api" class="md-nav__link">
+    POI（MS Office编程的Java API）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pony-mail" class="md-nav__link">
+    Pony Mail（邮箱归档、查看等交互服务）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#portable-runtime" class="md-nav__link">
+    Portable Runtime（跨平台库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#portals" class="md-nav__link">
+    Portals（协作的软件开发项目，提供门户网站相关软件）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pulsar-" class="md-nav__link">
+    Pulsar（分布式发布-订阅消息系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qpidadvanced-message-queuing-protocolamqp" class="md-nav__link">
+    Qpid（Advanced Message Queuing Protocol（AMQP）企业消息实现）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rangerhadoop" class="md-nav__link">
+    Ranger（Hadoop数据权限监控管理平台）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ratisjava-raft" class="md-nav__link">
+    Ratis（可自定制的Java Raft实现）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reefyarnmesos" class="md-nav__link">
+    REEF（可保留评估程序执行框架，Yarn/Mesos上开发可移植应用程序的库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#riverjini" class="md-nav__link">
+    River（JINI标准实现）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rivettcl-web" class="md-nav__link">
+    Rivet（Tcl 语义的Web框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rocketmq" class="md-nav__link">
+    RocketMQ（消息队列）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rollerjavawebblog" class="md-nav__link">
+    Roller（Java版本的WebBlog系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#royalemxml-as3" class="md-nav__link">
+    Royale（开源前端应用程序技术，MXML &amp; AS3 ）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ryardf" class="md-nav__link">
+    Rya（RDF数据的存储、获取和分析）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#samza" class="md-nav__link">
+    Samza（分布式流处理框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sandesha2ws-rm" class="md-nav__link">
+    Sandesha2（WS-RM的实现）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#santuario-xml" class="md-nav__link">
+    Santuario（ XML数字签名和加解密规范的实现）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scoutjaxr" class="md-nav__link">
+    Scout（JAXR的实现）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sdap" class="md-nav__link">
+    SDAP（科学数据分析平台）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sedonaspark" class="md-nav__link">
+    Sedona（大规模空间数据的集群计算系统，基于Spark）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#serfaprchttp-client" class="md-nav__link">
+    Serf（基于APR的C的HTTP Client库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#servicecombspringcloud" class="md-nav__link">
+    ServiceComb（微服务框架，对标SpringCloud）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#servicemixesbsoa" class="md-nav__link">
+    ServiceMix（开源ESB,适合SOA项目的集成）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shardingsphere" class="md-nav__link">
+    ShardingSphere（分布式数据库中间件解决方案）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shirojava" class="md-nav__link">
+    Shiro（Java安全框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#singo" class="md-nav__link">
+    SINGO（分布式深度学习平台）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#skywalkingjava" class="md-nav__link">
+    SkyWalking（Java分布式应用追踪系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#slingweb" class="md-nav__link">
+    Sling（Web内容存储框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solrlucene" class="md-nav__link">
+    Solr（全文搜索服务，基于Lucene）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spamassassin" class="md-nav__link">
+    SpamAssassin（识别垃圾邮件的系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spark" class="md-nav__link">
+    Spark（大数据处理系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spatial-information-system" class="md-nav__link">
+    Spatial Information System（空间信息管理系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sqoophadooprdbms" class="md-nav__link">
+    Sqoop（Hadoop和RDBMS体系之间传送数据）。
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stevepython" class="md-nav__link">
+    Steve（Python投票系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#storm" class="md-nav__link">
+    Storm（分布式实时计算系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#streampipesiotiot" class="md-nav__link">
+    StreamPipes（企业IoT工具箱，用于连接、分析、探索IoT数据）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#streamsactivitystreams" class="md-nav__link">
+    Streams（实现ActivityStreams 技术的轻量级框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#submarine" class="md-nav__link">
+    Submarine（云原生的机器学习平台）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subversion" class="md-nav__link">
+    Subversion（开源的集中式版本控制系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#superset" class="md-nav__link">
+    Superset（数据可视化平台）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#synapsexml-web" class="md-nav__link">
+    Synapse（XML 和 Web 服务管理与集成代理）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#syncopejava-ee" class="md-nav__link">
+    Syncope（JAVA EE 开发的开源的适用于企业的数字身份管理系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#systemdssystemml" class="md-nav__link">
+    SystemDS（原SystemML，大数据的机器学习平台）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tapestryjavaweb" class="md-nav__link">
+    Tapestry（面向组件的JavaWeb应用框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#teaclave" class="md-nav__link">
+    Teaclave（通用的安全计算框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tezyarn-dag" class="md-nav__link">
+    Tez（基于Yarn的支持 DAG 作业的开源计算框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#thriftrpc" class="md-nav__link">
+    Thrift（RPC框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tika" class="md-nav__link">
+    Tika（内容抽取的工具集合）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkerpopolapoltp" class="md-nav__link">
+    TinkerPop（图OLAP和OLTP系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tomcatweb-server" class="md-nav__link">
+    Tomcat（Web Server）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tomeej2ee-6-tomcat" class="md-nav__link">
+    TomEE（J2EE 6 认证的 Tomcat 企业版本）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#toreeapache-sparkrestful" class="md-nav__link">
+    Toree（Apache Spark远程Restful交互）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#torquejava" class="md-nav__link">
+    Torque（Java的对象关系映射）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#traffic-controlcdn" class="md-nav__link">
+    Traffic Control（分布式、可扩展的冗余解决方案，可用于构建CDN）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#traffic-serverhttp" class="md-nav__link">
+    Traffic Server（HTTP缓存代理服务器）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trafodionhadoopsql" class="md-nav__link">
+    Trafodion（基于Hadoop平台的交易型分布式SQL引擎）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#training" class="md-nav__link">
+    Training（以开源的形式为各种项目创建高质量的培训材料）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tubemq" class="md-nav__link">
+    TubeMQ（消息队列）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#turbineweb" class="md-nav__link">
+    Turbine（构建Web应用）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tuwenijava" class="md-nav__link">
+    Tuweni（开发区块链和反中心化的Java库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tvm" class="md-nav__link">
+    TVM（端到端的深度学习编译框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uima" class="md-nav__link">
+    UIMA（非结构化信息管理应用）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unomijavacdpcustomer-data-platform" class="md-nav__link">
+    Unomi（Java开源客户数据平台CDP,Customer Data Platform）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#usergridbaas" class="md-nav__link">
+    Usergrid（Baas平台）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vcl" class="md-nav__link">
+    VCL（计算资源管理平台）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#velocityjava" class="md-nav__link">
+    Velocity（基于Java的模板引擎）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#velocity-texenvelocityant" class="md-nav__link">
+    Velocity Texen（基于Velocity和Ant的代码生成）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#velocity-dvsldeclarative-velocity-style-language" class="md-nav__link">
+    Velocity DVSL（Declarative Velocity Style Language）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weexui" class="md-nav__link">
+    Weex（跨平台的高性能UI框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wicketjava-web" class="md-nav__link">
+    Wicket（Java Web应用框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ws-axiomxml" class="md-nav__link">
+    WS Axiom（XML解析）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ws-wodenwsdl" class="md-nav__link">
+    WS Woden（WSDL文档处理库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xalanxslt" class="md-nav__link">
+    Xalan（XSLT处理的库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xercesxml" class="md-nav__link">
+    Xerces（XML解析库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xmlbeansxmljava" class="md-nav__link">
+    XMLBeans（XML和Java映射）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xmlgraphics-batik-svgjava" class="md-nav__link">
+    XMLGraphics Batik （SVG操作的Java库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xmlgraphics-fopxsl" class="md-nav__link">
+    XMLGraphics FOP（XSL格式对象实现）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#yetus" class="md-nav__link">
+    Yetus（系统管理工具，为软件项目提供贡献和发布流程）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#yunikornkubernetes" class="md-nav__link">
+    YuniKorn（用于服务和批处理工作负载的增强型Kubernetes调度程序）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#zepplinwebnotebook" class="md-nav__link">
+    Zepplin（基于Web的交互式NoteBook）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#zookeeper" class="md-nav__link">
+    Zookeeper（高可用的分布式协调系统）
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#no" class="md-nav__link">
+    No
+  </a>
+  
+    <nav class="md-nav" aria-label="No">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#allura-web" class="md-nav__link">
+    Allura（基于 Web 的软件工具和协作软件开发的平台）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#airavata" class="md-nav__link">
+    Airavata（管理分布式系统软件？）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ariesosgi" class="md-nav__link">
+    Aries（企业OSGi应用编程模型）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#any23" class="md-nav__link">
+    Any23（结构化数据抽取库）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bigtophadoop" class="md-nav__link">
+    Bigtop（Hadoop及其周边生态进行打包，分发和测试的工具）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#camel" class="md-nav__link">
+    Camel（基于规则的路由以及媒介引擎）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemistry" class="md-nav__link">
+    Chemistry（内容管理互操作服务）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clerezzaosgi-restful-semantic-web" class="md-nav__link">
+    Clerezza（OSGi RESTFul Semantic Web应用和服务）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#felixosgi4" class="md-nav__link">
+    Felix（OSGi版本4规范的实现）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#karafosgiosgi" class="md-nav__link">
+    Karaf（osgi的运行环境，发布和运行osgi服务的容器）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mynewt" class="md-nav__link">
+    Mynewt（资源受限嵌入式环境的操作系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#myfacesjsf-web" class="md-nav__link">
+    MyFaces（JSF Web框架实现）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#myfaces-tobagoweb" class="md-nav__link">
+    MyFaces Tobago（创建具有统一外观的WEB应用的开发程序）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nuttx" class="md-nav__link">
+    NuttX（实时嵌入型操作系统）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#oodt" class="md-nav__link">
+    OODT（面向对象数据技术）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#petri" class="md-nav__link">
+    Petri（评估、教育、采纳基金会的合作发展政策及程序，以及加入基金会的利弊。）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#strutsjava-ee-webmvc" class="md-nav__link">
+    Struts（Java EE Web应用的MVC设计模式的应用框架）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vysper-xmppjabbermina" class="md-nav__link">
+    Vysper（模块化的,全功能的 XMPP(jabber)服务器软件，基于Mina）
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#whimsyasf" class="md-nav__link">
+    Whimsy（显示和可视化与ASF组织和流程相关的各种数据）
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<p>[toc]</p>
+<h1 id="apache2021414">Apache（2021/4/14）</h1>
+<h2 id="_1">有意义</h2>
+<h3 id="accumulokv">Accumulo（分布式KV存储）</h3>
+<p>基于Apache Hadoop，Apache Zookeeper, Apache Thrift 构建的，可靠的、可伸缩的、高性能的排序分布式KV数据存储系统。</p>
+<h3 id="activemq">ActiveMQ（消息队列）</h3>
+<p>a fast and powerful Message Broker which supports many Cross Language Clients and Protocols and many advanced features.</p>
+<h3 id="airflow">Airflow（调度和监控工作流）</h3>
+<p>workflow automation and scheduling that can be used to author and manage data pipelines.</p>
+<h3 id="ambari-hadoop">Ambari （Hadoop管理监控工具）</h3>
+<p>HDFS、MapReduce、YARN、Hive、Pig、 HBase、Zookeper、Sqoop和Hcatalog。</p>
+<h3 id="ant">Ant（构建工具）</h3>
+<p>a Java-based build tool.</p>
+<h3 id="apisixapi">ApiSix（云原生的API服务网关）</h3>
+<p>Cloud-native microservices API gateway.</p>
+<h3 id="archivamaven">Archiva（远程资源库maven等管理软件）</h3>
+<p>an extensible repository management software that helps taking care of your own personal or enterprise-wide build artifact repository. </p>
+<h3 id="arrow">Arrow（跨语言的内存数据格式）</h3>
+<p>A cross-language development platform for in-memory analytics.</p>
+<h3 id="asterixdb-bdms">AsterixDB（大数据管理系统 (BDMS））</h3>
+<p>a scalable, open source Big Data Management System (BDMS).</p>
+<h3 id="atlas">Atlas（大数据的元数据管理和数据治理平台）</h3>
+<p>Hadoop社区为解决Hadoop生态系统的元数据治理问题而产生的开源项目.</p>
+<h3 id="avro">Avro（行式序列化）</h3>
+<p>A data serialization system</p>
+<h3 id="axis2web">Axis2（Web服务的核心支援引擎）</h3>
+<p>a service hosting and consumption framework that makes it easy to use SOAP and Web Services.</p>
+<h3 id="bahirsparkflink">Bahir（Spark/Flink扩展）</h3>
+<p>extensions to multiple distributed analytic platforms, extending their reach with a diversity of streaming connectors and SQL data sources.</p>
+<h3 id="beam">Beam（统一编程模型的批流一体的数据处理）</h3>
+<p>An advanced unified programming model，Implement batch and streaming data processing jobs that run on any execution engine.</p>
+<h3 id="bloodhound">BloodHound（项目的进展和缺陷跟踪）</h3>
+<p>a software development collaboration tool, including issue tracking, wiki and repository browsing.</p>
+<h3 id="bookkeeper">Bookkeeper（扩展、高可用、低延迟的存储服务）</h3>
+<p>A reliable replicated log service.</p>
+<h3 id="brooklyn">Brooklyn（多数据中心的应用程序的蓝图和管理平台）</h3>
+<p>a framework for modeling, monitoring, and managing applications through autonomic blueprints.</p>
+<h3 id="brpcrpc">Brpc（百度的RPC开源）</h3>
+<p>an industrial-grade RPC framework for building reliable and high-performance services.</p>
+<h3 id="buildrmavengradle">Buildr（项目构建系统，类似Maven/Gradle）</h3>
+<p>a build system for Java-based applications, including support for Scala, Groovy and a growing number of JVM languages and tools.</p>
+<h3 id="bvaljavabean">Bval（JavaBean数据验证）</h3>
+<p>an implementation of the Java Bean Validation Specfication (JSR303/346) , can work with Spring.</p>
+<h3 id="calcite-sql">Calcite （开源SQL解析工具）</h3>
+<p>般常用作集成到某些框架里，比如Apache Drill、Apache Hive、Apache Kylin、Apache Phoenix、Apache Samza、Apache Flink、Lingual等。</p>
+<h3 id="carbondata">CarbonData（索引列式数据格式）</h3>
+<p>an indexed columnar data format for fast analytics on big data platform, e.g. Apache Hadoop, Apache Spark, etc.</p>
+<h3 id="cassandranosql">Cassandra（NOSQL数据库）</h3>
+<p>the right choice when you need scalability and high availability without compromising performance.</p>
+<h3 id="cayennejava-orm">Cayenne（Java ORM 框架）</h3>
+<p>User-friendly Java ORM with tools.</p>
+<h3 id="cloudstack">CloudStack（高可用性及扩展性的云计算平台）</h3>
+<p>an IaaS (“Infrastracture as a Service”) cloud orchestration platform.</p>
+<h3 id="cocoonweb">Cocoon（Web开发框架）</h3>
+<p>Web development framework: separation of concerns, component-based.</p>
+<h3 id="couchdb">CouchDB（开源的面向文档的数据库管理系统）</h3>
+<p><strong>Seamless</strong> multi-master sync, that scales from <strong>Big Data</strong> to <strong>Mobile,</strong> with an <strong>Intuitive</strong> HTTP/JSON API and designed for <strong>Reliability.</strong></p>
+<h3 id="commonsjava">Commons（常用的Java类库）</h3>
+<p>BeanUtils,  CLI，CodeC，Collections，Compress，Configuration，Crypto，CSV，IO，Lang，Math，Pool，Validator等。</p>
+<h3 id="cordova">Cordova（跨平台的移动应用程序开发框架）</h3>
+<p>A tool to create cross-platform apps from standard web technologies (HTML, CSS, and JavaScript).</p>
+<h3 id="crail">Crail（分布式数据处理工作负载中快速共享临时数据）</h3>
+<p>a high-performance distributed data store designed for fast sharing of ephemeral data in distributed data processing workloads.</p>
+<h3 id="creadur-rat">Creadur Rat（检查软件许可证发行的准确性和高效性的工具）</h3>
+<p>improves accuracy and efficiency when reviewing and auditing releases.</p>
+<h3 id="creadur-tentacles">Creadur Tentacles（对上传到临时存储库的批量组件进行审计）</h3>
+<p>download all the archives from a staging repo, unpack them and create a little report of what is there.</p>
+<h3 id="creadur-whisker">Creadur Whisker（应用程序对其发行版内容的许可特征建模。）</h3>
+<p>assists assembled applications to maintain correct legal documentation.</p>
+<h3 id="ctakes">CTakes（临床的文本分析和知识提取系统）</h3>
+<p>an open-source natural language processing system for information extraction from electronic medical record clinical free-text.</p>
+<h3 id="curatorzookeeper">Curator（Zookeeper的封装类库）</h3>
+<p>A set of Java libraries that make using Apache ZooKeeper much easier.</p>
+<h3 id="cxfservice">CXF（开源的Service框架）</h3>
+<p>An Open Source Service Framework.</p>
+<h3 id="daffodildfdl">Daffodil（数据格式描述语言DFDL开源实现）</h3>
+<p>库，数据格式描述语言（Data Format Description Language）DFDL 1.0 规范的开源实现，以实现通用数据交换。</p>
+<p>convert between fixed format data and XML/JSON based on a DFDL schema. </p>
+<h3 id="datafuhadoop">DataFu（Hadoop类库集合）</h3>
+<p>大规模数据处理的库函数，供Spark、MapReduce、Pig使用。</p>
+<h3 id="datalab">DataLab（数据实验平台）</h3>
+<p>a platform for creating self-service, exploratory data science environments in the cloud using best-of-breed data science tools.</p>
+<p>可选使用Zeeplin，Jupyter，Rstudio等分析工具。</p>
+<h3 id="datasketches">DataSketches（高性能大数据流算法库）</h3>
+<p>an open source, high-performance library of streaming algorithms commonly called "sketches" in the data sciences.</p>
+<h3 id="deltaspikecontexts-dependency-injection-extensions">DeltaSpike（Contexts &amp; Dependency Injection Extensions）</h3>
+<p>a collection of portable Extensions for CDI Containers.</p>
+<h3 id="derby">Derby（关系型数据库，可内嵌）</h3>
+<p>an open source relational database implemented in Java.</p>
+<h3 id="directoryfortressserverstudioldapkerberos">Directory&amp;Fortress&amp;Server&amp;Studio（LDAP和Kerberos标准实现）</h3>
+<p>LDAP and Kerberos, entirely in Java.</p>
+<h3 id="dolphinschedulerdag">DolphinScheduler（分布式可视化DAG工作流任务调度系统）</h3>
+<p>a distributed and extensible workflow scheduler platform with powerful DAG visual interfaces.</p>
+<h3 id="dorismppolap">Doris（MPP数据仓库，OLAP）</h3>
+<p>a MPP-based interactive SQL data warehousing for reporting and analysis.</p>
+<h3 id="drillmpp">Drill（分布式MPP查询系统）</h3>
+<p>a distributed MPP query layer that supports SQL and alternative query languages against NoSQL and Hadoop data storage systems. It was inspired in part by Google's Dremel.</p>
+<h3 id="druidolap">Druid（OLAP数据仓库）</h3>
+<p>a high performance real-time analytics database.</p>
+<h3 id="dubbojava-rpc">Dubbo（Java RPC框架）</h3>
+<p>a high-performance, lightweight, java based RPC framework.</p>
+<h3 id="echartsjs">ECharts（JS可视化库）</h3>
+<p>a charting and data visualization library written in JavaScript.</p>
+<h3 id="empire-dbhibernatemybatis">Empire-db（关系型数据持久化组件，类似Hibernate/Mybatis）</h3>
+<p>a lightweight relational database abstraction layer and data persistence component.</p>
+<h3 id="eventmeshservicemesh">EventMesh（云原生基础服务，类似ServiceMesh）</h3>
+<p>a dynamic cloud-native basic service runtime used to decouple the application and middleware layer.</p>
+<h3 id="fineract">Fineract（核心银行系统平台化建设）</h3>
+<p>Platform for Digital Financial Services.</p>
+<h3 id="flagon">Flagon（测试平台）</h3>
+<p>an open-soure, thin-client behavioral logging capability useful for business analytics, usage analytics, usability and user testing. </p>
+<h3 id="flexweb">Flex（跨平台的Web开发框架）</h3>
+<p>a highly productive, open source application framework for building and maintaining expressive web applications that deploy consistently on all major browsers, desktops and devices (including smartphones, tablets and tv).</p>
+<h3 id="flink">Flink（实时流处理系统）</h3>
+<p>Fast and reliable large-scale data processing</p>
+<h3 id="flume">Flume（日志收集系统）</h3>
+<p>a distributed, reliable, and available system for efficiently <strong>collecting, aggregating and moving large amounts of log data</strong> from many different sources to a centralized data store</p>
+<h3 id="fluogoogle">Fluo（Google搜索引擎的开源实现）</h3>
+<p>是 <a href="https://research.google.com/pubs/pub36726.html">Google Percolator</a>（搜索索引）的开源实现，允许用户对存储在 Apache Accumulo 中的大型数据集进行增量更新，而无需重新处理所有的数据。与批处理和流处理框架不同的是，Fluo 提供了更低的延迟，并且可以在极大的数据集上运行。</p>
+<h3 id="freemarker">FreeMarker（模板引擎类库）</h3>
+<p>a template engine.</p>
+<h3 id="geoderedis">Geode（缓存等数据管理平台，类似分布式缓存Redis）</h3>
+<p>Providing low latency, high concurrency data management solutions. </p>
+<p>内存数据库。</p>
+<h3 id="geronimojavaee-web">Geronimo（JavaEE Web服务）</h3>
+<p>an open source server runtime that integrates the best open source projects to create Java/OSGi server runtimes that meet the needs of enterprise developers and system administrators. </p>
+<h3 id="giraphhadoop">Giraph（基于Hadoop的分布式迭代图处理系统）</h3>
+<p>灵感来自 BSP (bulk synchronous parallel) 和 Google 的 Pregel. </p>
+<h3 id="gobblinhadoop">Gobblin（Hadoop 通用数据摄取框架）</h3>
+<p>A distributed data integration framework that simplifies common aspects of big data integration such as data ingestion, replication, organization and lifecycle management for both <strong>streaming</strong> and <strong>batch</strong> data ecosystems.</p>
+<p>支持大部分流行的数据源，例如RDBMS（Oralce、Mysql、SqlServer）， Espresso，Kafka，RocksDB，S3，Salesforce和Google Analytics等。让数据收集工作变得更加简单和易用。</p>
+<h3 id="goraorm">Gora（ORM框架，为大数据提供内存数据模型与数据的持久化）</h3>
+<p>an in-memory data model and persistence for big data. </p>
+<p>支持对于列数据、key-value数据，文档数据与RDBMS数据的存储，还支持使用Apache Hadoop来对对大数据进行分析。</p>
+<h3 id="griffin">Griffin（大数据的数据质量解决方案）</h3>
+<p>a data quality solution for big data, including both streaming and batch mode. It offers an unified process to measure data quality from different perspectives.</p>
+<h3 id="groovy-jvm">Groovy（基于 JVM 平台的动态/敏捷编程语言）</h3>
+<p>A multi-faceted language for the Java platform.</p>
+<h3 id="guacamoleweb">Guacamole（基于Web的远程桌面）</h3>
+<p>a <strong>clientless remote desktop gateway</strong>. It supports standard protocols like VNC, RDP, and SSH.</p>
+<h3 id="gump">Gump（持续集成工具）</h3>
+<p>large scale continuous integration for various open source projects.</p>
+<h3 id="hadoop-mapreducehadoop">Hadoop MapReduce（Hadoop计算框架）</h3>
+<p>map reduce framework.</p>
+<h3 id="hadoop-hdfshadoop">Hadoop HDFS（Hadoop分布式文件系统）</h3>
+<p>open-source software for reliable, scalable, distributed computing.</p>
+<h3 id="hadoop-yarnhadoop">Hadoop Yarn（Hadoop集群资源管理）</h3>
+<p>Yet another resource Negotiator.</p>
+<h3 id="hawqmpphadoop-sql">HAWQ（MPP的Hadoop SQL分析平台）</h3>
+<p>a Hadoop native SQL query engine that combines the key technological advantages of an MPP database with the scalability and convenience of Hadoop.</p>
+<h3 id="hbasenosqlkv">HBase（NOSQL，KV数据库）</h3>
+<p><a href="https://hadoop.apache.org/">Hadoop</a> database, a distributed, scalable, big data store.</p>
+<h3 id="helix">Helix（集群管理框架，用于自动化的分区、复制和资源分布）</h3>
+<p>A cluster management framework for partitioned and replicated distributed resources</p>
+<h3 id="heron">Heron（分布式流处理）</h3>
+<p>A real-time, distributed, fault-tolerant stream processing engine.</p>
+<h3 id="hivehadoop">Hive（Hadoop数据仓库）</h3>
+<p>data warehouse software facilitates querying and managing large datasets residing in distributed storage.</p>
+<h3 id="hivemallhivesparkpig">Hivemall（机器学习库，Hive/Spark/Pig）</h3>
+<p>a library for machine learning implemented as Hive UDFs/UDAFs/UDTFs.</p>
+<h3 id="hop">Hop（数据编排工具）</h3>
+<p>aims to facilitate all aspects of data and metadata orchestration.</p>
+<h3 id="httpserverweb">HttpServer（Web服务器）</h3>
+<p>an open-source HTTP server for modern operating systems including UNIX, Microsoft Windows, Mac OS/X and Netware.</p>
+<h3 id="httpcomponents-clientcorehttp">HttpComponents Client/Core（HTTP 协议的客户端/服务器编程工具包）</h3>
+<p>creating and maintaining a toolset of low level Java components focused on HTTP and associated protocols.</p>
+<h3 id="hudi">Hudi（数据湖）</h3>
+<p>Hadoop Updates and Incrementals：ingests &amp; manages storage of large analytical datasets over DFS (hdfs or cloud stores).</p>
+<h3 id="iceberg">Iceberg（表格式，数据湖）</h3>
+<p>managing huge analytic datasets using a standard at-rest table format that is designed for high performance and ease of use.</p>
+<h3 id="ignite">Ignite（分布式数据库）</h3>
+<p>分布式数据库，支持以内存级的速度进行高性能计算。</p>
+<h3 id="impalampp-sql">Impala（MPP SQL查询）</h3>
+<p>he open source, native analytic database for Apache Hadoop.</p>
+<h3 id="iotdb">IoTDB（物联网数据库，收集、存储、管理与分析）</h3>
+<p>an IoT native database with high performance for data management and analysis</p>
+<h3 id="isis-java">Isis（领域驱动应用的 java 框架）</h3>
+<p>a framework for rapidly developing domain-driven apps in Java.</p>
+<h3 id="ivyant">Ivy（项目依赖管理工具，与Ant集成）</h3>
+<p>a very powerful dependency manager oriented toward Java dependency management, even though it could be used to manage dependencies of any kind.</p>
+<h3 id="jackrabbitjava">Jackrabbit（Java内容仓库规范的实现）</h3>
+<p>JCR(Java Content Repository)，即Java内容仓库规范，定义了一套规范API，用于文件和元数据的存储管理、全文检索等。JBoss ModeShape、Apache Jackrabbit等都是JCR规范的具体实现</p>
+<h3 id="jamesjava">JAMES（Java企业邮箱服务）</h3>
+<p>pure Java SMTP and POP3 Mail server and NNTP News server. </p>
+<h3 id="jclouds-java">jclouds（云计算 Java 开发工具包）</h3>
+<p>an open source multi-cloud toolkit for the Java platform that gives you the freedom to create applications that are <strong>portable across clouds</strong> while giving you <strong>full control</strong> to use cloud-specific features.</p>
+<h3 id="jena-web-java">Jena（构建语义 Web 程序的 Java 框架）</h3>
+<p>A framework for developing Semantic Web and Linked Data applications in Java.</p>
+<h3 id="jmeterweb">JMeter（Web测试工具）</h3>
+<p>test performance both on static and dynamic resources (files, Servlets, Perl scripts, Java Objects, Data Bases and Queries, FTP Servers and more).</p>
+<h3 id="johnzon-jsonp-java">Johnzon（解析和创建 JSONP 的 Java 库）</h3>
+<p>an implementation of JsonProcessing (aka JSR-353) and a set of useful extension for this specification like an Object mapper.</p>
+<h3 id="joshuajava">Joshua（Java统计机器翻译平台）</h3>
+<p>statistical and other forms of machine translation.</p>
+<h3 id="jspwikiwiki">JSPWiki（Wiki服务）</h3>
+<p>A feature-rich and extensible WikiWiki engine built around the standard JEE components (Java, servlets, JSP).</p>
+<h3 id="juneau-pojo-rest-api">Juneau（编组 POJO和开发 REST微服务和 API）</h3>
+<p>编组 POJO（普通 Java 对象）和开发 REST（表征状态转移）微服务和 API。</p>
+<h3 id="kafka-">Kafka（分布式消息订阅-发布）</h3>
+<p>a distributed, fault tolerant, publish-subscribe messaging.</p>
+<h3 id="kerbyjava-kerberos">Kerby（Java Kerberos）</h3>
+<p>Kerberos binding in Java.</p>
+<h3 id="kibble">Kibble（可视化活动报告分析平台）</h3>
+<p>一个活动报告平台，用于收集、汇总、分析和可视化软件项目和社区中的活动。</p>
+<h3 id="knoxhadoop">Knox（Hadoop 部署交互的应用网关）</h3>
+<p>通过REST API和UI与Apache Hadoop 部署交互的应用网关。</p>
+<h3 id="kudu">Kudu（列式存储系统）</h3>
+<p>an open source distributed data storage engine that makes fast analytics on fast and changing data easy.</p>
+<h3 id="kylin">Kylin（大数据分析型数据仓库）</h3>
+<p>Extreme OLAP Engine for Big Data.</p>
+<h3 id="libcloudpython">Libcloud（Python访问云计算服务的统一接口）</h3>
+<p>a standard Python library that abstracts away differences among multiple cloud provider APIs.</p>
+<h3 id="liminal">Liminal（机器学习编制平台）</h3>
+<p>an end-to-end platform for data engineers and scientists, allowing them to build, train and deploy machine learning models in a robust and agile way.</p>
+<h3 id="livyapache-sparkrest">Livy（基于<em>Apache</em> Spark的REST服务）</h3>
+<p>a REST interface for managing long running Apache Spark contexts in your cluster.</p>
+<h3 id="logging">Logging（日志记录）</h3>
+<p>logging services for C++， Java，Scala 等。</p>
+<h3 id="lucene-pylucenepython-api">Lucene / PyLucene（搜索引擎库/Python API）</h3>
+<p>a high-performance, full-featured text search engine library.</p>
+<h3 id="madlibsql">MADlib（基于SQL的数据库内置的可扩展机的器学习库）</h3>
+<p>Scalable, Big Data, SQL-driven machine learning framework for Data Scientists.</p>
+<p>目前支持PostgresSQL和GreenPlum。</p>
+<h3 id="mahout">Mahout（大数据机器学习库）</h3>
+<p>a distributed linear algebra framework and mathematically expressive Scala DSL designed to let mathematicians, statisticians, and data scientists quickly implement their own algorithm.</p>
+<h3 id="manifoldcfjava">ManifoldCF（JAVA实现的爬虫框架）</h3>
+<p>Open-source software for transferring content between repositories or search indexes.</p>
+<h3 id="marvin-ai">Marvin-AI（机器学习操作的平台）</h3>
+<p>an open source Artificial Intelligence platform that focus on helping data science team members, in an easy way, to deliver complex solutions supported by a high-scale, low-latency, language agnostic and standardized architecture while simplifying the process of exploitation and modeling.</p>
+<h3 id="maven">Maven（项目开发/管理框架）</h3>
+<p>a project development management and comprehension tool.</p>
+<h3 id="maven-doxia">Maven Doxia（内容生成框架）</h3>
+<p>a content generation framework which aims to provide its users with powerful techniques for generating static and dynamic content.</p>
+<h3 id="mesos">Mesos（集群资源管理框架）</h3>
+<p>a cluster manager that provides efficient resource isolation and sharing across distributed applications, or frameworks.</p>
+<h3 id="metamodel">MetaModel（统一的查询语言类库）</h3>
+<p>a common interface for discovery, exploration of metadata and querying of different types of data sources. </p>
+<p>Relational (JDBC) databases, CSV files, Excel spreadsheets, XML files, JSON files, Fixed width files, MongoDB, Apache CouchDB, Apache HBase, Apache Cassandra, ElasticSearch, OpenOffice.org databases, Salesforce.com, SugarCRM and even collections of plain old Java objects (POJOs).</p>
+<h3 id="milagro">Milagro（分布式安全认证系统）</h3>
+<p>a crypto libraries and core security infrastructure for decentralized networks and distributed systems.</p>
+<h3 id="mina">Mina（网络应用框架）</h3>
+<p>A network application framework.</p>
+<h3 id="mina-ftpserverftpmina">Mina FtpServer（Ftp服务器，基于MINA）</h3>
+<p>a 100% pure Java FTP server.</p>
+<h3 id="mina-sshdjava-sshmina">Mina SSHD（Java SSH客户端和服务端，基于MINA）</h3>
+<p>a 100% pure java library to support the SSH protocols on both the client and server side.</p>
+<h3 id="mnemonicspark">Mnemonic（非易失性混合内存存储的库，可与Spark集成）</h3>
+<p>a transparent nonvolatile hybrid memory oriented library for Big data, High-performance computing, and Analytics.</p>
+<h3 id="mxnet">MxNet（深度学习框架）</h3>
+<p>A truly open source deep learning framework suited for flexible research prototyping and production.</p>
+<h3 id="nemo">Nemo（多样弹性部署的数据处理系统）</h3>
+<p>A Data Processing System for Flexible Employment With Different Deployment Characteristics.</p>
+<p>可以作为Apache Beam的官方Runner运行。</p>
+<h3 id="nifi">NiFi（数据流设计的可靠的数据处理和分发系统）</h3>
+<p>powerful and scalable directed graphs of data routing, transformation, and system mediation logic.</p>
+<h3 id="nlpcraftnluapi">NLPCraft（NLU应用的API）</h3>
+<p>An API to convert natural language into actions.</p>
+<h3 id="nutch">Nutch（网络爬虫软件）</h3>
+<p>an open source web crawler software project.</p>
+<p>可基于Hadoop集群运行。</p>
+<h3 id="ofbizerp">OFBiz（开源ERP解决方案）</h3>
+<p>an open source enterprise automation software project.</p>
+<h3 id="olingoodatajava">Olingo（实现开放数据协议(OData)的Java库）</h3>
+<p>Apache Olingo serves client and server aspects of OData. It currently supports OData 2.0 and support OData 4.0 (beta).</p>
+<h3 id="ooziehadoop">Oozie（Hadoop工作流调度）</h3>
+<p>A workflow scheduler system to manage Apache Hadoop jobs.</p>
+<h3 id="openjpajava">OpenJPA（Java持久化实现）</h3>
+<p>Java Persistence API Implementation.</p>
+<h3 id="openmeetings">OpenMeetings（视频会议，及时消息）</h3>
+<p>Video conferencing, instant messaging, white board and collaborative document editing application.</p>
+<h3 id="opennlpnlp">OpenNLP（NLP工具类）</h3>
+<p>a machine learning based toolkit for the processing of natural language text.</p>
+<h3 id="openofficems-office">OpenOffice（似于微软MS Office软件跨平台的办公室软件）</h3>
+<p>An open-source, office-document productivity suite.</p>
+<h3 id="openwebbeansjavaee">OpenWebBeans（JavaEE依赖注入）</h3>
+<p>Dependency Injection Platform. </p>
+<h3 id="openwhiskfaas">OpenWhisk（分布式无服务器平台，开源FaaS平台）</h3>
+<p>a platform for building serverless applications with functions. </p>
+<h3 id="orc">ORC（列式存储格式）</h3>
+<p>ORC is a self-describing type-aware columnar file format designed for Hadoop workloads. It is optimized for large streaming reads, but with integrated support for finding required rows quickly.</p>
+<h3 id="ozonehadoop">Ozone（Hadoop云原生的分布式对象存储）</h3>
+<p>a distributed object store for Hadoop-based and Cloud-native environments.</p>
+<h3 id="pagespeed">PageSpeed（网页性能只能优化）</h3>
+<p>a series of open source technologies to help make the web faster by rewriting web pages to reduce latency and bandwidth.</p>
+<h3 id="parquet">Parquet（列式存储格式）</h3>
+<p>Apache Parquet is a general-purpose columnar storage format, built for Hadoop, usable with any choice of data processing framework, data model, or programming language.</p>
+<h3 id="pdfboxjavapdf">PDFBox（Java处理PDF的类库）</h3>
+<p>an open source Java tool for working with PDF documents.</p>
+<h3 id="pegasuskv">Pegasus（分布式KV存储系统）</h3>
+<p>a distributed key-value storage system which is designed to be simple, horizontally scalable, strongly consistent and high-performance.</p>
+<h3 id="pinot-olap">Pinot（实时分布式的 OLAP 数据存储和分析系统）</h3>
+<p>a distributed columnar storage engine that can ingest data in real-time and serve analytical queries at low latency.</p>
+<h3 id="pivot">Pivot（构建可安装的网络应用）</h3>
+<p>an open-source platform for building installable Internet applications (IIAs).</p>
+<h3 id="phoenixsql-on-hbase">Phoenix（SQL on HBase）</h3>
+<p>High performance relational database layer over Apache HBase for low latency applications.</p>
+<h3 id="pig">Pig（大数据分析系统）</h3>
+<p>a platform for analyzing large data sets on Hadoop.</p>
+<h3 id="plc4xapi">PLC4X（可编程逻辑控制器的统一API）</h3>
+<p>Universal API for communicating with programmable logic controllers.</p>
+<h3 id="poims-officejava-api">POI（MS Office编程的Java API）</h3>
+<p>Java API To Access Microsoft Document File Formats.</p>
+<h3 id="pony-mail">Pony Mail（邮箱归档、查看等交互服务）</h3>
+<p>a mail-archiving, archive viewing, and interaction service, that can be integrated with many email platforms.</p>
+<h3 id="portable-runtime">Portable Runtime（跨平台库）</h3>
+<p>Cross-platform library easing many progamming tasks in C.</p>
+<h3 id="portals">Portals（协作的软件开发项目，提供门户网站相关软件）</h3>
+<p>a robust, full-featured, commercial-quality, and freely available Portal related software on a wide variety of platforms and programming languages.</p>
+<h3 id="pulsar-">Pulsar（分布式发布-订阅消息系统）</h3>
+<p>highly scalable, low latency messaging platform running on commodity hardware.</p>
+<h3 id="qpidadvanced-message-queuing-protocolamqp">Qpid（Advanced Message Queuing Protocol（AMQP）企业消息实现）</h3>
+<p>AMQP enterprise messaging implementation.</p>
+<h3 id="rangerhadoop">Ranger（Hadoop数据权限监控管理平台）</h3>
+<p>enable, monitor and manage comprehensive data security across the Hadoop platform.</p>
+<h3 id="ratisjava-raft">Ratis（可自定制的Java Raft实现）</h3>
+<p>a highly customizable Raft protocol implementation in Java.</p>
+<h3 id="reefyarnmesos">REEF（可保留评估程序执行框架，Yarn/Mesos上开发可移植应用程序的库）</h3>
+<p>Retainable Evaluator Execution Framework：a scale-out computing fabric that eases the development of Big Data applications on top of resource managers such as Apache YARN and Mesos.</p>
+<h3 id="riverjini">River（JINI标准实现）</h3>
+<p>a standards-compilani JINI service.</p>
+<h3 id="rivettcl-web">Rivet（Tcl 语义的Web框架）</h3>
+<p>a system for creating dynamic web content via the Tcl programming language integrated with Apache Web Server. </p>
+<h3 id="rocketmq">RocketMQ（消息队列）</h3>
+<p>a fast, low latency, reliable, scalable, distributed, easy to use message-oriented middleware, especially for processing large amounts of streaming data.</p>
+<h3 id="rollerjavawebblog">Roller（Java版本的WebBlog系统）</h3>
+<p>a full-featured, multi-user and group blog server suitable for blog sites large and small.</p>
+<h3 id="royalemxml-as3">Royale（开源前端应用程序技术，MXML &amp; AS3 ）</h3>
+<p>improving developer productivity in creating applications for wherever Javascript runs (and other runtimes).</p>
+<h3 id="ryardf">Rya（RDF数据的存储、获取和分析）</h3>
+<p>scalable storage, retrieval, and analysis of RDF data</p>
+<h3 id="samza">Samza（分布式流处理框架）</h3>
+<p>build stateful applications that process data in real-time from multiple sources including Apache Kafka.</p>
+<h3 id="sandesha2ws-rm">Sandesha2（WS-RM的实现）</h3>
+<p>an Axis2 module implementing WS-RM.</p>
+<h3 id="santuario-xml">Santuario（ XML数字签名和加解密规范的实现）</h3>
+<p>Library implementing XML Digital Signature Specification &amp; XML Encryption Specification.</p>
+<h3 id="scoutjaxr">Scout（JAXR的实现）</h3>
+<p>an implementation of the JSR 93 (JAXR).</p>
+<h3 id="sdap">SDAP（科学数据分析平台）</h3>
+<p>an integrated data analytic center for Big Science problems.</p>
+<p>SDAP是一个技术软件解决方案，旨在更好地使科学家参与推进地球物理海洋学的研究。</p>
+<h3 id="sedonaspark">Sedona（大规模空间数据的集群计算系统，基于Spark）</h3>
+<p>a big geospatial data processing engine.</p>
+<h3 id="serfaprchttp-client">Serf（基于APR的C的HTTP Client库）</h3>
+<p>High performance C-based HTTP client library built upon the Apache Portable Runtime (APR) library.</p>
+<h3 id="servicecombspringcloud">ServiceComb（微服务框架，对标SpringCloud）</h3>
+<p>a microservice framework that provides a set of tools and components to make development and deployment of cloud applications easier.</p>
+<h3 id="servicemixesbsoa">ServiceMix（开源ESB,适合SOA项目的集成）</h3>
+<p>an open source ESB providing routing and mediation features.</p>
+<h3 id="shardingsphere">ShardingSphere（分布式数据库中间件解决方案）</h3>
+<p>a database clustering system providing data sharding, distributed transactions, and distributed database management</p>
+<h3 id="shirojava">Shiro（Java安全框架）</h3>
+<p>a powerful and flexible open-source security framework that cleanly handles authentication, authorization, enterprise session management, single sign-on and cryptography services.</p>
+<h3 id="singo">SINGO（分布式深度学习平台）</h3>
+<p>a distributed deep learning platform.</p>
+<h3 id="skywalkingjava">SkyWalking（Java分布式应用追踪系统）</h3>
+<p>the application performance management and monitoring (APM) tool.</p>
+<p>尤其是针对微服务、云原生和面向容器的分布式系统架构。</p>
+<h3 id="slingweb">Sling（Web内容存储框架）</h3>
+<p>a web framework that uses a Java Content Repository, such as Apache Jackrabbit, to store and manage content. </p>
+<h3 id="solrlucene">Solr（全文搜索服务，基于Lucene）</h3>
+<p>an open source enterprise search server based on the Lucene Java search library.</p>
+<h3 id="spamassassin">SpamAssassin（识别垃圾邮件的系统）</h3>
+<p>an extensible email filter which is used to identify spam.</p>
+<h3 id="spark">Spark（大数据处理系统）</h3>
+<p>a fast and general engine for large-scale data processing.</p>
+<h3 id="spatial-information-system">Spatial Information System（空间信息管理系统）</h3>
+<p>provides  data structures for geographic data and associated metadata along with methods to manipulate those data structures. </p>
+<h3 id="sqoophadooprdbms">Sqoop（Hadoop和RDBMS体系之间传送数据）。</h3>
+<p>a tool designed for efficiently transferring bulk data between Apache Hadoop and structured datastores such as relational databases.</p>
+<h3 id="stevepython">Steve（Python投票系统）</h3>
+<p>a collection of online voting tools, used by the ASF, to handle STV and other voting methods.</p>
+<h3 id="storm">Storm（分布式实时计算系统）</h3>
+<p>a distributed real-time computation system, provides a set of general primitives for doing real-time computation.</p>
+<h3 id="streampipesiotiot">StreamPipes（企业IoT工具箱，用于连接、分析、探索IoT数据）</h3>
+<p>a self-service (Industrial) IoT toolbox to enable non-technical users to connect, analyze and explore (Industrial) IoT data streams.</p>
+<h3 id="streamsactivitystreams">Streams（实现ActivityStreams 技术的轻量级框架）</h3>
+<p>interoperability of online profiles and activity feeds.</p>
+<h3 id="submarine">Submarine（云原生的机器学习平台）</h3>
+<p>allowing infrastructure engineers and data scientists to build deep learning applications (TensorFlow, PyTorch, etc.) </p>
+<h3 id="subversion">Subversion（开源的集中式版本控制系统）</h3>
+<p>Enterprise-class centralized version control for the masses.</p>
+<h3 id="superset">Superset（数据可视化平台）</h3>
+<p>data exploration, analysis, visualization, and dashboarding.</p>
+<h3 id="synapsexml-web">Synapse（XML 和 Web 服务管理与集成代理）</h3>
+<p>a lightweight ESB engine and XML router.</p>
+<h3 id="syncopejava-ee">Syncope（JAVA EE 开发的开源的适用于企业的数字身份管理系统）</h3>
+<p>an Open Source system for managing digital identities in enterprise environments.</p>
+<h3 id="systemdssystemml">SystemDS（原SystemML，大数据的机器学习平台）</h3>
+<p>A machine learning platform optimal for big data.</p>
+<h3 id="tapestryjavaweb">Tapestry（面向组件的JavaWeb应用框架）</h3>
+<p>Component oriented framework for creating dynamic, robust, highly scalable web applications in Java.</p>
+<h3 id="teaclave">Teaclave（通用的安全计算框架）</h3>
+<p>a universal secure computing platform.</p>
+<h3 id="tezyarn-dag">Tez（基于Yarn的支持 DAG 作业的开源计算框架）</h3>
+<p>building an application framework which allows for a complex directed-acyclic-graph of tasks for processing data.</p>
+<h3 id="thriftrpc">Thrift（RPC框架）</h3>
+<p>a framework for scalable cross-language services development, combines a software stack with a code generation engine to build services.</p>
+<h3 id="tika">Tika（内容抽取的工具集合）</h3>
+<p>detects and extracts metadata and structured text content from various documents using existing parser libraries.</p>
+<p>检测<strong>上千种文件类型</strong>，并提取它们的<strong>元数据和文本</strong>。</p>
+<h3 id="tinkerpopolapoltp">TinkerPop（图OLAP和OLTP系统）</h3>
+<p>A graph computing framework for both graph databases (OLTP) and graph analytic systems (OLAP).</p>
+<h3 id="tomcatweb-server">Tomcat（Web Server）</h3>
+<p>A Java Servlet, JavaServer Pages, Java Expression Language and Java WebSocket specifications implementation.</p>
+<h3 id="tomeej2ee-6-tomcat">TomEE（J2EE 6 认证的 Tomcat 企业版本）</h3>
+<p>an all-Apache Java EE 6 Web Profile stack for Apache Tomcat.</p>
+<h3 id="toreeapache-sparkrestful">Toree（Apache Spark远程Restful交互）</h3>
+<p>provides applications with a mechanism to interactively and remotely access Apache Spark.</p>
+<h3 id="torquejava">Torque（Java的对象关系映射）</h3>
+<p>an object-relational mapper for Java.</p>
+<h3 id="traffic-controlcdn">Traffic Control（分布式、可扩展的冗余解决方案，可用于构建CDN）</h3>
+<p>building, monitoring, configuring, and provisioning a large scale content delivery network (CDN).</p>
+<h3 id="traffic-serverhttp">Traffic Server（HTTP缓存代理服务器）</h3>
+<p>an HTTP proxy cache.</p>
+<h3 id="trafodionhadoopsql">Trafodion（基于Hadoop平台的交易型分布式SQL引擎）</h3>
+<p>Webscale SQL-on-Hadoop solution enabling transactional or operational workloads on Apache Hadoop.</p>
+<h3 id="training">Training（以开源的形式为各种项目创建高质量的培训材料）</h3>
+<p>develop resources which can be used for training purposes in various media formats, languages and for various Apache and non-Apache target projects.</p>
+<h3 id="tubemq">TubeMQ（消息队列）</h3>
+<p>distributed messaging queue (MQ) system.</p>
+<h3 id="turbineweb">Turbine（构建Web应用）</h3>
+<p>a servlet based framework that allows Java developers to quickly build web applications.</p>
+<h3 id="tuwenijava">Tuweni（开发区块链和反中心化的Java库）</h3>
+<p>a set of libraries and other tools to aid development of blockchain and other decentralized software in Java and other JVM languages.</p>
+<h3 id="tvm">TVM（端到端的深度学习编译框架）</h3>
+<p>compilation of machine learning models to run on a wide range of hardware platforms.</p>
+<p>可重复使用的工具链来将高级神经网络描述从深度学习框架前端向下编译为多硬件后端的低级机器代码。</p>
+<h3 id="uima">UIMA（非结构化信息管理应用）</h3>
+<p>Annotator components and a scalable integration and deployment framework for Unstructured Information analysis</p>
+<h3 id="unomijavacdpcustomer-data-platform">Unomi（Java开源客户数据平台CDP,Customer Data Platform）</h3>
+<p>providing a reference implementation of the OASIS Customer Data Platform specification currently being worked on by the OASIS Context Server Technical Committee.</p>
+<h3 id="usergridbaas">Usergrid（Baas平台）</h3>
+<p>The BaaS Framework <em>you</em> run.</p>
+<h3 id="vcl">VCL（计算资源管理平台）</h3>
+<p>A cloud computing platform for provisioning and brokering access to dedicated remote compute resources.</p>
+<p>自服务的系统，为最终用户提供专用计算环境的远程访问环境。</p>
+<h3 id="velocityjava">Velocity（基于Java的模板引擎）</h3>
+<p>a Java-based template engine. It permits anyone to use a simple yet powerful template language to reference objects defined in Java code.</p>
+<h3 id="velocity-texenvelocityant">Velocity Texen（基于Velocity和Ant的代码生成）</h3>
+<p>a general purpose text generating utility based on Apache Velocity and Apache Ant.</p>
+<h3 id="velocity-dvsldeclarative-velocity-style-language">Velocity DVSL（Declarative Velocity Style Language）</h3>
+<p>A tool modeled after XSLT and intended for general XML transformations using the Velocity Template Language.</p>
+<h3 id="weexui">Weex（跨平台的高性能UI框架）</h3>
+<p>a framework for building Mobile cross-platform high performance UI.</p>
+<h3 id="wicketjava-web">Wicket（Java Web应用框架）</h3>
+<p>an open source Java component oriented web application framework.</p>
+<h3 id="ws-axiomxml">WS Axiom（XML解析）</h3>
+<p>An XML and SOAP object model which supports deferred parsing and on-demand building of the object tree.</p>
+<h3 id="ws-wodenwsdl">WS Woden（WSDL文档处理库）</h3>
+<p>a Java API for reading, manipulating, creating and writing WSDL documents.</p>
+<h3 id="xalanxslt">Xalan（XSLT处理的库）</h3>
+<p>XSLT的处理包，用于将XML文档转为HTML文档,文本文件TXT,或其他格式的XML文档。</p>
+<h3 id="xercesxml">Xerces（XML解析库）</h3>
+<p>a validating XML parser.</p>
+<h3 id="xmlbeansxmljava">XMLBeans（XML和Java映射）</h3>
+<p>technology for accessing XML by binding it to Java types. </p>
+<h3 id="xmlgraphics-batik-svgjava">XMLGraphics Batik （SVG操作的Java库）</h3>
+<p>a Java-based toolkit for applications or applets to use images in the Scalable Vector Graphics (SVG) format for various purposes, such as display, generation and manipulation.</p>
+<h3 id="xmlgraphics-fopxsl">XMLGraphics FOP（XSL格式对象实现）</h3>
+<p>XSL Formatting Objects (XSL-FO) implementation.</p>
+<h3 id="yetus">Yetus（系统管理工具，为软件项目提供贡献和发布流程）</h3>
+<p>A collection of libraries and tools that enable contribution and release processes for software projects.</p>
+<h3 id="yunikornkubernetes">YuniKorn（用于服务和批处理工作负载的增强型Kubernetes调度程序）</h3>
+<p>a standalone resource scheduler responsible for scheduling batch jobs and long-running services on large scale distributed systems running in on-premises environments as well as different public clouds.</p>
+<h3 id="zepplinwebnotebook">Zepplin（基于Web的交互式NoteBook）</h3>
+<p>a modern web-based tool for the data scientists to collaborate over large-scale data exploration and visualization projects.</p>
+<h3 id="zookeeper">Zookeeper（高可用的分布式协调系统）</h3>
+<p>an effort to develop and maintain an open-source server which enables highly reliable distributed coordination.</p>
+<h2 id="no">No</h2>
+<h3 id="allura-web">Allura（基于 Web 的软件工具和协作软件开发的平台）</h3>
+<p>an open source implementation of a software "forge", a web site that manages source code repositories, bug reports, discussions, wiki pages, blogs and more for any number of individual projects.</p>
+<h3 id="airavata">Airavata（管理分布式系统软件？）</h3>
+<p>a software framework that enables you to compose, manage, execute, and monitor large scale applications and workflows on distributed computing resources such as local clusters, supercomputers, computational grids, and computing clouds.</p>
+<h3 id="ariesosgi">Aries（企业OSGi应用编程模型）</h3>
+<p>delivering a set of pluggable Java components enabling an enterprise OSGi application programming model.</p>
+<h3 id="any23">Any23（结构化数据抽取库）</h3>
+<p>a library, a web service and a command line tool that extracts structured data in RDF format from a variety of Web documents.</p>
+<h3 id="bigtophadoop">Bigtop（Hadoop及其周边生态进行打包，分发和测试的工具）</h3>
+<p>for Infrastructure Engineers and Data Scientists looking for comprehensive packaging, testing, and configuration of the leading open source big data components.</p>
+<h3 id="camel">Camel（基于规则的路由以及媒介引擎）</h3>
+<p>an Open Source integration framework that empowers you to quickly and easily integrate various systems consuming or producing data.</p>
+<p>一个集成框架，旨在使项目集成更加高效。</p>
+<h3 id="chemistry">Chemistry（内容管理互操作服务）</h3>
+<p>open source implementations of the Content Management Interoperability Services (CMIS) specification.</p>
+<h3 id="clerezzaosgi-restful-semantic-web">Clerezza（OSGi RESTFul Semantic Web应用和服务）</h3>
+<p>a service platform which provides a set of functionality for management of semantically linked data accessible through RESTful Web Services and in a secured way.</p>
+<h3 id="felixosgi4">Felix（OSGi版本4规范的实现）</h3>
+<p>OSGi framework implementation and related technologies.</p>
+<h3 id="karafosgiosgi">Karaf（osgi的运行环境，发布和运行osgi服务的容器）</h3>
+<p>an OSGi distribution for server-side applications.</p>
+<h3 id="mynewt">Mynewt（资源受限嵌入式环境的操作系统）</h3>
+<p>embedded OS optimized for networking and built for remote management of constrained devices.</p>
+<h3 id="myfacesjsf-web">MyFaces（JSF Web框架实现）</h3>
+<p>free open source implementation of Jakarta Server Faces, a web application framework that accomplishes the MVC paradigm. </p>
+<h3 id="myfaces-tobagoweb">MyFaces Tobago（创建具有统一外观的WEB应用的开发程序）</h3>
+<p>provide the community with a well designed set of user interface components based on JSF.</p>
+<h3 id="nuttx">NuttX（实时嵌入型操作系统）</h3>
+<p>a mature, real-time embedded operating system (RTOS).</p>
+<h3 id="oodt">OODT（面向对象数据技术）</h3>
+<p>Apache OODT 是软件框架，也是快速构建科学数据系统的架构风格。它提供用于数据捕捉、综合处理、元数据提取、工作流管理、资源管理和数据处理的组件。</p>
+<h3 id="petri">Petri（评估、教育、采纳基金会的合作发展政策及程序，以及加入基金会的利弊。）</h3>
+<p>deals with the assessment of, education in, and adoption of the Foundation's policies and procedures for collaborative development and the pros and cons of joining the Foundation.</p>
+<h3 id="strutsjava-ee-webmvc">Struts（Java EE Web应用的MVC设计模式的应用框架）</h3>
+<p>a free open-source framework for creating Java web applications.</p>
+<h3 id="vysper-xmppjabbermina">Vysper（模块化的,全功能的 XMPP(jabber)服务器软件，基于Mina）</h3>
+<p>A modular, full featured XMPP (Jabber) server.</p>
+<h3 id="whimsyasf">Whimsy（显示和可视化与ASF组织和流程相关的各种数据）</h3>
+<p>Tools that display and visualize various bits of data related to ASF organizations and processes.</p>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            回到页面顶部
+          </a>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top"], "search": "../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\s\\-\uff0c\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version.title": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+      
+    
+    
+  </body>
+</html>
