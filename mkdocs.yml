@@ -117,6 +117,7 @@ nav:
         - 访问者模式: code_guide/design_pattern/visitor.md
       - 分布式应用设计模式:
         - 边车模式: code_guide/design_pattern/sidecar.md
+        -
     - 数据结构:
       - 数组: code_guide/data_structure/array.md
       - 队列: code_guide/data_structure/queue.md
