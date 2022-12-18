@@ -159,9 +159,9 @@ spec:
 
 ### 生命周期和重启策略
 
-#### Pod阶段
+#### Pod阶段和状态
 
-Pod的状态（阶段, phase）：
+Pod的阶段( phase ）：`pod.status.phase`
 
 - **Pending**：Pod 定义正确，但Pod内还有至少一个容器的镜像没有创建；
 - **Running**：Pod内容器均已创建，且至少一个容器处于运行状态、正在启动状态或正在重启状态；
@@ -169,9 +169,19 @@ Pod的状态（阶段, phase）：
 - **Failed**：Pod内容器均已退出，但至少一个容器为退出失败状态；
 - **Unknown**：某种原因无法获取Pod状态，如网络通信不畅；
 
+Pod的状况（condition）：`pod.status.conditions`
 
+- `Unschedulable`：调度器不能正常调度容器，例如缺乏资源或其他限制；
 
-Pod状态中的状况（condition）：
+- `PodScheduled`：Pod 已被调度到一个节点；
+- `Initialized`：所有 init containers 成功启动；
+- `ContainersReady`：Pod 中所有容器全部就绪；
+- `Ready`：Pod 能够提供请求( readiness probe 完成)；
+
+Pod 的状态（RUNNING）跟`kubectl get pods`显示的Status（CrashLoopBackOff）为什么不一致？
+
+- 对于异常情况，kubectl看到的状态就是`containerStatuses`的 容器里的`state.waiting.reason`；
+- 源码见`pkg/kubectl/resource_printer.go`；
 
 #### 容器的状态
 
@@ -197,7 +207,7 @@ Terminated：已经开始执行并且或者正常结束或者因为某些原因�
 
 - **Always**：**默认**，任何情况下，只要容器不在运行状态，就自动重启容器；
 - **OnFailure**：容器以非 0 状态退出或者被系统终止；（比如对于FAAS等短时间应用）
-- **Never**：从不重启容器。（关心容器退出后的日志、文件、目录等信息）
+- **Never**：从不重启容器。（需要保留容器退出后的日志、文件、目录等信息）
 
 简言之：
 
@@ -216,11 +226,14 @@ Pod里的**容器的健康检查**：支持`exec`执行命令（返回0表示健
 - `readinessProbe`：指示容器是否准备好为请求提供服务
   - 就绪态探测失败， 端点控制器将从与 Pod 匹配的所有Services的端点列表中删除该 Pod 的 IP 地址；
   - 容器不提供就绪态探针，则默认状态为 `Success`。
-
 - `startupProbe`：指示容器中的应用是否已经启动
   - 提供了启动探针，则所有其他探针都会被 禁用，直到此探针成功为止；
   - 启动探测失败，`kubelet` 将杀死容器，而容器依其重启策略进行重启；
   - 如果容器没有提供启动探测，则默认状态为 `Success`。
+
+注意：
+
+- 如果**不使用Deployment这样的控制器，Pod的恢复（重启）永远发生在当前节点上**而不会迁移。
 
 
 ```yaml
@@ -249,9 +262,7 @@ spec:
 
 
 
-
-
-### PodPreset
+### PodPreset（1.20废弃）
 
 定义`PodPreset`对象，会自动追加到对应的Pod定义的yaml文件里。
 
@@ -269,6 +280,10 @@ spec:
     - name: DB_PORT
       value: "6379"
 ```
+
+注意：
+
+- 定义多个作用于同一个Pod对象的多个PodPreset，K8s会进行合并（Merge），冲突字段则不会变更；
 
 ### Cmd/Args
 
@@ -289,9 +304,15 @@ spec:
 - `HostToContainer:` - 这种卷挂载将会收到之后所有的由 `host` 创建在该卷上或其子目录上的挂载。换句话说, 如果 `host` 在卷挂载内挂载的任何内容, 在容器中都是可见的。同样, 如果任何具有 `Bidirectional` 的 Pod 挂载传播到该卷挂载上, 具有 `HostToContainer` 的挂载传播都可以看见。
 - `Bidirectional:` - 这种挂载机制和 `HostToContainer` 类似。此外, 任何在容器中创建的挂载都会传播到 `host`, 然后传播到使用相同卷的所有 Pod 的所有容器。注意: `Bidirectional` 挂载传播是很危险的。可能会危害到 `host` 的操作系统。因此只有特权 `securityContext: privileged: true` 容器在允许使用它。
 
+### Lifecycle
+
+`postStart`：在容器启动后立刻执行一个指定操作，跟`ENTRYPOINT`是**异步执行**的；
+
+`preStop`：容器结束前执行操作，同步执行即会阻塞当前的容器结束流程。
+
 ### 配置
 
-通常你不需要直接创建 Pod，甚至单实例 Pod。 相反，你会使用诸如 Deployment或 Job这类工作负载资源来创建 Pod。
+通常不需要直接创建 Pod，甚至单实例 Pod。 相反使用诸如 Deployment或 Job这类工作负载资源来创建 Pod。
 
 ```yaml
 apiVersion: v1
@@ -398,11 +419,13 @@ spec:
 
 修改Deployment的Pod模板后，自动触发“滚动更新”：**服务多实例部署时在线升级**
 
-- 根据新的Pod模板，创建新的ReplicaSet，初始副本数为0；
+- 根据新的Pod模板，创建**新的ReplicaSet**，初始副本数为0；
 - 新的ReplicaSet副本数逐渐增多，旧的ReplicaSet副本数逐渐减少；
 
 `spec.strategy,type`定义升级策略，滚动升级对应`RollingUpdate`，配置：
 
+- 确保在任何时间窗口，只有指定比例Pod处于离线状态，同时只有指定比例的新Pod被创建出来
+  - 默认为 DESIRED 的 25%，如3Pod副本，滚动更新时至少2副本可用，4副本同时存在；
 - `maxSurge`：除配置的Pod副本数量外，一次滚动更新中Deployment控制器创建多少新Pod；
 - `maxUnavailable`：一次滚动更新中Deployment控制器删除多少旧Pod；
 
@@ -410,6 +433,15 @@ ReplicaSet的历史版本保留配置：
 
 - 每次Deployment的更新，都会生成新的ReplicaSet；
 - `spec.revisionHistoryLimit`字段，限制保留的历史版本的个数，设置为0，就不能回滚。
+
+```shell
+# 查看所有的版本历史
+kubectl rollout history deployment/nginx-deployment
+# 回滚到指定版本
+kubectl rollout undo deployment/nginx-deployment --revision=2
+```
+
+
 
 ### 配置
 
@@ -452,9 +484,9 @@ spec:
 - 通过headless service为有编号的Pod，在DNS中生成带有相同编号的DNS记录；
 - 为Pod分配以额相同编号的PVC（Persistent Volume Claim），保证重启后，重新匹配到相同的PVC；
 
-### 配置
+### 示例（TODO）
 
-
+见示例[MySQL集群yaml](./)
 
 ## DaemonSet
 
@@ -462,10 +494,11 @@ Pod在K8s的每个节点上运行，且只运行一个实例，且随着新节�
 
 - 用于网络插件，存储插件，监控和日志组件；
 
-DaemonSet Controller从etcd获取所有节点列表，遍历判断每个节点上是否有`name: fluentd-elasticsearch`标签的Pod运行。
+DaemonSet Controller从etcd获取所有节点列表，遍历判断每个节点上是否有特定标签的Pod运行。
 
 - 多则删，调用K8s的API；
-- 无则加，通过`nodeAffinity`，只在该节点上运行；通过`toleration`保证在节点上可以运行Pod；
+- 无则加，通过`nodeAffinity`，只在该节点上运行；
+- 通过`toleration`保证在节点上可以运行Pod（如网络插件容忍`network-unavailable`污点）；
 
 ### 更新
 
@@ -501,8 +534,6 @@ spec:
 
 ## Job
 
-Job 中 Pod 的 [`RestartPolicy`](https://kubernetes.io/zh/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy) 只能设置为 `Never` 或 `OnFailure` 之一。
-
 **Job 完成时不会再创建新的 Pod，不过已有的 Pod 也不会被删除，Job对象也会保留。** 
 
 - 保留这些 Pod 使得你可以查看已完成的 Pod 的日志输出，以便检查错误、警告 或者其它诊断性输出。
@@ -512,6 +543,20 @@ Job 中 Pod 的 [`RestartPolicy`](https://kubernetes.io/zh/docs/concepts/workloa
 不需要定义`spec.selector`描述需要控制哪些Pods。
 
 - Job Controller会自动为Pod模板加上`controller-uid=<随机字符串>`的标签，并在Job对象本身添加该标签对应的selector。
+
+重启策略： [`RestartPolicy`](https://kubernetes.io/zh/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy) 只能设置为 `Never` 或 `OnFailure` 
+
+- `Never`：失败，则重试重新创建Pod（`spec.backoffLimit	定义最大次数，指数时间递增）；
+- `OnFailure`：失败不会新建Pod，而是不停尝试重启Pod里的容器；
+
+最大运行时间：
+
+- `spec.activeDeadlineSeconds`：限制运行时长，看到Pod终止原因（`reason: DeadlineExceeded`）；
+
+并行batch：
+
+- `spec.parallelism`：一个Job在任意时间最多可以启动多少个Pod同时运行；
+- `spec.completions`：Job至少要完成的Pod数目，即Job的最小完成数；
 
 ```yaml
 apiVersion: batch/v1
@@ -545,15 +590,15 @@ spec:
 
 在某些情况下，可能会创建两个 Job，或者不会创建任何 Job。 我们试图使这些情况尽量少发生，但不能完全杜绝。因此，**Job 应该是 *幂等的***。
 
-未能在调度时间内创建 CronJob当作一次miss，（指定的时间内）连续miss的数目超过100时，CronJob会停止创建该Job。
+`spec.concurrencyPolicy`：解决某个job还未运行完，另一个job就产生的场景
 
-- `spec.startDeadlineSeconds`：（指定的时间内）
+- **Allow**：Job可以同时存在；
+- **Forbid**：不会创建新Job，该创建周期被跳过；
+- **Replace**：产生新的Job替换旧的、未执行完的Job。
 
-`spec.concurrencyPolicy`：
+未能在调度时间内创建 CronJob（即创建失败）当作一次miss，**（指定的时间内）连续miss的数目超过100时，CronJob会停止创建该Job**。
 
-- Allow：Job可以同时存在；
-- Forbid：不会创建新Job，该创建周期被跳过；
-- Replace：产生新的Job替换旧的、未执行完的Job。
+- `spec.startingDeadlineSeconds`：（指定的时间内）
 
 ```sh
 # ┌───────────── 分钟 (0 - 59)
@@ -686,9 +731,7 @@ subsets:
 
 ### 配置
 
-正常情况下，**service的port和pod镜像开放的端口一致**。
-
-比如nginx的镜像是开放80端口，service的port指定的是80端口，那么pod和pod直接就可以进行访问，**不用指定targetPort端口**
+正常情况下，**service的port和pod镜像开放的端口一致**。比如nginx的镜像是开放80端口，service的port指定的是80端口，那么pod和pod直接就可以进行访问，**不用指定targetPort端口**
 
 ```yaml
 apiVersion: v1
@@ -710,7 +753,7 @@ spec:
   # ClusterIP模式（默认）：不指定时，自动分配
   # 指定为None时，属于Headless模式
   clusterIP: None
-  # 指定为 NodePort模式
+  # 指定为 NodePort模式，默认ClusterIP
   type: NodePort      
   # 选择pod(根据对应的label: app=nginx)
   selector:
@@ -731,21 +774,21 @@ HTTP/HTTPS 根据 url 进行转发，作为Edge Router，将集群外的客户�
 
 
 
-### Project Volumes
+## Project Volumes
 
 > 为容器提供预先定义好的数据，被k8s注入到容器中。
 
 Secret、ConfigMap、Downward API三种信息，可以通过**环境变量的方式出现再容器里，但是不具备自动更新的能力**。
 
-#### Secret
+### Secret
 
-把Pod想要访问的加密数据存储到etcd中，通过Pod的容器挂载Volume的形式访问Secret里的信息。
+把Pod想要访问的加密数据存储到etcd中，通过Pod的容器**挂载Volume**的形式访问Secret里的信息。
 
-Secrent的加密是插件，需要单独配置。
+- **Secrent的加密是插件，需要单独配置。**
 
-在容器中会生成`${container_mount_path}/${secret_name}`文件，文件内容为对应的值，且etcd中值更新时，文件内容也会更新。
+在容器中会生成`${container_mount_path}/${secret_name}`文件，文件内容为对应的值，且etcd中值更新时，**文件内容也会更新**。
 
-##### kubernetes.io/dockerconfigjson
+#### kubernetes.io/dockerconfigjson
 
 作为 docker 私有镜像的认证配置，通过
 
@@ -774,11 +817,7 @@ spec:
   - name: hubsecret-go
 ```
 
-
-
-
-
-## ConfigMap
+### ConfigMap
 
 与Secret的区别是，**ConfigMap存储无需加密、应用所需的配置信息**。
 
@@ -793,13 +832,13 @@ data:
   application-name: Test
 ```
 
-### 使用
+#### 使用
 
 Pod的使用方式：
 
 - 将ConfigMap中的数据设置为**容器的环境变量**
 - 将ConfigMap中的数据设置为**命令行参数**
-- 使用Volume将ConfigMap**作为文件或目录挂载**
+- 使用Volume将ConfigMap**作为文件或目录挂载**（可自动更新）
 - 编写代码在 Pod 中运行，使用 **Kubernetes API** 来读取 ConfigMap
 
 
@@ -808,13 +847,41 @@ Pod的使用方式：
 
 Pod里的容器能够**直接获取这个Pod API对象本身的信息**（**容器进程启动之前就确定的信息**）。
 
+- `fieldRef`：`metadata`的`name`, `namespace`, `label`等；
+- `resourceFieldRef`：cpu, memory等；
+
+示例：将Pod Labels字段的值挂载到容器的`/etc/podinfo/labels`文件
+
+```yaml
+...
+spec:
+  containers:
+  - name: client
+    volumeMounts:
+    - name: podinfo
+      mountPath: /etc/podinfo
+  volumes:
+  - name: podinfo
+    projected:
+      sources:
+      - downwardAPI:
+        items:
+        - path: "labels"
+        	fieldRef:
+        	  fieldPath: metadata.labels
+```
+
 
 
 ### ServiceAccountToken
 
 Service Account对象的作用是Kubernetes内置的一种“服务账户”，是K8s进行权限分配的对象。
 
-Service Account的授权信息和文件，作为特殊的Secret，存在容器里的`/var/run/secrents/kubernetes.io/serviceaccount`目录，Pods会自动挂载一个类型为Secret，名为default-token-***的Volume。
+`InClusterConfig`：将K8s客户端以容器方式运行，使用默认的Service Account自动授权
+
+- Pods会自动挂载一个类型为Secret，名为`default-token-***`的Volume。
+
+- Service Account的授权信息和文件，作为特殊的Secret，存在容器里的`/var/run/secrets/kubernetes.io/serviceaccount`目录，包含`ca.crt`, `token`等；
 
 
 
