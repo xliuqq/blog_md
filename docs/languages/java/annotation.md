@@ -41,24 +41,24 @@ public @interface Action {
 
 
 
-## 处理器
-
-### Processor
+## Processor
 
 `javax.annotation.processing.Processor`
 
 注解处理器(Annotation Processor)是javac内置的一个用于编译时扫描和处理注解(Annotation)的工具，常用的用法就是在编译期间获取相关注解数据，然后动态生成`.java`源文件，比如lombok。
 
-```shell
-javac -encoding UTF-8 cn/tf/jvm/part10/NameCheckProcessor.java
-javac -processor cn.tf.jvm.part10.NameCheckProcessor cn/tf/jvm/part10/BADLY_NAMED_CODE.java
-```
+在编译的时候，javac会去找所有jar包及项目（模块）里`resource/META-INF/services/javax.annotation.processing.Processor`这个文件中配置的类信息，记住是**类信息**，它会通过classloader去加载这个类，此时项目（模块）中的文件因为是在编译期，尚未生成class文件，也就找不到对应的类，解决方法：
 
+- 通过`maven-resource`插件，编译完之后再进行 copy-resource；
 
+简单案例见代码库
+
+- [GetterSetterProcessor](https://gitee.com/luckyQQQ/lifelearning/tree/master/java/jvm/annotation/core)
+- [demo](https://gitee.com/luckyQQQ/lifelearning/tree/master/java/jvm/annotation/demo)
 
 ### 编译期间修改语法树
 
-示例：实现 GettetSetter 注解（见[代码库](??????))；
+示例：实现 GettetSetter 注解；
 
 ```java
 // 根据字符串获取Name

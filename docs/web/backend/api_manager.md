@@ -1,180 +1,105 @@
-# 接口管理设计（Spring Boot）
-
-## 需求
-
-微服务的不同版本间，可以查看接口的改动。
+# 接口管理
 
 
 
-## 基本思路
+## 接口版本间改动
 
-1. 每个版本都有对应的 OpenAPI 规范的 Yaml 描述文件，通过[OpenAPI Tools](https://github.com/OpenAPITools/openapi-diff)进行接口版本比对；
+> 微服务的不同版本间，可以查看接口的改动。
+
+基本思路：每个版本都有对应的 OpenAPI 规范的 Yaml 描述文件，通过[OpenAPI Tools](https://github.com/OpenAPITools/openapi-diff)进行接口版本比对；
 
 每个版本如何具备对应的OpenAPI的yaml描述文件？
 
-## 思路1：根据Yaml生成Controller层注解代码
 
-> 开发接口先写OpenAPI 3 的 yaml 文件，然后生成对应的Controller层的接口。
 
-工具
+### 思路1：根据Yaml生成Controller层注解代码
 
-- [openapi-generator和maven-plugin](https://github.com/OpenAPITools/openapi-generator): 根据Yaml生成客户端/服务端的桩代码；
+> 开发接口先写OpenAPI 3 的 yaml 文件，然后生成对应的Controller层的接口。（可行，但对于开发不太友好，注解比yaml容易写）
 
-问题点:
+- [openapi-generator和maven-plugin](https://github.com/OpenAPITools/openapi-generator): 根据Yaml生成客户端/服务端的桩代码，且不生成辅助代码
 
-- openapi-generator 生成的代码和其它配置比较多，因此需要深入研究参数，如何屏蔽一些无用的配置和代码；
-  - `.openapi-genrator`目录、`.openapi-generator-ignore`文件，`applicaiton.properties`, `openapi.yaml` 和 `org.openapitools`包
-- 改动OpenAPI的yaml，需要重新生成相关的api/pojo代码，即生成的Controller代码不能进行修改；
-
-### 实战代码
-
-`pom.xml`配置，具体代码见 []()
-
-```xml
-<dependency>
-    <groupId>org.springdoc</groupId>
-    <artifactId>springdoc-openapi-ui</artifactId>
-    <version>1.6.6</version>
-</dependency>
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-web</artifactId>
-    <exclusions>
-        <exclusion>
-            <artifactId>logback-classic</artifactId>
-            <groupId>ch.qos.logback</groupId>
-        </exclusion>
-    </exclusions>
-</dependency>
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-test</artifactId>
-</dependency>
-<dependency>
-    <groupId>com.google.code.findbugs</groupId>
-    <artifactId>jsr305</artifactId>
-    <version>3.0.2</version>
-</dependency>
-<dependency>
-    <groupId>com.fasterxml.jackson.dataformat</groupId>
-    <artifactId>jackson-dataformat-yaml</artifactId>
-</dependency>
-<dependency>
-    <groupId>com.fasterxml.jackson.datatype</groupId>
-    <artifactId>jackson-datatype-jsr310</artifactId>
-</dependency>
-<dependency>
-    <groupId>org.openapitools</groupId>
-    <artifactId>jackson-databind-nullable</artifactId>
-    <version>0.2.2</version>
-</dependency>
-<dependency>
-    <groupId>org.openapitools</groupId>
-    <artifactId>openapi-generator</artifactId>
-    <version>${openapi-generator-version}</version>
-</dependency> 
-
-... 
-
-<plugin>
-     <groupId>org.openapitools</groupId>
-     <artifactId>openapi-generator-maven-plugin</artifactId>
-     <version>${openapi-generator-version}</version>
-     <executions>
-         <execution>
-             <goals>
-                 <goal>generate</goal>
-             </goals>
-             <configuration>
-                 <inputSpec>${project.basedir}/src/main/resources/swagger/petastore.yaml</inputSpec>
-                 <generatorName>spring</generatorName>
-                 <apiPackage>com.xliu.lifelearning.cs.spring.springbootopenapigenerator.api</apiPackage>
-                 <modelPackage>com.xliu.lifelearning.cs.spring.springbootopenapigenerator.pojo</modelPackage>
-                 <skipValidateSpec>false</skipValidateSpec>
-                 <!--> 生成在项目源码中，而不是在target/classes目录下<-->
-                 <output>${project.basedir}</output>
-                 <generateApiDocumentation>false</generateApiDocumentation>
-                 <!--> 禁止重写已经存在的文件，如果接口有变动，则将文件删除重新生成<-->
-                 <skipOverwrite>true</skipOverwrite>
-                 <library>spring-boot</library>
-
-                 <configOptions>
-                     <delegatePattern>false</delegatePattern>
-                     <title>swagger</title>
-                     <serializableModel>true</serializableModel>
-                 </configOptions>
-             </configuration>
-         </execution>
-     </executions>
-</plugin>
+```
+<generateApiDocumentation>false</generateApiDocumentation>
+<generateSupportingFiles>false</generateSupportingFiles>
+<skipOperationExample>true</skipOperationExample>
 ```
 
+具体代码见 [根据Yaml生成SpringBoot接口](https://gitee.com/luckyQQQ/lifelearning/tree/master/java/spring/spring-boot-openapi-generator)
 
 
-## **思路2：根据Controller**层注解代码生成Yaml
+
+### **思路2：根据Controller**层注解代码生成Yaml
+
+> github上有直接根据注解进行静态解析，生成对应的yaml接口文档，如 https://github.com/UbiqueInnovation/springboot-swagger3 ，但是鲁棒性不够；
 
 工具：
 
 - [springdoc-openapi](https://github.com/springdoc/springdoc-openapi) : 在SpringBoot中使用OpenAPI 3的注解；
 
-- [springdoc-openapi-maven-plugin](https://github.com/springdoc/springdoc-openapi-maven-plugin) : 根据 OpenAPI 3的注解生成OpenAPI 3的Yaml
+- [springdoc-openapi-maven-plugin](https://github.com/springdoc/springdoc-openapi-maven-plugin) : 根据 OpenAPI 3的注解生成OpenAPI 3的Yaml，依赖于 `spring-boot-maven` 插件
+
+- Maven在**集成测试阶段**（integration-test）运行openapi插件（通过`mvn verify`）。
+
 
 问题点：
 
-- 在**运行时才能生成OpenAPI 文档**（通过`mvn verify`）：`springdoc-openapi-maven-plugin` 依赖于 `spring-boot-maven` 插件。Maven在**集成测试阶段**(integration-test)运行openapi插件。
-  - 因此，如果SpringBoot启动失败，则无法生成对应的文档内容；
-  - github上有直接根据注解进行静态解析，生成对应的yaml接口文档，如 https://github.com/UbiqueInnovation/springboot-swagger3 ，但是鲁棒性不够；
+- 但是在CI阶段，一般不进行verify，仅package不会运行spring，也就无法生成 Yaml；
 
+具体代码见 [根据注解生成Yaml](https://gitee.com/luckyQQQ/lifelearning/tree/master/java/spring/springboot-springdoc-openapi-generate-yaml)
 
-```xml
-<dependency>
-    <groupId>org.springdoc</groupId>
-    <artifactId>springdoc-openapi-ui</artifactId>
-    <version>1.6.6</version>
-</dependency>
+## OpenAPI/Swagger 3
 
- <plugin>
-     <groupId>org.springframework.boot</groupId>
-     <artifactId>spring-boot-maven-plugin</artifactId>
-     <version>2.3.4.RELEASE</version>
-     <configuration>
-         <jvmArguments>-Dspring.application.admin.enabled=true</jvmArguments>
-     </configuration>
-     <executions>
-         <execution>
-             <id>pre-integration-test</id>
-             <goals>
-                 <goal>start</goal>
-             </goals>
-         </execution>
-         <execution>
-             <id>post-integration-test</id>
-             <goals>
-                 <goal>stop</goal>
-             </goals>
-         </execution>
-     </executions>
-</plugin>
-<plugin>
-    <!-- springdoc-openapi-maven-plugin 依赖于 spring-boot-maven 插件.
-                 Maven在集成测试阶段(integration-test)运行openapi插件。-->
-    <groupId>org.springdoc</groupId>
-    <artifactId>springdoc-openapi-maven-plugin</artifactId>
-    <version>1.1</version>
-    <configuration>
-        <outputDir>${project.basedir}/src/main/resources/</outputDir>
-        <outputFileName>openapi.json</outputFileName>
-    </configuration>
-    <executions>
-        <execution>
-            <id>integration-test</id>
-            <goals>
-                <goal>generate</goal>
-            </goals>
-        </execution>
-    </executions>
-</plugin>
-```
+### 规范
+
+https://github.com/swagger-api/swagger-codegen
+
+- 支持json和yaml文件解析，自动生成多种语言的API客户端和服务器stub；
+- swagger配置规范说明，https://swagger.io/specification；
+- swagger maven plugin，https://github.com/garethjevans/swagger-codegen-maven-plugin；
+
+![OpenAPI2.0 OpenAPI3.0 info](pics/swagger.png)
 
 
 
+### springboot 集成（[springdoc](https://github.com/springdoc/springdoc-openapi)）
+
+> springfox 不支持 springboot 2.4 以上的版本，最新更新时间为 2020/10/14号。
+
+springdoc 与 springboot 的版本兼容性：
+
+| spring-boot Versions | Minimum springdoc-openapi Versions |
+| :------------------- | :--------------------------------- |
+| `3.0.x`              | `2.0.x`+                           |
+| `2.7.x`, `1.5.x`     | `1.6.0`+                           |
+| `2.6.x`, `1.5.x`     | `1.6.0`+                           |
+| `2.5.x`, `1.5.x`     | `1.5.9`+                           |
+| `2.4.x`, `1.5.x`     | `1.5.0`+                           |
+| `2.3.x`, `1.5.x`     | `1.4.0`+                           |
+| `2.2.x`, `1.5.x`     | `1.2.1`+                           |
+| `2.0.x`, `1.5.x`     | `1.0.0`+                           |
+
+
+
+`SpringFox - SpringDoc` 对应关系如下
+
+- `@Api` → `@Tag`
+- `@ApiIgnore` → `@Parameter(hidden = true)` or `@Operation(hidden = true)` or `@Hidden`
+- `@ApiImplicitParam` → `@Parameter`
+- `@ApiImplicitParams` → `@Parameters`
+- `@ApiModel` → `@Schema`
+- `@ApiModelProperty(hidden = true)` → `@Schema(accessMode = READ_ONLY)`
+- `@ApiModelProperty` → `@Schema`
+- `@ApiOperation(value = "foo", notes = "bar")` → `@Operation(summary = "foo", description = "bar")`
+- `@ApiParam` → `@Parameter`
+- `@ApiResponse(code = 404, message = "foo")` → `@ApiResponse(responseCode = "404", description = "foo")`
+
+
+
+示例项目见
+
+- [根据Yaml生成SpringBoot接口](https://gitee.com/luckyQQQ/lifelearning/tree/master/java/spring/spring-boot-openapi-generator)
+- [根据注解生成Yaml](https://gitee.com/luckyQQQ/lifelearning/tree/master/java/spring/springboot-springdoc-openapi-generate-yaml)
+
+
+
+### Swagger 添加自定义注解的信息（TODO）
