@@ -1,63 +1,152 @@
-# 用户
+# 用户与权限
 
-Kubernetes提供了一系列机制以满足多用户的使用，包括多用户，鉴权，命名空间，资源限制等等。
+Kubernetes提供了一系列机制以满足多用户的使用，包括**多用户，鉴权，命名空间，资源限制**等等。
 
+- 在Kubernetes里**User只是一个用户身份辨识的ID**，没有真正用户管理；
+- 通过**第三方提供用户管理和存储**，k8s通过User进行身份验证与权限认证；
 
+- Kubernetes用户验证支持**X509证书认证，token认证和密码验证**几种方式；
 
-在Kubernetes里User只是一个用户身份辨识的ID，没有真正用户管理。
-
-k8s通过**第三方提供用户管理和存储**，k8s通过User进行身份验证与权限认证。
-
-Kubernetes用户验证支持**X509证书认证，token认证和密码验证**几种方式。
-
-RBAC是Kubernetes进行**权限控制**的方式。用户与角色绑定，赋予角色权限。
+RBAC是Kubernetes进行**权限控制**的方式。用户与角色绑定，赋予角色权限；
 
 
 
+## RBAC
 
-
-## Service Account
-
-属于账号的一种，但是不是给K8s集群的用户（系统管理员、运维人员、租户用户等）使用，而是**给运行在Pod中的进程使用**，提供必要的身份证明。
+### User
 
 
 
-## 使用示例
+#### Service Account
+
+K8s内置，属于账号的一种，但是不是给K8s集群的用户（系统管理员、运维人员、租户用户等）使用，而是**给运行在Pod中的进程使用**，提供必要的身份证明。
+
+- K8s 会为 `ServiceAccount`自动创建 并分配 Secret 对象（`token`, `ca.crt`, `namespace`三个数据）；
+- Pod 可以在`spec.ServiceAccountName`中使用`ServiceAccount`，如果不指定则K8s为Pod分配默认的`ServiceAccount`；
+  - 默认的`ServiceAccount`没有关联任何Role，继承了system:serviceaccounts的权限，只能操作一些非资源类型；
+  - 生产环境，建议为所有`Namespace`下默认的`ServiceAccount`绑定只读权限的`Role`；
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: drone
+  namespace: default
+# 自动创建
+secrets:
+- name: drone-token-lrgmd
+```
+
+### UserGroup
+
+如果为K8s配置外部认证服务，则“用户组”的概念由外部认证服务提供；
+
+- `ServiceAccount`对应的“用户”是：`system:serviceaccount:<NameSpace 名><ServiceAccount名>`，对应的内置“用户组”是`system:serviceaccounts:<Namespace名>`
+
+### Role
+
+定义角色，受限于名空间。单个规则的字段：
+
+- `apigroup`：API 组，比如`Pod/Deployment`等在`""`组下，`Job/CronJob`在`batch`组下；
+- `resource`：对应API组下的资源，如 Pod等；
+- `verbs`：允许的操作，如`get,list,watch,create,update,patch,delete`；
+- `resourceName`：数据权限，限定可访问的资源名称； 空集合意味着允许所有资源。
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: example-role
+  namespace: default
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - '*'
+  verbs:
+  - '*'
+```
+
+### RoleBinding
+
+将用户和角色绑定，处于给定命名空间中的 **RoleBinding 仅在该命名空间中有效**。
+
+- 可以引用相同命名空间中的 Role 或全局命名空间中的 ClusterRole；
+
+**subjects** 字段：
+
+- **subjects.kind** ：必需，被引用的对象的类别。 这个 API 组定义的值是 `User`、`Group` 和 `ServiceAccount`。 
+
+- **subjects.name** ：必需被引用的对象的名称。
+- **subjects.apiGroup**：apiGroup 包含被引用主体的 API 组。 对于 ServiceAccount 主体默认为 ""。 对于 User 和 Group 主体，默认为 "rbac.authorization.k8s.io"。
+- **subjects.namespace**：被引用的对象的命名空间。 “User” 或 “Group” 不支持该字段。
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: example-rolebinding
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: drone
+subjects:
+- kind: User
+  name: drone
+  apigroup: rbac.authorization.k8s.io
+- kind: ServiceAccount
+  name: drone
+  namespace: default
+# 应用于`default`名空间下的所有ServiceAccount
+- kind: Group
+  name: system:serviceaccounts:default
+  apiGroup: rbac.authorization.k8s.io
+```
+
+### ClusterRole
+
+定义集群角色，不受名空间限制。
+
+### ClusterRoleBinding
+
+将用户和集群角色绑定，不受限于名空间。
+
+
+
+## 宿主机设置用户权限
 
 接下来将创建一个名为test的用户，其拥有test命名空间下的管理员权限，该命名空间有着CPU，内存，Pod数量等限制。
 
-## 创建用户
+### 创建用户
 
-Kubernetes中的用户创建大体包括静态创建和动态创建两类。
-
-- 静态创建需要apiserver启动时提供用户信息文件；
-- 动态创建则可以在apiserver启动后动态添加。
-
-动态创建的认证方式包括客户端证书认证和Service Account Token认证。如果能够登录至master的话建议使用客户端证书认证，这里使用Service Account Token认证方式创建用户。
-
-- Service Account隶属于命名空间之下，因此首先创建namespace/test：
+创建`namespace/test`：**每创建一个命名空间，都会为其新建一个名为default的serviceaccount**
 
 ```shell
 kubectl create namespace test
 ```
 
-- **每创建一个命名空间，都会为其新建一个名为default的serviceaccount**，这里新建名为test的serviceaccount：
+新建名为test的serviceaccount
 
 ```shell
 kubectl create -n test serviceaccount test
 ```
 
-- 此时一个新的用户test就已经创建好了，只不过在apiserver看来，他的用户名全称应为
+在apiserver看来，用户名全称应为
 
 ```shell
 system:serviceaccount:test:test
 ```
 
-## 切换用户验证权限
+### 切换用户验证权限
 
-创建用户后还需要切换至该用户，kubectl命令提供了config子命令以完成这一目的，该命令本质上是修改了位于`~/.kube/config`的kubeconfig文件，因此也可以为新用户创建一个新的Linux用户，为其放置kubeconfig文件，以实现针对不同Linux用户使用不同的Kubernetes用户
+创建用户后还需要切换至该用户，kubectl命令提供了config子命令以完成这一目的，该命令本质上是修改了位于`~/.kube/config`的kubeconfig文件：
 
-- 首先需要获取serviceaccount/test用户的token
+- 也可以**为新用户创建一个新的Linux用户，为其放置kubeconfig文件**，以实现针对不同Linux用户使用不同的Kubernetes用户
+
+首先需要获取`serviceaccount/test`用户的token
 
 ```shell
 kubectl describe -n test serviceaccount/test | grep Token
@@ -65,34 +154,32 @@ kubectl describe -n test serviceaccount/test | grep Token
 kubectl describe -n test secret/test-token-xz9dl
 ```
 
-- 设置kubeconfig的user，其名称为test（<TOKEN_CONTENT>就是serviceaccount/test的token）：
+设置kubeconfig的user，其名称为test（<TOKEN_CONTENT>就是`serviceaccount/test`的token）：
 
 ```shell
 kubectl config set-credentials test --token=<TOKEN_CONTENT>
 ```
 
-- 然后设置context，名称为test-context，引用user为test，cluster为kubernetes，命名空间为test（使用kubectl命令时如不指定namespace，则默认为test）：
+然后设置context，名称为`test-context`，引用user为test，cluster设置kuebconfig配置文件中环境选项中的集群，命名空间为test：
 
 ```shell
-kubectl config set-context test-context --user=test --cluster=kubernetes --namespace=test
+kubectl config set-context test-context --user=test --cluster=<Cluster Name> --namespace=test
 ```
 
-- 最后，切换至该context：
+最后，切换至该context：
 
 ```shell
 kubectl config use-context test-context
 ```
 
-- 尝试获取pod列表，发现无权限，不过可以验证用户切换成功：
+尝试获取pod列表，发现无权限，不过可以验证用户切换成功：
 
 ```shell
 # 输出 Forbidden字眼，没有权限
 kubectl get pod
 ```
 
-## 授予用户权限
-
-新创建的用户没有任何权限，因此需要为其授予权限，Kubernetes提供了多种权限授予方式，包括ABAC，Webhook，RBAC等等。
+### 授予用户权限
 
 RBAC为Kubernetes默认且推荐的权限授予方式，如果想要使用其他方式，需修改apiserver启动参数。
 
@@ -110,7 +197,7 @@ kubectl describe clusterrole admin
 
 ![img](pics/1654157169266-8bc79d4c-8995-4bea-a7fa-e0350a544fd7.png)
 
-- 接下来需要将clusterrole/admin绑定至serviceaccount/staight上：
+- 接下来需要将`clusterrole/admin`绑定至`serviceaccount/test`上：
 
 ```shell
 kubectl create rolebinding test-admin --clusterrole=admin --serviceaccount=test:test --namespace=test

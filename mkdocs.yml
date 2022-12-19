@@ -51,7 +51,7 @@ nav:
       - 配置: cloud/k8s/conf.md
       - 使用: cloud/k8s/cmd_usage.md
       - 资源类型: cloud/k8s/k8s_resource.md
-      - 权限: cloud/k8s/authnz.md
+      - 用户权限: cloud/k8s/k8s_rbac.md
       - Helm: cloud/k8s/helm.md
       - 镜像仓库: cloud/k8s/habor.md
       - CRD:
