@@ -120,47 +120,118 @@ subjects:
 
 接下来将创建一个名为test的用户，其拥有test命名空间下的管理员权限，该命名空间有着CPU，内存，Pod数量等限制。
 
-### 创建用户
+### 创建ServiceAccount
 
 创建`namespace/test`：**每创建一个命名空间，都会为其新建一个名为default的serviceaccount**
 
-```shell
-kubectl create namespace test
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: starfish1
+  namespace: ai-education
 ```
 
-新建名为test的serviceaccount
+### 创建Role
 
-```shell
-kubectl create -n test serviceaccount test
+`kubectl apply -f role-ai-education.yaml`
+
+```yaml
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: ai-education
+  name: starfish1-role
+rules:
+  - apiGroups: ["", "extensions", "apps"]
+    resources: ["*"]
+    verbs: ["*"]
+  - apiGroups: ["batch"]
+    resources:
+      - jobs
+      - cronjobs
+    verbs: ["*"]
 ```
 
-在apiserver看来，用户名全称应为
+### 创建 RoleBinding
 
-```shell
-system:serviceaccount:test:test
+`kubectl apply -f rolebinding-ai-education.yaml`
+
+```yaml
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: starfish1-rolebinding
+  namespace: ai-education
+subjects:
+- kind: ServiceAccount
+  name: starfish1
+  namespace: ai-education
+roleRef:
+  kind: Role
+  name: starfish1-role
+  apiGroup: rbac.authorization.k8s.io
 ```
 
-### 切换用户验证权限
 
-创建用户后还需要切换至该用户，kubectl命令提供了config子命令以完成这一目的，该命令本质上是修改了位于`~/.kube/config`的kubeconfig文件：
 
-- 也可以**为新用户创建一个新的Linux用户，为其放置kubeconfig文件**，以实现针对不同Linux用户使用不同的Kubernetes用户
+### 创建kubeconfig
 
-首先需要获取`serviceaccount/test`用户的token
+ 获取token相关信息，利用最后一行的secrets创建认证信息
 
 ```shell
-kubectl describe -n test serviceaccount/test | grep Token
-# 将上一步的token信息复制下来
-kubectl describe -n test secret/test-token-xz9dl
+kubectl get serviceaccount starfish1 -n ai-education -o yaml 
 ```
 
-设置kubeconfig的user，其名称为test（<TOKEN_CONTENT>就是`serviceaccount/test`的token）：
+指定server、name（2.4.1节的token名）、namespace信息
+
+```shell
+server=https://172.16.2.132:6443
+name=starfish1-token-m4bdx
+namespace=ai-education
+
+token=$(kubectl get secret/$name -n $namespace -o jsonpath='{.data.token}' | base64 --decode)
+ca=$(kubectl get secret/$name -n $namespace -o jsonpath="{['data']['ca\.crt']}")
+
+echo "apiVersion: v1
+kind: Config
+clusters:
+- name: cluster.local
+  cluster:
+    certificate-authority-data: ${ca}
+    server: ${server}
+contexts:
+- name: cluster.local
+  context:
+    cluster: cluster.local
+    user: starfish1
+current-context: cluster.local
+users:
+- name: starfish1
+  user:
+    token: ${token}
+" > starfish1.kubeconfig
+```
+
+### 使用KubeConfig
+
+#### 可选1：指定kubeconfig路径
+
+```shell
+export KUBECONFIG=/path/starfish1.kubeconfig
+```
+
+#### 可选2：设置context
+
+设置kubeconfig的user，其名称为test（<TOKEN_CONTENT>就是`serviceaccount/starfish1`的token）：
 
 ```shell
 kubectl config set-credentials test --token=<TOKEN_CONTENT>
 ```
 
 然后设置context，名称为`test-context`，引用user为test，cluster设置kuebconfig配置文件中环境选项中的集群，命名空间为test：
+
+- 会在`~/.kube/config`中添加`test-context`的信息；
 
 ```shell
 kubectl config set-context test-context --user=test --cluster=<Cluster Name> --namespace=test
@@ -172,62 +243,13 @@ kubectl config set-context test-context --user=test --cluster=<Cluster Name> --n
 kubectl config use-context test-context
 ```
 
-尝试获取pod列表，发现无权限，不过可以验证用户切换成功：
 
-```shell
-# 输出 Forbidden字眼，没有权限
-kubectl get pod
-```
-
-### 授予用户权限
-
-RBAC为Kubernetes默认且推荐的权限授予方式，如果想要使用其他方式，需修改apiserver启动参数。
-
-首先需要新建一个`Role/ClusterRole`资源并指定允许的权限，Kubernetes预设了`clusterrole/admin`，允许单个命名空间内除了资源配额和命名空间本身的写访问，很适合作为单个命名空间的管理员使用。因此这里不再新建role。
-
-- 如果想知道`clusterrole/admin`到底授予了什么样的权限，可以使用describe命令查看：
-
-```shell
-# 切换回admin用户
-kubectl config use-context kubernetes-admin@kubernetes
-
-# 查看权限
-kubectl describe clusterrole admin
-```
-
-![img](pics/1654157169266-8bc79d4c-8995-4bea-a7fa-e0350a544fd7.png)
-
-- 接下来需要将`clusterrole/admin`绑定至`serviceaccount/test`上：
-
-```shell
-kubectl create rolebinding test-admin --clusterrole=admin --serviceaccount=test:test --namespace=test
-```
-
-![img](pics/1654157222858-72e345fc-df11-4c08-bef7-4583fcd5cdfb.png)
-
-如上，为test用户授予了test命名空间的admin角色，如果需要让该用户管理多个命名空间，更改–namespace参数再次创建即可。
-
-- 切换至test用户，尝试获取test命名空间下的Service Account：
-
-```shell
-kubectl config use-context test-context
-
-kubectl get serviceaccounts 
-```
-
-![img](pics/1654157307950-4221dbb7-ced1-4f66-9957-a38e9184213a.png)
-
-![img](pics/1654157337573-c6197738-121b-446f-b823-cf789001e3c6.png)
-
-成功获取，授权成功。
-
-大部分情况下，完成新用户对单个命名空间的管理权限就已经可以了，不过如果需要对其资源使用做进一步的限制的话，还需修改命名空间的资源配额。
 
 ## 资源配额
 
 资源配额是一个用于限制一个命名空间下资源使用的机制，其包括如下两个对象：
 
-`ResourceQuota`：限制单个命名空间下的资源使用量。包括***CPU，内存，存储，资源对象的个数***等等。
+`ResourceQuota`：限制**单个命名空间下的资源使用量**。包括***CPU，内存，存储，资源对象的个数***等等。
 
 `LimitRanger`：为容器的Limits和Requests设置默认值和范围约束。
 
@@ -320,11 +342,7 @@ spec:
 ```
 
 - 如上，如创建Pod时未指定limits和requests值，则自动为其添加requests.memory: 10Mi，limits.memory: 10Mi；
-- 如创建时limits.memory值小于10Mi或大于20Mi，则会拒绝该请求：
-
-![img](pics/1654158793949-bac98df6-4b6d-4eb6-89fc-755fa107d936.png)
-
-
+- 如创建时limits.memory值小于10Mi或大于20Mi，则会拒绝该请求。
 
 
 
