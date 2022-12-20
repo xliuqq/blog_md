@@ -1,21 +1,54 @@
-# 用户与权限
+# 集群安全机制
+
+## API Server 认证
+
+K8s集群中所有资源访问和变更都是通过k8s API Server的REST API实现，
+
+认证（Authentication）：识别客户端的身份；
+
+### API 访问方式
+
+K8s API的访问方式分类：
+
+- 证书方式访问的普通用户或进程，包括运维人员、kubectl、kubelets等进程；
+- Service Account方式访问的K8s的内部服务进程；
+- 匿名方式访问的进程。
+
+### API 认证方式
+
+- HTTPS 证书认证：默认，基于**CA根证书签名的双向数字证书**认证方式；
+- HTTP Bear Token认证：通过**Bearer Token**识别合法用户，指定存储的文件（存储token对应的用户信息，csv格式）；
+- OpenID Connect Token认证：通过第三方OIDC协议进行认证；
+- Webhook Token认证：通过**外部Webhook服务**进行认证；
+- Authentication Proxy认证：通过认证代理程序进行认证；
+
+## API Server 授权
+
+### 授权策略
+
+默认为`--authorization-mode=Node,RBAC`
+
+- ~~AllowDeny：拒绝所有，仅用于测试；~~
+- ~~AlwaysAllow：允许所有，集群不需要授权时使用；~~
+- ~~ABAC：基于属性的访问控制；~~
+- **RBAC**：基于角色的访问控制；
+- **Webhook**：基于外部的REST服务进行授权；
+- **Node**：对kubelet进行授权的特殊模式；
+
+### RBAC
 
 Kubernetes提供了一系列机制以满足多用户的使用，包括**多用户，鉴权，命名空间，资源限制**等等。
+
+RBAC是Kubernetes进行**权限控制**的方式。用户与角色绑定，赋予角色权限；
+
+#### User
 
 - 在Kubernetes里**User只是一个用户身份辨识的ID**，没有真正用户管理；
 - 通过**第三方提供用户管理和存储**，k8s通过User进行身份验证与权限认证；
 
 - Kubernetes用户验证支持**X509证书认证，token认证和密码验证**几种方式；
 
-RBAC是Kubernetes进行**权限控制**的方式。用户与角色绑定，赋予角色权限；
-
-
-
-## RBAC
-
-### User
-
-
+`User`：字符串标识，通常应该在客户端CA证书中进行设置，K8s内置系统级别的用户/用户组，以"system:"开头；
 
 #### Service Account
 
@@ -23,7 +56,7 @@ K8s内置，属于账号的一种，但是不是给K8s集群的用户（系统�
 
 - K8s 会为 `ServiceAccount`自动创建 并分配 Secret 对象（`token`, `ca.crt`, `namespace`三个数据）；
 - Pod 可以在`spec.ServiceAccountName`中使用`ServiceAccount`，如果不指定则K8s为Pod分配默认的`ServiceAccount`；
-  - 默认的`ServiceAccount`没有关联任何Role，继承了system:serviceaccounts的权限，只能操作一些非资源类型；
+  - 默认的`ServiceAccount`没有关联任何Role，继承`system:serviceaccounts`的权限，只能操作一些非资源类型；
   - 生产环境，建议为所有`Namespace`下默认的`ServiceAccount`绑定只读权限的`Role`；
 
 ```yaml
@@ -37,13 +70,14 @@ secrets:
 - name: drone-token-lrgmd
 ```
 
-### UserGroup
+#### Group
 
 如果为K8s配置外部认证服务，则“用户组”的概念由外部认证服务提供；
 
 - `ServiceAccount`对应的“用户”是：`system:serviceaccount:<NameSpace 名><ServiceAccount名>`，对应的内置“用户组”是`system:serviceaccounts:<Namespace名>`
+- ``Group`：与用户名类似，通常应该在客户端CA证书中进行设置，不以"system:"为前缀；
 
-### Role
+#### Role
 
 定义角色，受限于名空间。单个规则的字段：
 
@@ -51,6 +85,10 @@ secrets:
 - `resource`：对应API组下的资源，如 Pod等；
 - `verbs`：允许的操作，如`get,list,watch,create,update,patch,delete`；
 - `resourceName`：数据权限，限定可访问的资源名称； 空集合意味着允许所有资源。
+  - 对`list`, `watch`, `create`, `deletecollection`操作无效
+
+
+注：Role或ClusterRole与RoleBinding或ClusterRoleBinding**绑定之后，则Role/ClusterRole无法修改**；
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -69,7 +107,7 @@ rules:
   - '*'
 ```
 
-### RoleBinding
+#### RoleBinding
 
 将用户和角色绑定，处于给定命名空间中的 **RoleBinding 仅在该命名空间中有效**。
 
@@ -106,21 +144,23 @@ subjects:
   apiGroup: rbac.authorization.k8s.io
 ```
 
-### ClusterRole
+#### ClusterRole
 
 定义集群角色，不受名空间限制。
 
-### ClusterRoleBinding
+- K8s内置ClusterRole，包括admin，view，edit等
+
+#### ClusterRoleBinding
 
 将用户和集群角色绑定，不受限于名空间。
 
 
 
-## 宿主机设置用户权限
+### 宿主机设置不同访问权限
 
 接下来将创建一个名为test的用户，其拥有test命名空间下的管理员权限，该命名空间有着CPU，内存，Pod数量等限制。
 
-### 创建ServiceAccount
+#### 创建ServiceAccount
 
 创建`namespace/test`：**每创建一个命名空间，都会为其新建一个名为default的serviceaccount**
 
@@ -132,7 +172,7 @@ metadata:
   namespace: ai-education
 ```
 
-### 创建Role
+#### 创建Role
 
 `kubectl apply -f role-ai-education.yaml`
 
@@ -153,7 +193,7 @@ rules:
     verbs: ["*"]
 ```
 
-### 创建 RoleBinding
+#### 创建 RoleBinding
 
 `kubectl apply -f rolebinding-ai-education.yaml`
 
@@ -173,9 +213,7 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ```
 
-
-
-### 创建kubeconfig
+#### 创建kubeconfig
 
  获取token相关信息，利用最后一行的secrets创建认证信息
 
@@ -213,15 +251,15 @@ users:
 " > starfish1.kubeconfig
 ```
 
-### 使用KubeConfig
+#### 使用KubeConfig
 
-#### 可选1：指定kubeconfig路径
+##### 可选1：指定kubeconfig路径
 
 ```shell
 export KUBECONFIG=/path/starfish1.kubeconfig
 ```
 
-#### 可选2：设置context
+##### 可选2：设置context
 
 设置kubeconfig的user，其名称为test（<TOKEN_CONTENT>就是`serviceaccount/starfish1`的token）：
 
@@ -245,6 +283,20 @@ kubectl config use-context test-context
 
 
 
+## Admission Control
+
+准入控制器的插件列表，支持用户自定义扩展。
+
+- [**Mutating Admission Webhook，Validating Admission Webhook**](./k8s.md#Webhook)
+
+
+
+## 磁盘限制（TODO）
+
+防止将宿主机的磁盘撑满，导致宿主机不可用。
+
+
+
 ## 资源配额
 
 资源配额是一个用于限制一个命名空间下资源使用的机制，其包括如下两个对象：
@@ -262,6 +314,7 @@ resourcequota对相当多的资源提供限制，详细内容可参考文档：h
 ```shell
 kubectl apply -f resource.yaml
 ```
+
 resource.yaml的信息如下：
 
 ```yaml
@@ -320,7 +373,7 @@ LimitRanger用于为容器设置默认的requests和limits值，以及限制其�
 
 - 示例：限制test命名空间下容器的requests值和limits值	
 - kubectl config use-context kubernetes-admin@kubernetes
--  kubectl apply -f limit.yaml
+- kubectl apply -f limit.yaml
 
 ```yaml
 apiVersion: v1
@@ -345,98 +398,6 @@ spec:
 - 如创建时limits.memory值小于10Mi或大于20Mi，则会拒绝该请求。
 
 
-
-# 集群安全机制
-
-## API Server 认证
-
-K8s集群中所有资源访问和变更都是通过k8s API Server的REST API实现，
-
-认证（Authentication）：识别客户端的身份；
-
-### API 访问方式
-
-K8s API的访问方式分类：
-
-- 证书方式访问的普通用户或进程，包括运维人员、kubectl、kubelets等进程；
-- Service Account方式访问的K8s的内部服务进程；
-- 匿名方式访问的进程。
-
-### API 认证方式
-
-- HTTPS 证书认证：默认，基于**CA根证书签名的双向数字证书**认证方式；
-- HTTP Bear Token认证：通过**Bearer Token**识别合法用户，指定存储的文件（存储token对应的用户信息，csv格式）；
-- OpenID Connect Token认证：通过第三方OIDC协议进行认证；
-- Webhook Token认证：通过**外部Webhook服务**进行认证；
-- Authentication Proxy认证：通过认证代理程序进行认证；
-
-## API Server 授权
-
-### 授权策略
-
-默认为`--authorization-mode=Node,RBAC`
-
-- ~~AllowDeny：拒绝所有，仅用于测试；~~
-- ~~AlwaysAllow：允许所有，集群不需要授权时使用；~~
-- ~~ABAC：基于属性的访问控制；~~
-- **RBAC**：基于角色的访问控制；
-- **Webhook**：基于外部的REST服务进行授权；
-- **Node**：对kubelet进行授权的特殊模式；
-
-### RBAC
-
-资源对象：Role（受限于命名空间）、ClusterRole（全局）、RoleBinding、ClusterRoleBinding；
-
-- Role或ClusterRole与RoleBinding或ClusterRoleBinding**绑定之后，则Role/ClusterRole无法修改**；
-- K8s内置ClusterRole，包括admin，view，edit等；
-
-Rules的使用：
-
-- `apiGroups`：“”（Core），"extensions", "apps", "batch" 等；
-- `resources`：“services”, “endpoints”, “pods“，"deployments“，“jobs”，“configmaps”，“nodes”，“rolebindings”，“clusterroles” 等；
-- `verbs`：create、delete、deletecollection、get、list、patch、update、watch、bind；
-- `resourceNames`：数据权限，**限制特定实例名称**有权限，可用于`get,delete,update,patch`，但对`list`, `watch`, `create`, `deletecollection`操作无效；
-
-主体绑定：
-
-- `User`：字符串标识，通常应该在客户端CA证书中进行设置，K8s内置系统级别的用户/用户组，以"system:"开头；
-- ``Group`：与用户名类似，通常应该在客户端CA证书中进行设置，不以"system:"为前缀；
-- `Service Account`：用户和所属的组名，会被k8s设置为以"system:serviceaccount"为前缀的名称；
-
-示例：
-
-```yaml
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  namespace: default
-  name: pod-reader
-rules:
-- apiGroups: [""]
-  resources: ["pods"]
-  resourceNames: ["test-app"]
-  verbs: ["get", "watch", "list"]
----
-kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: read-pods
-  namespace: default
-subjects:
-- kind: User
-  name: mark
-  apiGroup: rbac.authorization.k8s.io  # 固定的字段指
-roleRef:
-  kind: Role
-  name: pod-reader
-  apiGroup: rbac.authorization.k8s.io
-```
-
-## Admission Control
-
-准入控制器的插件列表，支持用户自定义扩展。
-
-- [**Mutating Admission Webhook，Validating Admission Webhook**](./k8s.md#Webhook)
 
 
 

@@ -889,13 +889,14 @@ Service Account对象的作用是Kubernetes内置的一种“服务账户”，�
 
 持久化卷， 支持本地存储和网络存储，支持两个属性， capacity和accessModes：
 
-- accessModes：ReadWriteOnce（被单个node读写）， ReadOnlyMany（被多个nodes读）， ReadWriteMany（被多个nodes读写）；
+- `accessModes`：**ReadWriteOnce**（被单个node读写）， **ReadOnlyMany**（被多个nodes读）， **ReadWriteMany**（被多个nodes读写）；**ReadWriteOncePod**（单个Pod读写，仅 K8s 1.22+ 的CSI Volume支持）
+- k8s的存储的支持程度见 https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes
 
-重声明策略(reclaim policy)：用户删除PVC释放对PV的占用后，系统根据PV的"reclaim policy"决定对PV执行何种回收操作
+**重声明策略**(reclaim policy)：用户删除PVC释放对PV的占用后，系统根据PV的"reclaim policy"决定对PV执行何种回收操作
 
-- Retain – 手动重新使用
-- Recycle – 基本的数据擦除 (“rm -rf /thevolume/*”)
-- Delete – 移除PV对象和相关联的后端存储卷删除， 后端存储比如AWS EBS, GCE PD, Azure Disk, or OpenStack Cinder
+- **Retain** ：手动重新使用
+- **Recycle** ： 基本的数据擦除 (`rm -rf /thevolume/*`)
+- **Delete** ： 默认，移除PV对象和相关联的后端存储卷删除， 后端存储比如`AWS EBS, GCE PD, Azure Disk, or OpenStack Cinder`
 
 节点亲和性（NodeAffinity）
 
@@ -920,11 +921,105 @@ spec:
     server: 172.17.0.2
 ```
 
+### StorageClass(Dynamic Provisioning)
 
+自动创建PV的机制，`StorageClass`对象的作用就是创建PV的模板：
+
+- `storageclass.kubernetes.io/is-default-class: "true"` 注解表明使用这个StorageClass作为默认的持久化存储提供者；
+- 有两个或多个被标记为默认，Kubernetes 将忽略这个注解， 也就是它将表现为没有默认 StorageClass。
+
+示例：cephfs 
+
+```yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rook-cephfs
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: rook-ceph.cephfs.csi.ceph.com
+parameters:
+  clusterID: rook-ceph
+  csi.storage.k8s.io/controller-expand-secret-name: rook-csi-cephfs-provisioner
+  csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
+  csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
+  csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+  fsName: myfs
+  pool: myfs-replicated
+```
+
+### Local PV
+
+应用于分布式数据存储如MongoDB，分布式文件系统如Ceph等，以及需要在本地磁盘缓存大量数据的分布式应用。
+
+- 不应该将宿主机上的目录用作PV。会对宿主机造成影响，且不同本地目录之间缺乏哪怕最基础的I/O隔离机制；
+- Local PV对应的存储介质，一定是一块额外挂载在宿主机上的磁盘或者块设备（即不是宿主机根目录使用的主硬盘）；
+- 不支持`Dynamic Provisioning`；
+
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: example-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: FileSystem
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: local-storage
+  local:
+    path: /mnt/disk/vol1
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpresssions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - node-1
+--------------------------------------
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+-----------------------------------
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: example-local-claim
+spec:
+  resources:
+    requests:
+      storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  # 看到该storageClass，发现是延迟绑定
+  storageClassName: local-storage
+```
+
+**volumeBindingMode**：延迟绑定，因为`PV`对节点有要求，`Pod`对节点也有要求，在创建PVC时，如果PVC绑定PV，则会出现不匹配的情况
+
+- 将绑定推迟到调度的时候，根据Pod对节点的要求，绑定相应的PVC；
+
+
+
+### emptyDir
+
+在node上自动分配 一个目录，因此无需指定宿主机node上对应的目录文件。这个目录的初始内容为空，当Pod从node上移除时，emptyDir中的数据会被删除。
+
+- 主要用于某些应用程序无需永久保存的临时目录，多个容器的共享目录等
 
 ## PVC
 
 pvc － 对 pv 资源的请求
+
+- `resources.requests.storage`的作用：？？
 
 ```yaml
 kind: PersistentVolumeClaim
@@ -947,10 +1042,12 @@ spec:
 
 在PVC中绑定一个PV，可以根据下面几种条件组合选择
 
-- `Access Modes`， 按照访问模式选择pv
-- `Resources`， 按照资源属性选择， 比如说请求存储大小为8个G的pv
-- `Selector`， 按照pv的label选择
-- `Class`， 根据StorageClass的class名称选择, 通过annotation指定了Storage Class的名字, 来绑定特定类型的后端存储
+- `Access Modes`：按照访问模式选择pv
+- `Resources`：按照资源属性选择， 比如说请求存储大小为8个G的pv
+- `Selector`：按照pv的label选择
+- `Class`：根据StorageClass的class名称选择, 通过annotation指定了Storage Class的名字, 来绑定特定类型的后端存储
+
+
 
 ### PVC保护(partition)
 
