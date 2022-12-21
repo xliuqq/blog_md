@@ -766,9 +766,11 @@ spec:
 
 HTTP/HTTPS 根据 url 进行转发，作为Edge Router，将集群外的客户端请求路由到集群内部的服务上；
 
+### [NGINX Ingress](https://github.com/kubernetes/ingress-nginx)
+
 默认的 Ingress 是基于 NGINX 实现的。NGINX Ingress Controller 帮助维护了 Kubernetes 集群与 NGINX 的状态同步，并且提供了基本的反向代理能力。
 
-### Apache APISIX Ingress 
+### [Apache APISIX Ingress](https://apisix.apache.org/docs/ingress-controller/getting-started/)
 
 
 

@@ -34,6 +34,7 @@ $ ip netns exec nstest ip addr
 $ ip netns add nstest
 
 # 创建network namespace时，默认创建一个回环设备（loopback interface : lo），默认不启动
+# 启动 nstest 的 lo
 $ ip netns exec nstest ip link set dev lo up
 
 # 主机上创建veth-pair两张虚拟网卡 veth-a 和 veth-b
@@ -69,6 +70,12 @@ $ ip netns exec nstest ping 10.0.0.1
 ```
 
 ## Brctl
+
+```shell
+# 查看所有的网桥以及对应的网卡信息
+$ brctl show
+bridge name	    bridge id		STP enabled	    interfaces	
+```
 
 
 

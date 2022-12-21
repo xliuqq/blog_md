@@ -266,10 +266,22 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 ### Pod网络插件安装（仅Master）
 
-CNI 插件 calico
+#### CNI 插件 calico
+
+下载 calico manifests 文件
 
 ```bash
 curl https://docs.projectcalico.org/manifests/calico.yaml -o calico.yaml
+```
+
+calico 的注意事项
+
+- 3.x 版本默认使用 IPIP 模式：将 `FELIX_INPUTMTU`值改为 1480 （默认为1440主要是为适配Google的GCE环境）
+- 默认使用K8s API 存取数据：超过50个节点的集群，下载`calico-typha.yaml`进行部署；
+  - calico-typha Depolyment 将所有Calico的通信集中起来与API Server进行统一交互；
+  - 每个calico-typha Pod资源可承载100到200个Calico节点的连接请求，数量在 3 ~ 20 之间（生产环境）；
+
+```yaml
 kubectl apply -f calico.yaml # configmap/calico-config created 
 # 查看
 kubectl get pod --all-namespaces
