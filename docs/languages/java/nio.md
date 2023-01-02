@@ -8,13 +8,34 @@ Java中跟zero copy相关的主要集中在FileChannel和MappedByteBuffer中。
 
 
 
+## 类库
+
+### 缓冲区 Buffer
+
+绍缓冲区（Buffer） 是一个对象，它包含一些要写入或者要读出的数据。
+
+`DirectByteBuffer`：堆外内存
+
+- `unsafe.allocateMemory(size)` native方法，通过C的malloc来进行分配（`brk`系统调用）；
+- 直接的文件拷贝操作，或者I/O操作。直接使用堆外内存就能少去内存从用户内存拷贝到系统内存的操作
+
+### 通道 Channel
+
+Channel 是一个通道，可以通过它读取和写入数据。
+
+通道与流的不同之处在于通道是双向的，流只是在一个方向上移动，而且**通道可以用于读、写或者同时用于读写**。
+
+### 多路复用器 Selector
+
+Selector 会不断地轮询注册在其上的 Channel，如果某个 Channel 上面有新的 TCP 连接接入、读和写事件，这个 Channel 就处于就绪状态，会被 Selector 轮询出来，然后通过 SelectionKey 可以获取就绪 Channel 的集合，进行后续的 I/O 操作。
+
 ## 零拷贝
 
 Zero拷贝的细节，见[该文档](../../os/IO.md#Linux OS的零拷贝（发送文件为例）)。
 
 ### MappedByteBuffer
 
-java nio提供的FileChannel提供了map()方法，该方法可以在一个打开的文件和MappedByteBuffer之间建立一个虚拟内存映射，MappedByteBuffer继承于ByteBuffer，类似于一个基于内存的缓冲区，只不过该对象的数据元素存储在磁盘的一个文件中；
+java nio提供的FileChannel提供`map()`方法，该方法可以在一个`打开的文件和MappedByteBuffer`之间建立一个虚拟内存映射，MappedByteBuffer继承于ByteBuffer，类似于一个基于内存的缓冲区，只不过该对象的数据元素存储在磁盘的一个文件中；
 
 示例代码
 
@@ -51,12 +72,9 @@ ByteBuffer directByteBuffer = ByteBuffer.allocateDirect(100);
 
 经常需要从一个位置将文件传输到另外一个位置，FileChannel提供了transferTo()方法用来提高传输的效率：
 
-```java
-作者：Java编程宇宙
-链接：https://www.zhihu.com/question/498972987/answer/2246203635
-来源：知乎
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+- 避免数据在缓冲区的拷贝开销；
 
+```java
 public class ChannelTransfer {
     public static void main(String[] argv) throws Exception {
         String files[]=new String[1];

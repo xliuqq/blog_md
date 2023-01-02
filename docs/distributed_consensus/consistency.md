@@ -148,3 +148,21 @@ RocketMQ 在4.3.0版中已经支持分布式事务消息，采用了***2PC（两
 
 ## 拜占庭将军问题
 
+
+
+## 经典资料
+
+《Distributed systems theory for the distributed systems engineer》推荐 4 份阅读材料共同概括构建分布式系统的难点，以及所有工程师必须克服的技术难题。
+
+- 《Distributed Systems for Fun and Profit》
+- 《Notes on distributed systems for young bloods》
+- 《A Note on Distributed Systems》
+- 《The fallacies of distributed computing》
+
+失败和时间（Failure and Time）：
+
+- 分布式系统工程师面临的很多困难都可以归咎于两个根本原因：进程可能会失败；没有好方法表明进程失败。
+
+
+
+《分布式系统原理与范型》系统性地学习基础知识，了解编写分布式系统的基本原则和逻辑。
