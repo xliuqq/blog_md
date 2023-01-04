@@ -65,7 +65,7 @@ https://github.com/swagger-api/swagger-codegen
 
 > springfox 不支持 springboot 2.4 以上的版本，最新更新时间为 2020/10/14号。
 
-springdoc 与 springboot 的版本兼容性：
+[springdoc 与 springboot 的版本兼容性](https://springdoc.org/v2/#what-is-the-compatibility-matrix-of-springdoc-openapi-with-spring-boot：
 
 | spring-boot Versions | Minimum springdoc-openapi Versions |
 | :------------------- | :--------------------------------- |

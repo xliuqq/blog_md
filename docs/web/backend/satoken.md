@@ -1,9 +1,5 @@
 # SaToken
 
-
-
-
-
 ## 登录与注销
 
 Sa-Token 为这个账号创建了一个Token凭证，且通过 Cookie 上下文返回给了前端：

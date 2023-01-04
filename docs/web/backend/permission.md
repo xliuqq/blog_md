@@ -1,12 +1,105 @@
 # 认证授权
 
-## RBAC
+## 接口权限（RBAC）
 
 基于资源的权限控制，**用户 -> 角色 -> 资源** 的映射关系。
 
 [Satoken](./satoken.md)
 
 [Apache Shiro](./shiro/shiro.md)
+
+
+
+## 数据权限
+
+> - 用户能够查看组织下的用户，并进行相应的修改；
+> - 当前用户创建的资源，其它人是否能够看到？
+> - 
+
+数据权限分为：
+
+- 是否能够操作具体的数据；（事前校验）
+- 能够查看哪些具体的数据；（事后过滤）
+
+基于 Mybatis plus interceptor + 自定义注解实现。
+
+- 在进行`Select/Update/Delete`时，对 `where` 语句进行扩充，实现数据权限；
+
+
+
+注：mybatis plus 3.5 版本提供`DataPermissionInterceptor`，但官网未提及如何使用 
+
+```java
+@Bean
+public MybatisPlusInterceptor mybatisPlusInterceptor() {
+    MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+   
+    // 添加数据权限插件
+    DataPermissionInterceptor dataPermissionInterceptor=new DataPermissionInterceptor();
+    MyDataPermissionHandler myDataPermissionHandler=new MyDataPermissionHandler();
+    // 添加自定义的数据权限处理器
+    dataPermissionInterceptor.setDataPermissionHandler(myDataPermissionHandler);
+    interceptor.addInnerInterceptor(dataPermissionInterceptor);
+    
+    return interceptor;
+}
+
+// 继承 DataPermissionHandler，实现 getSqlSegment
+// MultiDataPermissionHandler (支持多表的数据权限处理器)
+public class MyDataPermissionHandler implements DataPermissionHandler {
+
+    /**
+     * @param where             原SQL Where 条件表达式
+     * @param mappedStatementId Mapper接口方法ID
+     * @return
+     */
+    @SneakyThrows
+    @Override
+    public Expression getSqlSegment(Expression where, String mappedStatementId) {
+        log.info("=========================== start MyDataPermissionHandler");
+        // 1. 模拟获取登录用户，从用户信息中获取部门ID
+        Random random = new Random();
+        int userDeptId = random.nextInt(9) + 1; // 随机部门ID 1-10 随机数
+        Expression expression = null;
+        log.info("=============== userDeptId:{}", userDeptId);
+        if (userDeptId == DeptEnum.BOOS.getType()) {
+            // 2.userDeptId为1，说明是老总，可查看所有数据无需处理
+            return where;
+
+        } else if (userDeptId == DeptEnum.MANAGER_02.getType()) {
+            // 3. userDeptId为2，说明是02部门经理，可查看02部门及下属部门所有数据
+            // 创建IN 表达式
+            Set<String> deptIds = Sets.newLinkedHashSet(); // 创建IN范围的元素集合
+            deptIds.add("2");
+            deptIds.add("3");
+            deptIds.add("4");
+            deptIds.add("5");
+            ItemsList itemsList = new ExpressionList(deptIds.stream().map(StringValue::new).collect(Collectors.toList())); // 把集合转变为JSQLParser需要的元素列表
+            InExpression inExpression = new InExpression(new Column("order_tbl.dept_id"), itemsList); //  order_tbl.dept_id IN ('2', '3', '4', '5')
+            return new AndExpression(where, inExpression);
+        } else if (userDeptId == DeptEnum.MANAGER_06.getType()) {
+            // 4. userDeptId为6，说明是06部门经理，可查看06部门及下属部门所有数据
+            // 创建IN 表达式
+            Set<String> deptIds = Sets.newLinkedHashSet(); // 创建IN范围的元素集合
+            deptIds.add("6");
+            deptIds.add("7");
+            deptIds.add("8");
+            deptIds.add("9");
+            ItemsList itemsList = new ExpressionList(deptIds.stream().map(StringValue::new).collect(Collectors.toList())); // 把集合转变为JSQLParser需要的元素列表
+            InExpression inExpression = new InExpression(new Column("order_tbl.dept_id"), itemsList);
+            return new AndExpression(where, inExpression);
+        } else {
+            // 5. userDeptId为其他时，表示为员工级别没有下属机构，只能查看当前部门的数据
+            //  = 表达式
+            EqualsTo equalsTo = new EqualsTo(); // order_tbl.dept_id = userDeptId
+            equalsTo.setLeftExpression(new Column("order_tbl.dept_id"));
+            equalsTo.setRightExpression(new LongValue(userDeptId));
+            // 创建 AND 表达式 拼接Where 和 = 表达式
+            return new AndExpression(where, equalsTo); // WHERE user_id = 2 AND order_tbl.dept_id = 3
+        }
+    }
+}
+```
 
 
 
@@ -58,8 +151,6 @@ create table sys_user (
   avatar            varchar(100)    default ''                 comment '头像地址',
   password          varchar(100)    default ''                 comment '密码',
   status            char(1)         default '0'                comment '帐号状态（0正常 1停用）',
-  del_flag          char(1)         default '0'                comment '删除标志（0代表存在 2代表删除）',
-  login_ip          varchar(128)    default ''                 comment '最后登录IP',
   login_date        datetime                                   comment '最后登录时间',
   create_by         varchar(64)     default ''                 comment '创建者',
   create_time       datetime                                   comment '创建时间',
@@ -70,7 +161,7 @@ create table sys_user (
 ) engine=innodb comment = '用户信息表';
 ```
 
-### 岗位
+### 岗位（可选）
 
 ```sql
 -- ----------------------------
@@ -109,7 +200,6 @@ create table sys_role (
   menu_check_strictly  tinyint(1)      default 1                  comment '菜单树选择项是否关联显示',
   dept_check_strictly  tinyint(1)      default 1                  comment '部门树选择项是否关联显示',
   status               char(1)         not null                   comment '角色状态（0正常 1停用）',
-  del_flag             char(1)         default '0'                comment '删除标志（0代表存在 2代表删除）',
   create_by            varchar(64)     default ''                 comment '创建者',
   create_time          datetime                                   comment '创建时间',
   update_by            varchar(64)     default ''                 comment '更新者',
@@ -188,7 +278,7 @@ create table sys_role_dept (
 ) engine=innodb comment = '角色和部门关联表';
 ```
 
-### 用户岗位关联表
+### 用户岗位关联表（可选）
 
 ```sql
 -- ----------------------------

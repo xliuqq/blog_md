@@ -222,21 +222,7 @@ Expose：
 
 https://blog.csdn.net/networken/article/details/108218569
 
-## 容器监控
 
-### cAdvisor
-
-> Analyzes resource usage and performance characteristics of running containers.
-
-目前cAdvisor集成到了kubelet组件内，可以在kubernetes集群中每个启动了kubelet的节点使用cAdvisor提供的metrics接口获取该节点所有容器相关的性能指标数据。
-
-从apiserver访问cadvisor的地址：
-
-- cAdvisor的metrics地址: /api/v1/nodes/[节点名称]/proxy/metrics/cadvisor
-
-直接从各个node的kubelet访问cadvisor的地址：
-
-- cAdvisor的metrics地址: node_ip:10250/metrics/cadvisor
 
 ## Alpine
 

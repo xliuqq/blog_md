@@ -95,7 +95,12 @@ cgroup2 on /sys/fs/cgroup/unified type cgroup2 (rw,nosuid,nodev,noexec,relatime)
 CPU 资源的控制也有两种策略：
 
 - 一种是完全公平调度 （CFS：Completely Fair Scheduler）策略，提供了限额和按比例分配两种方式进行资源控制；
-- 另一种是实时调度（Real-Time Scheduler）策略，针对实时进程按周期分配固定的运行时间。配置时间都以微秒（µs）为单位，文件名中用us表示。
+  - `cpu.cfs_period_us`：cpu分配的周期(微秒），默认为100000
+  - `cpu.cfs_quota_us`：该control group限制占用的时间（微秒），默认为-1，表示不限制。如果设为50000，表示占用50000/100000=50%的CPU。
+  - `cpu.shares`：***对于控制组之间的 CPU 分配比例***，它的缺省值是 1024，当所有的控制组的CPU总额超过节点CPU时起作用；
+    - ***无论其他容器申请多少 CPU 资源，即使运行时整个节点的 CPU 都被占满的情况下，我的这个容器还是可以保证获得需要的 CPU 数目***
+
+- 另一种是实时调度（RT：Real-Time Scheduler）策略，针对实时进程按周期分配固定的运行时间。配置时间都以微秒（µs）为单位，文件名中用us表示
 
 ### cpuacct - CPU 资源报告
 

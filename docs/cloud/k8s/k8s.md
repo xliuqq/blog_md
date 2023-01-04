@@ -146,10 +146,10 @@ for {
 容器化应用写入 **`stdout`** 和 **`stderr`** 的任何数据，都会被**容器引擎捕获并被重定向到某个位置**。
 
 - docker作为k8s容器运行时的情况下，容器日志的落盘由docker来完成
-  - 默认json-file格式，且无限制大小，需要修改`/etc/docker/daemon.json`；
-  - Pod的日志位置：`/var/log/pods/*/*.log`，是kubelet建立的软链；
+  - 默认`json-file`格式，且无限制大小，需要修改`/etc/docker/daemon.json`；
+  - Pod的日志位置：`/var/log/pods/*/*.log`，是`kubelet`建立的软链；
 
-- 使用某 *CRI 容器运行时* 时，**kubelet 要负责对日志进行轮换**，并 管理日志目录的结构：
+- 使用某 *CRI 容器运行时* 时，**kubelet 要负责对日志进行轮换**，并管理日志目录的结构：
 
   - kubelet 将此信息发送给 CRI 容器运行时，后者将容器日志写入到指定的位置；
 
@@ -160,8 +160,8 @@ for {
 
 节点级日志记录中，需要重点考虑**实现日志的轮转**，以此来保证日志不会消耗节点上全部可用空间。
 
-- 需要配合logrotare来进行 , 日志超过最大限制 , 自动进行rotate操作；
-- kubectl logs 仅可查询到最新的日志内容，滚动的日志无法查看；
+- 需要配合`logrotare`来进行 , 日志超过最大限制 , 自动进行rotate操作；
+- `kubectl logs` 仅可查询到最新的日志内容，滚动的日志无法查看；
 
 
 
@@ -186,11 +186,11 @@ for {
 
 > Container Runtime Interface
 
-#### containerd
+containerd
 
-#### CRI-O
+CRI-O
 
-#### Docker
+Docker
 
 ### CSI
 
@@ -266,11 +266,15 @@ func Register(mgr manager.Manager, client client.Client, log logr.Logger) {
 }
 ```
 
+## Kubelet
 
+### Static Pod
 
-## 权限
+Kubernetes中有一种特殊的容器启动方法，称为”Static Pod“，允许把Pod的Yaml放在指定目录，当`kubelet`启动时，会自动检查该目录，加载所有的Pod YAML并启动。
 
-### RBAC
+kubeadm创建的K8s集群，Master组件的Yaml会被生成在`/etc/kubernetes/manifests`路径下：
+
+- `etcd.yaml`、`kube-apiserver.yaml`、`kube-controller-manager.yaml`、`kube-scheduler.yaml`；
 
 
 

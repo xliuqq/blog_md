@@ -95,9 +95,9 @@ ReplicaSet 是一组 Pod 的属主，具有属主的对象是属主的附属（D
 
 三种级别的设置：
 
-- Container级别：Container-level Security Context
-- 单Pod内所有容器和Volume：Pod-level Security Context
-- 集群内部所有Pod和Volume：Pod Security Policies
+- **Container**级别：Container-level Security Context
+- **单Pod**内所有容器和Volume：Pod-level Security Context
+- **集群内部所有Pod和Volume**：Pod Security Policies
 
 配置安全上下文可以
 
@@ -108,13 +108,9 @@ ReplicaSet 是一组 Pod 的属主，具有属主的对象是属主的附属（D
 - 设 SELinux C Security aced Linux 安全增强型 Linux ）边项，加强对容器的限制；
 - 阻止进程写入容器的根文件系统
 
-
-
 ```bash
 kubectl explain 'pods.spec.securityContext'
 ```
-
-
 
 Pod的设置：
 
@@ -175,3 +171,10 @@ kubectl describe pod $apiserver_pods -n kube-system
 
 - 对于已经创建的NodePort类型的Service，需要删除重新创建
 - 如果集群有多个 Master 节点，需要逐个修改每个节点上的 /etc/kubernetes/manifests/kube-apiserver.yaml 文件，并重启 apiserver
+
+
+
+## 磁盘限制（TODO）
+
+防止将宿主机的磁盘撑满，导致宿主机不可用。
+

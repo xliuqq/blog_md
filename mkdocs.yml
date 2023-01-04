@@ -64,6 +64,7 @@ nav:
       - CSI机制: cloud/k8s/k8s_csi.md
       - 调度: cloud/k8s/k8s_scheduler.md
       - 开源管理软件: cloud/k8s/KubeSphere.md
+      - 交付平台: cloud/k8s/KubeVela.md
     - 虚拟化:
       - 容器生态: cloud/virtualize/virtualize.md
       - docker:

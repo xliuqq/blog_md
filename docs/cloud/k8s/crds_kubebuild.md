@@ -1028,6 +1028,17 @@ webhooks:
 - `urls:=<[]string>`：配置访问非资源的URL
 - `verbs:=<[]string>：`对资源的操作，比如`get;list;watch;create;update;patch`；
 
+## Metrics
+
+> By default, controller-runtime builds a global prometheus registry and publishes [a collection of performance metrics](https://book.kubebuilder.io/reference/metrics-reference.html) for each controller.
+
+export the metrics using the Prometheus Operator
+
+- Uncomment the line `- ../prometheus` in the `config/default/kustomization.yaml`；
+- create the `ServiceMonitor` to export the metrics；
+
+
+
 ## 多版本API
 
 ### 
