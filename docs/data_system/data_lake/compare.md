@@ -35,9 +35,9 @@
 
 Hudi 为了 incremental 的 upserts，Iceberg 定位于高性能的分析与可靠的数据管理，DeltaLake 定位于流批一体的数据处理。
 
-### 场景:
+### 场景
 
-Hudi：
+Hudi
 
 ![hudi_design_scene](pics/hudi_scene.png)
 
@@ -61,7 +61,7 @@ DeltaLake
 2. Write Serialization: 是说多个writer必须严格串行，reader和writer之间则可以同时跑；
 3. Snapshot Isolation: 是说如果多个writer写的数据无交集，则可以并发执行；否则只能串行。Reader和writer可以同时跑。
 
-综合起来看，Snapshot Isolation隔离级别的并发性是相对比较好的。
+综合起来看，**Snapshot Isolation隔离级别的并发性是相对比较好**的。
 
 ### Schema变更支持和设计
 

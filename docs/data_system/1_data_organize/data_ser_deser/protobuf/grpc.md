@@ -43,7 +43,7 @@
 
 - 将**服务注册到gRPC内部的服务注册中心**上，根据服务名和方法名直接调用注册的服务实例，不需要反射的方式进行调用。
 
-## Stream vs Repeated
+### Stream vs Repeated
 
 **长时间运行的临时数据(如通知或日志消息)使用流特性。**
 
@@ -61,9 +61,9 @@
 
 
 
-## TODO
+### TODO（Zero copy）
 
-Alluxio的Grpc传输文件比自实现的Grpc性能要好，服务端发送完数据后，客户端需要一定时间进行读取，目前不清楚这部分性能消耗点！
+
 
 ## 模式
 
@@ -77,6 +77,10 @@ Alluxio的Grpc传输文件比自实现的Grpc性能要好，服务端发送完�
 
 
 
+## 拦截器
+
+
+
 ## 线程模型（Java）
 
 ### 服务端线程模型
@@ -87,7 +91,7 @@ Alluxio的Grpc传输文件比自实现的Grpc性能要好，服务端发送完�
 
 ![grpc服务端线程模型交互](./pics/grpc_server_thread_model)
 
-其中，HTTP/2服务端创建、HTTP/2请求消息的接入和响应发送由Netty负责，gPRC消息的序列化和反序列化接口调用由gRPC的SerializingExecutor的线程池负责。
+其中：HTTP/2服务端创建、HTTP/2请求消息的接入和响应发送由Netty负责；gPRC消息的序列化和反序列化接口调用由gRPC的SerializingExecutor的线程池负责。
 
 - NettyServer实例创建：由NettyServerBuilder的buildTransportServers方法构建。
 - 在 gRPC 中，默认采用共享池模式创建 NioEventLoopGroup，所有的 gRPC 服务端实例，都统一从 SharedResourceHolder 分配 NioEventLoopGroup 资源，实现 NioEventLoopGroup 的共享。
@@ -137,12 +141,35 @@ gRPC 的线程模型遵循 Netty 的线程分工原则，即：
 
 - 响应回调通知线程
 
-  
 
-响应消息的发送由调用服务端接口的应用线程（SerializingExecutor）执行
+客户端线程模型工作原理如下图所示（同步阻塞调用为例）：
+
+![图片](./pics/grpc_client_threads.jpeg)
+
+- 应用线程，负责调用 gRPC 服务端并获取响应，其中请求消息的序列化由该线程负责。
+- 客户端负载均衡以及 Netty Client 创建，由 grpc-default-executor 线程池负责。
+- HTTP/2 客户端链路创建、网络 I/O 数据的读写，由 Netty NioEventLoop 线程负责。
+- 响应消息的反序列化由 SerializingExecutor 负责，与服务端不同的是，客户端使用的是 ThreadlessExecutor，并非 JDK 线程池。
+- SerializingExecutor 通过调用 responseFuture 的 set(value)，唤醒阻塞的应用线程，完成一次 RPC 调用。
 
 
 
+**gRPC 采用的是网络 I/O 线程和业务调用线程分离的策略**，缺点就是在**一次 RPC 调用过程中，做了多次 I/O 线程到应用线程之间的切换，频繁切换会导致性能下降**。
 
 
-**gRPC 线程模型存在的一个缺点**，就是在**一次 RPC 调用过程中，做了多次 I/O 线程到应用线程之间的切换，频繁切换会导致性能下降**。
+
+## 实践
+
+### Alluxio Grpc
+
+gRPC高效传输数据的一些技巧：
+
+- **使用多个channel实现最大吞吐量**：虽然大多数短RPC调用都受益于多路复用，但数据传输需要利用所有网络带宽，而这是单个连接所不具备的。根据gRPC团队的建议，我们转而使用多个**channel**来最大化我们的数据传输吞吐量。
+- **使用更大的块大小**：发送每条消息都会产生一些开销，例如消息头和上下文切换。对于相同数量的数据，每个块越小，管道必须处理的块越多，这反过来会引入更多的开销。我们最终使用相对较大的块大小来最小化这种影响。
+- **不要丢弃Netty**：即使所有数据都是通过gRPC发送的。鉴于gRPC没有公开能够处理Netty ByteBuf的公共接口，我们在gRPC服务端点的早期实现中切换到使用Java NIO ByteBuffer。即使我们使用了堆外缓冲区，也还是引入了一些显著瓶颈。这里学到的教训是不要因为gRPC没有公开Netty缓冲区的接口而摆脱Netty。**Netty提供了一些非常有效的API来管理缓冲区**，这将使gRPC管道之外的东西依然保持迅速。
+- **实现零复制**：我们观察到切换到gRPC的另一个开销是过多的缓冲区复制。这是因为默认情况下，gRPC使用protobuf进行消息序列化，这会引入额外的复制操作。目前还没有能在**无需经过protobuf序列化或抛弃生成好的RPC绑定的情况下存取gRPC原始缓冲区的官方版的API**。我们最终使用了gRPC用户组的一些想法，实现了一种零复制的替代方案。
+  - 1.39.0+：[api, core: support zero copy into protobuf by voidzcy · Pull Request #8102 · grpc/grpc-java · GitHub](https://github.com/grpc/grpc-java/pull/8102)
+- **使用手动背压控制**(back pressure control)：gRPC Java SDK中的背压控制是通过流观察器(stream observer)的isReady标志和onReady事件提供的。一旦缓冲区中的数据小于32KB，就会触发onReady事件。这是一个相对较小的缓冲区大小，并且可能会导致一些争用，因为发送方一直在等待从缓冲区中删除数据，特别是当我们增加了块大小后，这种争用更加明显。不幸的是，截至目前，我们无法调整缓冲区大小。我们最终实现了手动背压控制，。
+- 
+
+Alluxio的Grpc传输文件比自实现的Grpc性能要好，服务端发送完数据后，客户端需要一定时间进行读取，目前不清楚这部分性能消耗点！
