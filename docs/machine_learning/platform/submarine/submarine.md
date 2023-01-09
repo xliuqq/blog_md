@@ -1,5 +1,3 @@
-[toc]
-
 # Apache Submarine
 
 > Cloud Native Machine Learning Platform

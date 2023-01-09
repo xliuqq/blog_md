@@ -185,7 +185,7 @@ Application层的几个核心类：
 
 **CQE**
 
-![图片](pics/640.png)
+<img src="pics/640.png" alt="图片" style="zoom:67%;" />
 
 示例：
 
@@ -282,7 +282,7 @@ CQE是有“意图”和“语意”的，我们需要尽量避免CQE对象的�
 
 DTO、Entity和DataObject之间的关系如下图：
 
-![图片](pics/640-16546167229182.png)
+<img src="pics/640-16546167229182.png" alt="图片" style="zoom:67%;" />
 
 **Result vs Exception**
 
