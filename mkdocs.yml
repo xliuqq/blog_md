@@ -241,11 +241,14 @@ nav:
     
   - Devops:
     - 概览: devops/devops.md
+    - 代码仓库:
+      - Gitlab: devops/codehub/gitlab.md
     - CI/CD:
-      - 概览: devoos/ci/README.md
-      - Gitlab: devops/ci/gitlab.md
-      - Commit规范: devops/ci/commit_format.md
-      - 版本自动发布: devops/ci/release_changelog.md
+      - 概览: devoos/cicd/README.md
+      - Gitlab CI: devops/cicd/gitlab-ci.md
+      - Drone CI: devops/cicd/drone-ci.md
+      - argo cd: devops/cicd/argo-cd.md
+      - 版本自动发布: devops/cicd/release_changelog.md
     - Ansible(部署): devops/ansible.md
     - Prometheus(时序数据存储): devops/prometheus.md
     - Grafana(数据可视化): devops/ansible.md
@@ -254,6 +257,7 @@ nav:
       - 节点监控: devops/monitor.md
     - 部署:
       - K8s集群交付: devops/sealer.md
+    - 实战: devops/action.md
 
   - CS系统知识:
     - 基础: cs/cs_basic.md

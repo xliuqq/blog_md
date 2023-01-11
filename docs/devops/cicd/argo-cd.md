@@ -1,6 +1,6 @@
 # [Argo](https://argoproj.github.io/)
 
-> Open source tools for Kubernetes to run workflows, manage clusters, and do GitOps right.
+> Open source tools for **Kubernetes** to run workflows, manage clusters, and do GitOps right.
 
 ## 组件
 
@@ -34,9 +34,9 @@
 
 
 
-
-
 - ？如何获取镜像，进行构建；
+
+
 
 
 
@@ -44,8 +44,7 @@
 
 - kustomize 应用；
 - helm charts；
-- jsonnnet 文件；
-- 特定目录下的YAML/json manifests；
+- Git 仓库中特定目录下的YAML/json manifests，包括 jsonnnet 文件；
 - 配置为配置管理插件的任何自定义配置管理工具
 
 
@@ -76,29 +75,56 @@
 #### yaml安装
 
 ```shell
+# 创建argocd名空间
 kubectl create namespace argocd 
+# 执行apply安装
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+# 查看安装镜像下载状态
+kubectl describe pod -n argocd |grep Image: |sort |uniq -c
+
+# 开启UI的Nodeport
+kubectl -n argocd expose deployments/argocd-server --type="NodePort" --port=8080 --name=argocd-server-nodeport
+
+# 获取密码，用户名为：admin
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d|xargs -n1 echo
 ```
 
-自签名证书配置：
+默认会安装一个自签名的证书。
 
-- 
 
-外部访问：
-
-- 
-
-初始密码在`argocd-initial-admin-secret`中（获取密码后可以删除）：
-
-```shell
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
-```
 
 #### helm安装
 
 https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
 
+
+
+### HA 安装（TODO）
+
+
+
 ### CLI 操作
+
+> Argo CD 提供UI界面，以及命令行操作。
+
+#### CLI安装
+
+```shell
+curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
+rm argocd-linux-amd64
+```
+
+#### CLI 登录
+
+```shell
+# 登录
+argocd login <ARGOCD_SERVER>
+
+# 修改密码，完成之后，需要删除`argocd-initial-admin-secret`(仅用于保存初始密码，会根据新的密码自动创建新的)
+argocd account update-password
+```
 
 #### 创建项目
 
@@ -126,9 +152,15 @@ argocd app create guestbook --repo https://github.com/argoproj/argocd-example-ap
 
 #### Git Webhook
 
-Argo CD 默认每3分钟检测Git仓库中manifests的变化，可以通过webhook event 监听变更，实时监测：
+Argo CD 默认每3分钟检测Git仓库中manifests的变化，可以通过**webhook event 监听变更，实时监测**：
 
-- 
+- 配置地址为：`https://argocd.server.url/api/webhook`
+
+
+
+#### Helm (TODO)
+
+
 
 ## [Argo Events](https://github.com/argoproj/argo-events)
 

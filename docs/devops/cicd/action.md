@@ -1,10 +1,6 @@
 # 实战
 
-
-
 [Commit 规范](./commit_format.md)
-
-
 
 ## Issue Track
 
@@ -25,7 +21,7 @@
 
 <img src="pics/image-20221205114009593.png" alt="image-20221205114009593" style="zoom:67%;" />
 
-配置 ira Integration
+配置 jira Integration
 
 - 配置仅 Merge Request 才会触发；
 
@@ -36,6 +32,14 @@
 <img src="pics/image-20221205113645524.png" alt="image-20221205113645524" style="zoom:80%;" />
 
 #### Jira配置
+
+> Jira DVCS connector
+
+- **Team or User Account** 填写 Gitlab User 能够访问的最顶层的 Group；
+- **Host URL** 填写 Gitlab 的地址；
+
+- **Client ID** 对应 Gitlab Application  的 Application ID；
+- **Client Secret** 对应 Gitlab Application 的 Secret ；
 
 ![image-20221205113852609](pics/image-20221205113852609.png)
 
