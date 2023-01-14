@@ -216,6 +216,16 @@ compile_job:
 - 验证 commit 信息，生成 `release note`，打 `git tag`
 - 其他后续流程，如生成`CHANGELOG.md`，`npm publish`等等（通过插件完成）
 
+
+
+`npm install -g @semantic-release`
+
+- 默认安装 "@semantic-release/commit-analyzer"，"@semantic-release/github"，"@semantic-release/npm"， "@semantic-release/release-notes-generator"
+
+### 版本号更新逻辑
+
+
+
 **版本号更新的逻辑**：只有 **feat** 和 **fix** 提交才会触发版本升级
 
 - 如果包含 feat 记录，版本由1.**0**.0升级到了1.**1**.0
@@ -223,68 +233,6 @@ compile_job:
 - feat 且 commit footer内有`BREAKING CHANGE:` 提交将会升级主版本号,版本由1.2.0升级到了2.0.0
 
 
-
-`npm install -g @semantic-release`
-
-- 默认安装 "@semantic-release/commit-analyzer"，"@semantic-release/github"，"@semantic-release/npm"， "@semantic-release/release-notes-generator"
-
-### Gitlab CI 使用
-
-- 项目工程中添加`.releaserc`配置
-  - 默认的插件顺序是`commit-analyzer, release-notes-generator, npm, github, `
-
-
-```javascript
-{
-  "plugins": [
-    "@semantic-release/commit-analyzer",
-    "@semantic-release/release-notes-generator",
-    "@semantic-release/changelog",
-    "@semantic-release/git"
-  ]
-}
-```
-
-- `.gitlab-ci.yml` 配置（gitlab-runner运行环境为powershell)
-
-```yaml
-# lint 过程用于检测 commitlint 结果
-# release 过程用于自动化产生 git tag 和 CHANGELOG.md
-
-stages:
-  - lint
-  - release
-
-commitlint:
-  stage: lint
-  image: node:lts
-  script: 
-    # 可以将下面的包内置到镜像中，不必每次都安装，提升CI效率
-    - npm install -g @commitlint/cli @commitlint/config-conventional commitlint-format-junit
-    - if("${CI_COMMIT_BEFORE_SHA}" -eq "0000000000000000000000000000000000000000") { npx commitlint -x @commitlint/config-conventional -f HEAD^ -o commitlint-format-junit > commitlint_result.xml}else{ npx commitlint -x @commitlint/config-conventional -f "${CI_COMMIT_BEFORE_SHA}" -o commitlint-format-junit > commitlint_result.xml}
-  artifacts:
-    name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
-    reports:
-      junit: commitlint_result.xml
-
-release:
-  stage: release
-  image: node:lts
-  script:
-    - npm install -g semantic-release @semantic-release/gitlab @semantic-release/changelog @semantic-release/git
-    - npx semantic-release
-  # 仅在中央仓库的分支发生提交时才触发 release 流程
-  only:
-    - master
-```
-
-- gitlab项目**环境变量配置**（GITLAB_TOKEN或者GL_TOKEN）
-
-
-
-效果图：
-
-![CHANGELOG出现在中央仓库](pics/changelog.png)
 
 ### Git 仓库认证
 
@@ -434,3 +382,162 @@ $ npm install @semantic-release/exec -D
 | `publish`          | Execute a shell command to publish the release.              |
 | `success`          | Execute a shell command to notify of a new release.          |
 | `fail`             | Execute a shell command to notify of a failed release.       |
+
+#### [google](https://github.com/google)/[semantic-release-replace-plugin](https://github.com/google/semantic-release-replace-plugin)
+
+>  update version strings throughout a project. 
+
+修改特定文件中的版本号信息。
+
+```shell
+$ npm install @google/semantic-release-replace-plugin -D
+```
+
+配置
+
+```
+{
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    [
+      "@google/semantic-release-replace-plugin",
+      {
+        "replacements": [
+          {
+            "files": ["foo/__init__.py"],
+            "from": "__VERSION__ = \".*\"",
+            "to": "__VERSION__ = \"${nextRelease.version}\"",
+            "results": [
+              {
+                "file": "foo/__init__.py",
+                "hasChanged": true,
+                "numMatches": 1,
+                "numReplacements": 1
+              }
+            ],
+            "countMatches": true
+          }
+        ]
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": ["foo/*.py"]
+      }
+    ]
+  ]
+}
+```
+
+### Gitlab CI 使用
+
+- 项目工程中添加`.releaserc`配置
+  - 默认的插件顺序是`commit-analyzer, release-notes-generator, npm, github, `
+
+
+```javascript
+{
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/changelog",
+    "@semantic-release/git"
+  ]
+}
+```
+
+- `.gitlab-ci.yml` 配置（gitlab-runner运行环境为powershell)
+
+```yaml
+# lint 过程用于检测 commitlint 结果
+# release 过程用于自动化产生 git tag 和 CHANGELOG.md
+
+stages:
+  - lint
+  - compile
+  - release
+
+commitlint:
+  stage: lint
+  image: node:lts
+  script: 
+    # 可以将下面的包内置到镜像中，不必每次都安装，提升CI效率
+    - npm install -g @commitlint/cli @commitlint/config-conventional commitlint-format-junit
+    - if("${CI_COMMIT_BEFORE_SHA}" -eq "0000000000000000000000000000000000000000") { npx commitlint -x @commitlint/config-conventional -f HEAD^ -o commitlint-format-junit > commitlint_result.xml}else{ npx commitlint -x @commitlint/config-conventional -f "${CI_COMMIT_BEFORE_SHA}" -o commitlint-format-junit > commitlint_result.xml}
+  artifacts:
+    name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+    reports:
+      junit: commitlint_result.xml
+
+compile:
+  stage: compile
+  image: maven
+  srcipt:
+    # 这里需要获取版本号
+    - mvn package
+
+release:
+  stage: release
+  image: node:lts
+  script:
+    - npm install -g semantic-release @semantic-release/gitlab @semantic-release/changelog @semantic-release/git
+    - npx semantic-release
+  # 仅在中央仓库的分支发生提交时才触发 release 流程
+  only:
+    - master
+```
+
+- gitlab项目**环境变量配置**（GITLAB_TOKEN或者GL_TOKEN）
+
+
+
+效果图：
+
+<img src="pics/changelog.png" alt="CHANGELOG出现在中央仓库" style="zoom: 67%;" />
+
+
+
+#### 版本号的阶段
+
+- `npm semantic-release` 会根据 commit 记录生成下一个版本号，git插件会修改相关文件并推回 git 仓库；
+- 对于 mvn / npm 项目，需要获取版本号再进行打包和发布；
+
+造成问题：如果先进行`semantic-release`会导致仓库变更，但 编译/打包 失败
+
+
+
+后端 Java 流程：
+
+- dev 分支 快照版本（不发布release）：
+  - 通过根据当前 VERSION.txt，拼上 commit sha 或者 timestamp 作为版本号；
+  - `mvn package`：编译出 ZIP 包
+    - 指定版本编译包
+    - 快照包发送到 nexus 仓库
+  - `build docker image`：根据 ZIP 包构建镜像，并推送到镜像仓库；
+    - docker build 根据版本生成镜像
+    - 镜像推送到镜像仓库
+  
+
+- master 分支 发布版本：
+  - 通过 `npx semantic --dry-run --no-ci` 生成版本信息
+  - `mvn package`：
+    - 指定版本编译包
+    - 快照包发送到 nexus 仓库
+  - `build docker image`：根据 ZIP 包构建镜像，并推送到镜像仓库；
+  - `npx semantic-release`（最后执行）
+    - 分析 commit ，生成新版本号，生成 CHANGELOG.md；
+    - 推送文件变更回 GIT 仓库（@semantic-release/git）；
+    - 发布版本（@semantic-release/gitlab）；
+      - 制品库的链接（mvn / image /npm / python / go 等）；
+
+
+
+### argocd  结合
+
+argocd 采用监听 git 仓库**特定分支的特定目录下的Yaml**的形式，自动进行部署。
+
+
+
+
+

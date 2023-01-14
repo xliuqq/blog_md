@@ -83,7 +83,7 @@ ChatOps
 
 ### [Jenkins-x Lighthouse](https://github.com/jenkins-x/lighthouse)
 
-Lighthouse 是一个**基于 webhooks 的轻量级 ChatOps 工具** , 通过 Git 仓库的 webhooks 可以**触发 Jenkins X 流水线** 、Tekton 流水线 、Jenkins 任务, 支持 GitHub、GitHub Enterprise、BitBucket Server 和 GitLab。
+Lighthouse 是一个**基于 webhooks 的轻量级 ChatOps 工具** , 通过 Git 仓库的 webhooks 可以**触发 Jenkins X 流水线 、Tekton 流水线 、Jenkins 任务**, 支持 GitHub、GitHub Enterprise、BitBucket Server 和 GitLab。
 
 
 

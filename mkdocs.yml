@@ -118,7 +118,6 @@ nav:
         - 访问者模式: code_guide/design_pattern/visitor.md
       - 分布式应用设计模式:
         - 边车模式: code_guide/design_pattern/sidecar.md
-        -
     - 数据结构:
       - 数组: code_guide/data_structure/array.md
       - 队列: code_guide/data_structure/queue.md
@@ -130,7 +129,6 @@ nav:
       - 常用算法: code_guide/algs/common.md
       - 负载均衡算法: code_guide/algs/load_balance.md
       - 算法应用: code_guide/algs/applications.md
-      
   - 编程语言:      
     - Java:
       - Effective java: languages/java/effective_java.md
@@ -247,8 +245,10 @@ nav:
       - 概览: devoos/cicd/README.md
       - Gitlab CI: devops/cicd/gitlab-ci.md
       - Drone CI: devops/cicd/drone-ci.md
+      - Gitlab CD: devops/cicd/gitlab-cd.md
       - argo cd: devops/cicd/argo-cd.md
       - 版本自动发布: devops/cicd/release_changelog.md
+      - 制品库: devops/cicd/nexus.md
     - Ansible(部署): devops/ansible.md
     - Prometheus(时序数据存储): devops/prometheus.md
     - Grafana(数据可视化): devops/ansible.md
@@ -265,7 +265,6 @@ nav:
     - 网络: cs/cs_network.md
     - 数据库: cs/cs_db.md
     - 软件工程: cs/software_engineering.md
-    
   - Web服务:
     - 后端:
       - 接口管理设计: web/backend/api_manager.md

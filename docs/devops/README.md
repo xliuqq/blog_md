@@ -1,16 +1,8 @@
-# 整体流程
+# 相关概念和产品
 
-## 制品库
+## 代码仓库
 
-### [Nexus](./nexus.md)
-
-- NPM；
-- MVN；
-- PYPI；
-- GO；
-- DOCKER；
-- HELM；
-- RAW：可用于前端打包出来的静态文件；
+[Gitlab 简介和安装](./codehub/gitlab.md)
 
 
 
@@ -29,21 +21,22 @@ Github + travis 持续集成工具； Softagram （pull request reviews and code
 
 
 
-### [Gitlab + Gitlab-ci](./gitlab.md)
-
-持续集成工具；
-
-
-
-### [JenkinsX](./jenkinsx.md)
+### [JenkinsX(CI/CD)](./jenkinsx.md)
 
 - K8s CI/CD；
 
 - 原生支持预览环境和 gitops；
 
-  
 
-### [Drone](./drone.md)
+
+
+### [Token(CI/CD)](./cicd/tekton.md)
+
+> Tekton is a powerful and flexible open-source framework for creating CI/CD systems, allowing developers to build, test, and deploy across cloud providers and on-premise systems.
+
+ 
+
+### [Drone(CI)](./drone.md)
 
 > Drone is a self-service **Continuous Integration** platform for busy development teams.
 
@@ -52,21 +45,27 @@ Github + travis 持续集成工具； Softagram （pull request reviews and code
 
 
 
-### [ArgoCD](https://github.com/argoproj/argo-cd)
+### [ArgoCD(CD)](https://github.com/argoproj/argo-cd)
 
 > Argo CD is a declarative, GitOps **continuous delivery** tool for Kubernetes.
 
 
 
-### Rancher Pipeline
 
 
+## 制品库
 
-## ChatOps
+### [Nexus](./nexus.md)
 
-### Prow
+- NPM；
+- MVN；
+- PYPI；
+- GO；
+- DOCKER；
+- HELM；
+- RAW：可用于前端打包出来的静态文件；
 
-### [JenkinsX Lighthouse](./jenkinsx.md#jenkins-x Lighthouse)
+
 
 
 
@@ -108,6 +107,16 @@ sonar.junit.reportsPath=target/surefire-reports
 - 支持多种CI工具如 travis、gitlab-ci、Jenkins，支持多种语言，进行代码覆盖率；
 
 
+
+## Gitops
+
+见 [gitops](./gitops.md)
+
+
+
+## Chatops
+
+见 [chatops](./chatops.md)
 
 
 

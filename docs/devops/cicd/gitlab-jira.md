@@ -1,15 +1,11 @@
-# 实战
+# Issue Track
 
-[Commit 规范](./commit_format.md)
-
-## Issue Track
-
-### Gitlab 集成 Jira
+## Gitlab 集成 Jira
 
 想要解决的问题：
 
-- 代码推送到gitlab时，自动在jira上添加评论信息；
-- 代码合并时，自动将 Jira 的 issue 关闭；
+- **代码推送到gitlab时，自动在jira上添加评论信息；**
+- **代码合并时，自动将 Jira 的 issue 关闭；**
 
 ### 配置
 
@@ -45,7 +41,7 @@
 
 ### 使用说明
 
-> 1. 只**有默认分支（master 可以在 GitLab -> Settings 中配置）的 commit and merge 会触发关闭 JIRA issue**
+> 1. 只**有默认分支（可以在 GitLab -> Settings 中配置默认分支）的 commit and merge 会触发关闭 JIRA issue**
 > 2. 已有解决方案的 JIRA issue 则不会发生状态流转（就是我之前说的：只会对 JIRA.issue.status.resolution = unresolved 的 issues 生效）
 
 Gitlab 自动触发状态流转的关键字有以下 3 个：

@@ -28,3 +28,8 @@
 
 https://help.sonatype.com/repomanager3/product-information/download
 
+
+
+## 配置
+
+### 配额限制（？）
