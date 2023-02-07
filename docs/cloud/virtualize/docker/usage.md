@@ -229,9 +229,10 @@ https://blog.csdn.net/networken/article/details/108218569
 ### Alpine-docker容器中安装GCC
 
 ```shell
-apk update
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
 
-apk add build-base
+RUN apt add --update  build-base && rm -rf /var/cache/apk/*
+
 ```
 
 `build-base` is a meta-package that will install the GCC, libc-dev and binutils packages (amongst others).

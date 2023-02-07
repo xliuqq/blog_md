@@ -764,17 +764,61 @@ spec:
 
 ## Ingress
 
-HTTP/HTTPS 根据 url 进行转发，作为Edge Router，将集群外的客户端请求路由到集群内部的服务上；
+**HTTP/HTTPS** 根据 url 进行转发，作为Edge Router，将集群外的客户端请求路由到集群内部的服务上；
+
+- `ingress controller`基于`Ingress`规则将客户端请求直接转发到`Service`对应的后端`Endpoint(Pod)`上。
 
 ### [NGINX Ingress](https://github.com/kubernetes/ingress-nginx)
 
 默认的 Ingress 是基于 NGINX 实现的。NGINX Ingress Controller 帮助维护了 Kubernetes 集群与 NGINX 的状态同步，并且提供了基本的反向代理能力。
 
+- 默认`controller-class=k8s.io/ingress-nginx`，`--ingress-class=nginx`
+
 ### [Apache APISIX Ingress](https://apisix.apache.org/docs/ingress-controller/getting-started/)
 
 
 
+## IngressClass
 
+用于在集群内有多个ingress controller时候，**区分ingress由谁处理**。
+
+- 如`nginx-controller`，其启动命令中，有2个配置在此时有用(`--ingress-class`和`--controller-class`)；
+
+### 无default ingressclass
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: nginx-example
+spec:
+  controller: k8s.io/ingress-nginx
+```
+
+针对不同场景，Ingress 的处理策略不一样：
+
+- ingress未设置ingressClassName，会被忽略；
+- ingress设置`ingressClassName`，对应`IngressClass`的`metadata.name`：
+  - 对应的 ingressclass 的 spec.controller字段所对应的 ingress-controller 处理（即等于 controller-class 字段值 ）；
+
+### 有default ingressclas
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: "true"
+  name: nginx
+spec:
+  controller: k8s.io/ingress-nginx
+```
+
+针对不同场景，Ingress 的处理策略不一样：
+
+- ingress未设置ingressClassName，被default ingressclass 的 spec.controller 指定的 ingress-controller 处理；
+- ingress设置`ingressClassName`，对应`IngressClass`的`metadata.name`：
+  - 对应的 ingressclass 的 spec.controller字段所对应的 ingress-controller 处理（即等于 controller-class 字段值 ）；
 
 ## Project Volumes
 

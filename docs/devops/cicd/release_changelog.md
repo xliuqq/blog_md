@@ -352,7 +352,7 @@ assets 字段
 > execute custom shell commands.
 
 ```shell
-$ npm install @semantic-release/exec -D
+$ npm install @semantic-release/exec -g
 ```
 
 配置（`.releaserc`）
@@ -429,6 +429,8 @@ $ npm install @google/semantic-release-replace-plugin -D
   ]
 }
 ```
+
+
 
 ### Gitlab CI 使用
 
@@ -507,9 +509,11 @@ release:
 
 
 
-后端 Java 流程：
+#### 微服务的流程
 
-- dev 分支 快照版本（不发布release）：
+后端 Java 流程：（采用 [master/dev/feature](./git_branch_model.md) 分支模型）
+
+- dev 分支 快照版本（不发布release）：测试环境监听并部署最新；
   - 通过根据当前 VERSION.txt，拼上 commit sha 或者 timestamp 作为版本号；
   - `mvn package`：编译出 ZIP 包
     - 指定版本编译包
@@ -517,8 +521,9 @@ release:
   - `build docker image`：根据 ZIP 包构建镜像，并推送到镜像仓库；
     - docker build 根据版本生成镜像
     - 镜像推送到镜像仓库
+  - 问题：dev分支的版本号信息一直是错误的，因为没有回推
+    - master 出完版本后，提交merge request，将 master 合并到dev（因为仅合并 `chore(release): 1.0.0 [skip ci]`commit，不会触发CI pipeline）
   
-
 - master 分支 发布版本：
   - 通过 `npx semantic --dry-run --no-ci` 生成版本信息
   - `mvn package`：
@@ -533,11 +538,21 @@ release:
 
 
 
+
+
+
+
 ### argocd  结合
 
 argocd 采用监听 git 仓库**特定分支的特定目录下的Yaml**的形式，自动进行部署。
 
+采用 [master/dev/feature](./git_branch_model.md) 分支模型 进行开发：
 
+- 开发环境：监听特性分支的变动；
+  - argocd 监听的分支名不支持正则，如何处理？；
+  - 开发环境主动推送？
+- 测试环境：监听 dev 分支的 yaml 变动； 
+- 生产环境：监听 master 分支的 yaml 变动；
 
 
 

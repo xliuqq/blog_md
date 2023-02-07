@@ -90,7 +90,71 @@ POST `v2/models/${MODEL_NAME}[/versions/${MODEL_VERSION}]/infer`
 
 ### k8s deployment
 
+#### 创建 `IngressClass`
 
+以 `Nginx`为例，
+
+- 安装 ingress - nginx
+
+```shell
+helm upgrade --install ingress-nginx ingress-nginx \
+  --repo https://kubernetes.github.io/ingress-nginx \
+  --namespace ingress-nginx --create-namespace
+```
+
+- ingress - nginx 自带 IngressClass
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.5.1
+  name: nginx
+spec:
+  controller: k8s.io/ingress-nginx
+```
+
+#### 安装 CertManager Yaml
+
+```shell
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.0/cert-manager.yaml
+```
+
+
+
+#### 安装Kserve Yaml
+
+```shell
+kubectl apply -f https://github.com/kserve/kserve/releases/download/v0.10.0/kserve.yaml
+
+kubectl apply -f https://github.com/kserve/kserve/releases/download/v0.10.0/kserve-runtimes.yaml
+```
+
+#### 
+
+#### 修改  `inferenceservice-config`
+
+部署模式为 `RawDeployment`
+
+```shell
+kubectl patch configmap/inferenceservice-config -n kserve --type=strategic -p '{"data": {"deploy": "{\"defaultDeploymentMode\": \"RawDeployment\"}"}}'
+```
+
+
+
+ingressClassName 为创建的 IngressClass
+
+```yaml
+ingress: |-
+{
+    "ingressClassName" : "your-ingress-class",
+}
+```
 
 ## 使用
 
