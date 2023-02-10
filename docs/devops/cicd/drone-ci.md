@@ -2,6 +2,12 @@
 
 > Drone by [Harness](https://harness.io/)™ is a modern Continuous Integration platform that empowers busy teams to automate their build, test and release workflows using a powerful, cloud native pipeline engine.
 
+## 问题
+
+### 不支持subgroup
+
+> https://github.com/harness/drone/issues/2009
+
 
 
 ## 使用
@@ -41,3 +47,11 @@ steps:
     channel: developers
     username: drone
 ```
+
+
+
+## 插件
+
+### [Drone-Cache](drone-cache)
+
+> A Drone plugin for caching current workspace files between builds to reduce your build times.

@@ -123,6 +123,26 @@ deploy:
   - 如果任何一个 Stage 失败，那么后面的 Stages 不会执行，该构建任务失败
 
 
+
+### Pipeline
+
+**Branch pipelines** that run for Git push events to a branch, like new commits or tags.
+
+**Tag pipelines** that run only when a new Git tag is pushed to a branch.
+
+**Merge request pipelines** that run for changes to a merge request, like new commits or selecting the Run pipeline button in a merge request’s pipelines tab.
+
+**Scheduled pipelines**.
+
+| Variables                                  | Branch | Tag  | Merge request | Scheduled                                                    |
+| :----------------------------------------- | :----- | :--- | :------------ | :----------------------------------------------------------- |
+| `CI_COMMIT_BRANCH`                         | Yes    |      |               | Yes                                                          |
+| `CI_COMMIT_TAG`                            |        | Yes  |               | Yes, if the scheduled pipeline is configured to run on a tag. |
+| `CI_PIPELINE_SOURCE = push`                | Yes    | Yes  |               |                                                              |
+| `CI_PIPELINE_SOURCE = scheduled`           |        |      |               | Yes                                                          |
+| `CI_PIPELINE_SOURCE = merge_request_event` |        |      | Yes           |                                                              |
+| `CI_MERGE_REQUEST_IID`                     |        |      | Yes           |                                                              |
+
 ### Jobs
 
 表示构建工作，即某个 Stage 里面执行的工作。一个 Stage 中可定义多个 Jobs
@@ -177,9 +197,54 @@ job-4:
       - echo "job-4 done"
 ```
 
+### variables
+
+GitLab CI/CD 预先定义的变量：https://docs.gitlab.com/ee/ci/variables/predefined_variables.html
+
+`.gitlab-ci.yaml`中定义变量：
+
+- jobs 中定义 `variables`为`{}`表明不需要全局变量；
+
+```yaml
+variables:
+  GLOBAL_VAR: "A global variable"
+
+job1:
+  variables:
+    JOB_VAR: "A job variable"
+  script:
+    - echo "Variables are '$GLOBAL_VAR' and '$JOB_VAR'"
+    
+job1:
+  variables: {}
+  script:
+    - echo This job does not need any variables
+```
 
 
-## cache
+
+### 将变量传递到其它job
+
+> create a new environment variables in a job, and pass it to another job in a later stage. 
+
+```yaml
+build-job:
+  stage: build
+  script:
+    - echo "BUILD_VARIABLE=value_from_build_job" >> build.env
+  artifacts:
+    reports:
+      dotenv: build.env
+
+test-job:
+  stage: test
+  script:
+    - echo "$BUILD_VARIABLE"  # Output is: 'value_from_build_job'
+```
+
+
+
+### cache
 
 > https://docs.gitlab.com/ee/ci/caching/
 
@@ -247,11 +312,19 @@ execute:
   script: /usr/lib/jvm/java-8-openjdk-amd64/bin/java Hello
 ```
 
-### 分布式 cache
+#### 分布式 cache
 
 
 
-## artifacts 
+### artifacts 
+
+> Use artifacts to pass intermediate build results between stages. 
+>
+> - Subsequent jobs in later stages of the same pipeline can use artifacts.
+> - Different projects cannot share artifacts.
+> - Artifacts expire after 30 days by default. You can define a custom [expiration time](https://docs.gitlab.com/ee/ci/yaml/index.html#artifactsexpire_in).
+> - The latest artifacts do not expire if [keep latest artifacts](https://docs.gitlab.com/ee/ci/pipelines/job_artifacts.html#keep-artifacts-from-most-recent-successful-jobs) is enabled.
+> - Use [dependencies](https://docs.gitlab.com/ee/ci/yaml/index.html#dependencies) to control which jobs fetch the artifacts
 
 `artifacts` is used to specify **a list of files and directories which should be attached to the job** when it succeeds, fails, or always.
 
@@ -259,7 +332,7 @@ The artifacts will be **sent to GitLab** after the job finishes and will be **av
 
 - 默认30天有效期，可以指定[`expire_in`字段](https://docs.gitlab.com/ee/ci/yaml/index.html#artifactsexpire_in)；
 
-### job artifacts
+#### job artifacts
 
 > https://docs.gitlab.com/ee/ci/pipelines/job_artifacts.html
 
@@ -287,8 +360,110 @@ By default the artifacts of the most recent pipeline for each Git ref  are locke
 - 默认流水线的 artifacts 不受过期时间影响；
 - 此设置优先于项目级别设置（Keep artifacts from most recent successful jobs）
 
-### Pipeline artifacts
+#### Pipeline artifacts
 
 > Pipeline artifacts are different to job artifacts because they are not explicitly managed by .gitlab-ci.yml definitions.
 
 Pipeline artifacts are used by the [test coverage visualization feature](https://docs.gitlab.com/ee/ci/testing/test_coverage_visualization.html) to collect coverage information.
+
+
+
+### When to Run
+
+> https://docs.gitlab.com/ee/ci/jobs/job_control.html
+
+手动触发 job：
+
+- 需要在 Pipeline 界面进行点击对应的Job的阶段的按钮，才会执行；
+- Pipeline 界面的 “Run Pipeline" 也不会触发`when: manual` 修饰的Job；
+
+```yaml
+when: manual
+```
+
+
+
+**rules**： include or exclude jobs in pipelines
+
+```yaml
+job:on-schedule:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  script:
+    - make world
+
+job:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+    - if: $VAR == "string value"
+      # Include the job and set to when:manual if any of the follow paths match a modified file.
+      changes:  
+        - Dockerfile
+        - docker/scripts/*
+      when: manual
+      allow_failure: true
+  script:
+    - make build
+```
+
+
+
+**only**：includes the job if **all** of the keys have at least one condition that matches.
+
+**except**：excludes the job if **any** of the keys have at least one condition that matches.
+
+
+
+```yaml
+job:
+  only:
+    # use special keywords, 等价于 only:refs
+    - tags
+    - triggers
+    - schedules
+    # 分支
+    - master
+    # 通过变量控制是否执行，支持 && ||
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /skip-end-to-end-tests/
+    # 通过文件的改动控制是否执行
+    changes:
+      - "*.md"
+    # 
+```
+
+
+
+## Environments and deployments
+
+> 将环境信息和部署信息进行关联，方便进行查看和管理。
+
+环境就像CI作业的标记，描述代码的部署位置。当作业将代码版本部署到环境时，会创建部署，因此每个环境都可以有一个或多个部署。
+
+- Provides a full history of deployments to each environment.
+- Tracks your deployments, so you always know what is deployed on your servers.
+
+
+
+## Review Apps
+
+> https://docs.gitlab.cn/jh/ci/review_apps/index.html
+>
+> - Gitlab 需要集成 K8s 
+
+Review Apps 是一种协作工具，可帮助提供展示产品更改的环境。
+
+- 为您的合并请求启动动态环境，提供对功能分支中所做更改的自动实时预览。
+- 允许设计师和产品经理查看您的更改，而无需检查您的分支并**在沙盒环境中运行**您的更改。
+
+<img src="pics/continuous-delivery-review-apps.png" alt="continuous-delivery-review-apps" style="zoom:70%;" />
+
+
+
+在前面的例子中：
+
+- 每次将提交推送到 `topic branch` 时都会构建一个 Review App。
+- 审核人在通过第三次审核之前未通过两次审核。
+- 审核通过后，`topic branch` 被合并到默认分支，在那里它被部署到 staging。
+- 在 staging 被批准后，合并到默认分支的更改将部署到生产中。
+
