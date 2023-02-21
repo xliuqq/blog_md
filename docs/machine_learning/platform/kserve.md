@@ -90,9 +90,13 @@ POST `v2/models/${MODEL_NAME}[/versions/${MODEL_VERSION}]/infer`
 
 ### k8s deployment
 
+> Raw Deployment 模式下不需要 Istio
+>
+> - 通过管理`Ingress`，控制路由，因此部署 Ingress-Nginx 即可。
+
 #### 创建 `IngressClass`
 
-以 `Nginx`为例，
+以 `Nginx`为例，参考 https://kubernetes.github.io/ingress-nginx/deploy/#quick-start，注意[跟 K8s 的版本依赖](https://github.com/kubernetes/ingress-nginx#supported-versions-table)
 
 - 安装 ingress - nginx
 
@@ -102,7 +106,7 @@ helm upgrade --install ingress-nginx ingress-nginx \
   --namespace ingress-nginx --create-namespace
 ```
 
-- ingress - nginx 自带 IngressClass
+- ingress - nginx 自带 IngressClass （不需要新增）
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -227,6 +231,84 @@ curl -v -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v1
   - Kubelet has a maximum number of pods per node with the default limit set to [110](https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/)，不建议超过 100；
 - `Maximum IP address limitation`.
   - Each pod in InferenceService needs an independent IP.
+
+
+
+### 示例
+
+#### 基础
+
+创建 PV 和PVC
+
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kserve-demo-pv
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/home/liuzhiqiang/tensorflow-serving/serving/tensorflow_serving/servables/tensorflow/testdata"
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - ${NODE_NAME} 
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kserve-demo-pvc
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+```
+
+创建 InferenceService
+
+```yaml
+apiVersion: "serving.kserve.io/v1beta1"
+kind: "InferenceService"
+metadata:
+  name: "tensorflow-pvc"
+spec:
+  predictor:
+    model:
+      modelFormat:
+        name: tensorflow
+      storageUri: "pvc://kserve-demo-pvc/saved_model_half_plus_two_cpu"
+```
+
+查看部署状态
+
+```shell
+$ kubectl get isvc tensorflow-pvc
+NAME            URL                                         READY     ...           AGE
+tensorflow-pvc   http://tensorflow-pvc-default.example.com   True                2m15s
+```
+
+
+
+#### Ingress配置
+
+
+
+## 模型存储
+
+支持 S3， PVC 和 URI。
 
 
 

@@ -47,3 +47,17 @@ GatewayFilter 与 GlobalFilter。
 
 - **GlobalFilter**： 全局过滤器
 - **GatewayFilter**： 将应用到单个路由或者一个分组的路由上。
+
+
+
+## Websocket 配置
+
+spring 默认支持 websocket
+
+```properties
+# websocket 的frame最大配置，默认64K
+spring.cloud.gateway.httpclient.websocket.max-frame-payload-length
+# Proxy ping frames to downstream services, defaults to true
+spring.cloud.gateway.httpclient.websocket.proxy-ping
+```
+

@@ -271,6 +271,7 @@ nav:
       - 刷库: web/backend/db_flush.md
     - 分布式追踪:
       - 概览: web/trace/tracing.md
+    - 实时消息推送: web/msg_notify.md
   - 工具:
     - 静态网页生成: tools/static_web_generator.md
     - maven:
