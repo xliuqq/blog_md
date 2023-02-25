@@ -342,7 +342,13 @@ $ sed '/first/a \add one' input.txt
 $ sed '/^ha.*day$/a \add one' input.txt
 ```
 
+获取匹配内容
 
+- `\(.*\)`匹配的内容，可用`\1`的形式进行使用；
+
+```shell
+cat mail.xml | sed 's/.*<title>\(.*\)<\/title.*<author><name>\([^<]*\)<\/name><email>\([^<]*\).*/Authot: \2 [\3] \nSubject: \1\n/' 
+```
 
 ## 磁盘
 
