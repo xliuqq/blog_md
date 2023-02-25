@@ -774,11 +774,19 @@ spec:
 
 - 默认`controller-class=k8s.io/ingress-nginx`，`--ingress-class=nginx`
 
+nginx 配置的upstream，是通过lua脚本动态处理，需要通过相应的 [nginx kubectl plugin](https://kubernetes.github.io/ingress-nginx/kubectl-plugin) 查看
+
+`kubectl ingress-nginx backends`
+
 ### [Apache APISIX Ingress](https://apisix.apache.org/docs/ingress-controller/getting-started/)
 
 
 
 ## IngressClass
+
+> 默认的 IngressClass，需要加上注解
+>
+> - `ingressclass.kubernetes.io/is-default-class: "true"`
 
 用于在集群内有多个ingress controller时候，**区分ingress由谁处理**。
 

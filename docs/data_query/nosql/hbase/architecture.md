@@ -8,7 +8,8 @@ HBase的特性：
 - 自动的分片：表分布由regions构成，regions自动分裂且自动在集群中重新分布；
 - 自动RegionServer 容错；
 - Hadoop/HDFS继承：使用HDFS作为底层存储的分布式文件系统；
-- 
+
+
 
 ## Regions
 

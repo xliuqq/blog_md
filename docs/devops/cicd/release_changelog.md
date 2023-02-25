@@ -1,4 +1,4 @@
-# 自动版本发布
+# 版本自动发布
 
 ## 规范化 git commit 信息
 
@@ -432,7 +432,24 @@ $ npm install @google/semantic-release-replace-plugin -D
 
 
 
-### Gitlab CI 使用
+### 版本号需求的不同阶段
+
+说明：
+
+- `semantic-release` 是最后进行执行，因为会需要将CHANGELOG等**变更文件推回 git 仓库**；
+- 项目构建时，需要根据版本号出制品（如zip包，docker image tag等）；
+- `semantic-relase` **执行镜像跟项目的构建镜像不会是一个镜像**；
+- 版本制品会区分快照（SNAPSHOT）和发布（RELEASE）；
+
+因此：
+
+1. 通过`semantic-release` 的`dry`模式，区分release/snapshot，先生成版本号；
+2. 根据版本号进行项目构建，出相应版本的制品；
+3. `semantic-release` 变更文件推回git仓库，并创建 Git Tag；
+
+
+
+## Gitlab CI 使用
 
 - 项目工程中添加`.releaserc`配置
   - 默认的插件顺序是`commit-analyzer, release-notes-generator, npm, github, `
@@ -455,104 +472,86 @@ $ npm install @google/semantic-release-replace-plugin -D
 # lint 过程用于检测 commitlint 结果
 # release 过程用于自动化产生 git tag 和 CHANGELOG.md
 
+    
 stages:
   - lint
-  - compile
+  - build
+  - deploy
   - release
 
 commitlint:
   stage: lint
-  image: node:lts
-  script: 
-    # 可以将下面的包内置到镜像中，不必每次都安装，提升CI效率
-    - npm install -g @commitlint/cli @commitlint/config-conventional commitlint-format-junit
-    - if("${CI_COMMIT_BEFORE_SHA}" -eq "0000000000000000000000000000000000000000") { npx commitlint -x @commitlint/config-conventional -f HEAD^ -o commitlint-format-junit > commitlint_result.xml}else{ npx commitlint -x @commitlint/config-conventional -f "${CI_COMMIT_BEFORE_SHA}" -o commitlint-format-junit > commitlint_result.xml}
-  artifacts:
-    name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
-    reports:
-      junit: commitlint_result.xml
+  # node:lts 镜像并包含 npm install -g @commitlint/cli @commitlint/config-conventional commitlint-format-junit
+  # @semantic-release @semantic-release/gitlab @semantic-release/git @semantic-release/changelog @semantic-release/exec
+  image: ${GIT_NODE_IMAGE}
+  script: |
+    if [ "${CI_COMMIT_BEFORE_SHA}" = "0000000000000000000000000000000000000000" ]; then
+      npx commitlint -x @commitlint/config-conventional -f HEAD^
+    else
+      npx commitlint -x @commitlint/config-conventional -f "${CI_COMMIT_BEFORE_SHA}"
+    fi
 
-compile:
-  stage: compile
-  image: maven
-  srcipt:
-    # 这里需要获取版本号
-    - mvn package
+    echo "===${CI_COMMIT_REF_NAME}===${CI_COMMIT_BRANCH}"
+
+    # --dry-run 模式，预先生成版本号，区分 release / snapshot
+    if [ "${CI_COMMIT_REF_NAME}" == "master" ]; then
+      npx semantic-release --dry-run --no-ci
+      echo "VERSION_VAR=`cat VERSION`" > build.env
+      cat build.env
+    else
+      echo "VERSION_VAR=SNAPSHOT-`cat VERSION`-`date "+%Y%m%d-%H%M%S"`" > build.env
+      cat build.env
+    fi
+  # 通过环境变量传递版本号
+  artifacts:
+    reports:
+      dotenv: build.env
+
+build:
+  stage: build
+  image: ${MKDOCS_IMAGE}
+  # 构建版本制品，并上传制品库
+  script:
+    - mkdocs build
+    - ls -all ./
+    - tar -zcvf helpdoc-${VERSION_VAR}.tar.gz site 
+    - curl -v --user 'admin:admin123' --upload-file helpdoc-${VERSION_VAR}.tar.gz http://172.16.1.217:8081/repository/static/helpdoc/helpdoc-${VERSION_VAR}.tar.gz
+  artifacts:
+    paths:
+      - helpdoc-*.tar.gz
+    expire_in: 1 hour
+
+deploy:
+  stage: deploy
+  # 通过 SSH 部署到机器
+  image: ${SSHPASS_IMAGE}
+  script:
+    - sshpass -p ${NODE_125_PASSWD} scp -o StrictHostKeyChecking=no helpdoc-${VERSION_VAR}.tar.gz root@${NODE_125_IP}:/tmp
+    - sshpass -p ${NODE_125_PASSWD} ssh -o StrictHostKeyChecking=no root@${NODE_125_IP} "cd /tmp && rm -rf site && tar -zxvf helpdoc-${VERSION_VAR}.tar.gz && rm -rf /home/experiment/web_ai_education/nginx/html/help/ && mv site /home/experiment/web_ai_education/nginx/html/help/ && cd /home/experiment/web_ai_education/nginx/ && ./sbin/nginx -s reload"
+
 
 release:
   stage: release
-  image: node:lts
+  image: ${GIT_NODE_IMAGE}
   script:
-    - npm install -g semantic-release @semantic-release/gitlab @semantic-release/changelog @semantic-release/git
+    # 生成版本号，更新CHANGELOG，并推回仓库
     - npx semantic-release
-  # 仅在中央仓库的分支发生提交时才触发 release 流程
   only:
     - master
+  dependencies: []
 ```
 
 - gitlab项目**环境变量配置**（GITLAB_TOKEN或者GL_TOKEN）
 
 
 
-效果图：
+效果图示例（master分支构建流水线）：
 
 <img src="pics/changelog.png" alt="CHANGELOG出现在中央仓库" style="zoom: 67%;" />
 
 
 
-#### 版本号的阶段
 
-- `npm semantic-release` 会根据 commit 记录生成下一个版本号，git插件会修改相关文件并推回 git 仓库；
-- 对于 mvn / npm 项目，需要获取版本号再进行打包和发布；
-
-造成问题：如果先进行`semantic-release`会导致仓库变更，但 编译/打包 失败
-
-
-
-#### 微服务的流程
-
-后端 Java 流程：（采用 [master/dev/feature](./git_branch_model.md) 分支模型）
-
-- dev 分支 快照版本（不发布release）：测试环境监听并部署最新；
-  - 通过根据当前 VERSION.txt，拼上 commit sha 或者 timestamp 作为版本号；
-  - `mvn package`：编译出 ZIP 包
-    - 指定版本编译包
-    - 快照包发送到 nexus 仓库
-  - `build docker image`：根据 ZIP 包构建镜像，并推送到镜像仓库；
-    - docker build 根据版本生成镜像
-    - 镜像推送到镜像仓库
-  - 问题：dev分支的版本号信息一直是错误的，因为没有回推
-    - master 出完版本后，提交merge request，将 master 合并到dev（因为仅合并 `chore(release): 1.0.0 [skip ci]`commit，不会触发CI pipeline）
-  
-- master 分支 发布版本：
-  - 通过 `npx semantic --dry-run --no-ci` 生成版本信息
-  - `mvn package`：
-    - 指定版本编译包
-    - 快照包发送到 nexus 仓库
-  - `build docker image`：根据 ZIP 包构建镜像，并推送到镜像仓库；
-  - `npx semantic-release`（最后执行）
-    - 分析 commit ，生成新版本号，生成 CHANGELOG.md；
-    - 推送文件变更回 GIT 仓库（@semantic-release/git）；
-    - 发布版本（@semantic-release/gitlab）；
-      - 制品库的链接（mvn / image /npm / python / go 等）；
-
-
-
-
-
-
-
-### argocd  结合
-
-argocd 采用监听 git 仓库**特定分支的特定目录下的Yaml**的形式，自动进行部署。
-
-采用 [master/dev/feature](./git_branch_model.md) 分支模型 进行开发：
-
-- 开发环境：监听特性分支的变动；
-  - argocd 监听的分支名不支持正则，如何处理？；
-  - 开发环境主动推送？
-- 测试环境：监听 dev 分支的 yaml 变动； 
-- 生产环境：监听 master 分支的 yaml 变动；
 
 
 
