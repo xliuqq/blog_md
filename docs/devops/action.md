@@ -2,7 +2,14 @@
 
 [Gitlab仓库部署](../codehub/gitlab.md)：采用 Gitlab 进行源码管理
 
-[持续集成CI](./cicd/gitlab-ci.md)：采用 Gitlab CI 做持续集成
+- master ：版本发布
+- dev ：功能开发合并，合并到 master
+- “feature"：相关功能开发分支，合并到 dev
+
+[持续集成CI](./cicd/gitlab-ci.md)：采用 Gitlab CI Pipeline 做持续集成
+
+- **注意**：新建分支会触发 Push Webhook，不应该触发 CI；
+- **不足：**测试MergeRequest是否可以合并：Merge Request Result Pipeline 企业版只有；
 
 [版本自动发布](./cicd/release_changelog.md) ：采用规范的 commit 信息
 

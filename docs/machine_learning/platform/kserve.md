@@ -91,6 +91,8 @@ POST `v2/models/${MODEL_NAME}[/versions/${MODEL_VERSION}]/infer`
 ### k8s deployment
 
 #### 创建 `IngressClass`
+> https://kserve.github.io/website/0.9/admin/kubernetes_deployment/
+
 
 以 `Nginx`为例，
 
@@ -160,7 +162,7 @@ ingress: |-
 
 ### 模型支持
 
-https://kserve.github.io/website/0.9/modelserving/v1beta1/serving_runtime/
+> https://kserve.github.io/website/0.9/modelserving/v1beta1/serving_runtime/
 
 
 
@@ -220,7 +222,7 @@ curl -v -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v1
 
 ### 多模型部署
 
-默认模式是'one model, one server' paradigm，当模型过多，会出现：
+默认模式是**'one model, one server' paradigm**，当模型过多，会出现：
 
 - `Compute resource limitation`：cpu/gpu 的资源限制
 - `Maximum pods limitation`

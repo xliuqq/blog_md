@@ -163,3 +163,16 @@ User表，User主体有很多属性，比如证件（身份证、居住证、港
 
 **根据项目经验，一般建议使用星型模型。因为在实际项目中，往往最关注的是查询性能问题。**
 
+
+
+### 术语
+
+- 数据加载层：ETL（Extract-Transform-Load）
+- 数据运营层：ODS（Operational Data Store）
+- 数据仓库层：DW（Data Warehouse）
+
+- 数据明细层：DWD（Data Warehouse Detail）
+  - 数据中间层：DWM（Data WareHouse Middle）	
+  - 数据服务层：DWS（Data WareHouse Service）
+  - 数据应用层：APP（Application）
+- 维表层：DIM（Dimension）

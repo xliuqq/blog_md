@@ -1,5 +1,3 @@
-[toc]
-
 # Apache Bookkeeper
 
 > A scalable, fault-tolerant, and low-latency storage service optimized for real-time ( append-only )workloads.
@@ -43,7 +41,11 @@ log流，BookKeeper中的基本存储单元。
 
 ### bookie 
 
-每个独立的保存ledges的服务器。
+每个独立的保存ledges的服务器，可以分为三层：顶层是网络通信层（使用Netty），底层是磁盘IO层，中间层包含大量的缓存。
+
+![bookie_arch](pics/bookie_arch.png)
+
+
 
 ### ensemble
 

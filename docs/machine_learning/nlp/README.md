@@ -6,3 +6,11 @@
 
 - [分词和序列标注](./tokenize.md)
 
+
+
+## TODO
+
+https://mp.weixin.qq.com/s/SwY02qXSbf43Odgyc-WAVw
+
+https://github.com/oxford-cs-deepnlp-2017/lectures
+

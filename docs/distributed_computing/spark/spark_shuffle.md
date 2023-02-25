@@ -1,5 +1,3 @@
-[TOC]
-
 # Spark Shuffle
 
 
@@ -56,8 +54,6 @@ Shuffle的方式通过SortShuffleManager类中registerShuffle函数进行判断�
 
 
 
-
-
 ## Spark Shuffle With HDFS
 
 ### 问题和解决方案
@@ -82,5 +78,6 @@ Shuffle的方式通过SortShuffleManager类中registerShuffle函数进行判断�
 
 ### 工程
 
-见github相关项目：https://github.com/oap-project/remote-shuffle，https://github.com/uber/RemoteShuffleService
+见 github 相关项目：https://github.com/oap-project/remote-shuffle，https://github.com/uber/RemoteShuffleService
 
+[统一 remote shuffle](../remote_shuffle.md)

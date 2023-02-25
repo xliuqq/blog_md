@@ -292,3 +292,29 @@ By default the artifacts of the most recent pipeline for each Git ref  are locke
 > Pipeline artifacts are different to job artifacts because they are not explicitly managed by .gitlab-ci.yml definitions.
 
 Pipeline artifacts are used by the [test coverage visualization feature](https://docs.gitlab.com/ee/ci/testing/test_coverage_visualization.html) to collect coverage information.
+
+
+
+## Gitlab Webhook
+
+默认情况下
+
+- 新建分支，会触发 pipeline（需要分析是否符合预期）
+  - push 时 total_commits_count 为0时，表示新建分支会触发 pipeline hook
+  - 1次 push webhook；
+  - 3次 pipeline webhook(pending -> running -> succeed)
+
+- open a MergeRequest 触发一次 webhook，action 为 opened， "merge_status": "preparing",
+  - 没有 pipeline id，此时只能生成链接，点击查看
+
+
+- approve a MergeRequest 触发一次 webhook, action 为 approved
+  - merge Request 的时候，state 变成 merged ，action 为 merge
+
+- close merge request 时，state 变成 closed ，action 为 close
+
+
+
+## Quick action
+
+Gitlab 对于 Merge Request 支持 quick action，如[ `/approve, /merge` ](https://git.jshcbd.com.cn/help/user/project/quick_actions.md)。

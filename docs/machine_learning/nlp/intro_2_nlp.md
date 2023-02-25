@@ -1,5 +1,3 @@
-[toc]
-
 # Introduction to Natural Language Processing
 
 统计机器学习方法入门介绍，采用[HaNLP 1.x ](https://github.com/hankcs/HanLP/tree/v1.7.8) 版本。

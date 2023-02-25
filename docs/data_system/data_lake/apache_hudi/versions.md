@@ -8,13 +8,26 @@
 
 
 
+## 0.12.0
+
+- PrestoDB
+  - 0.275 版本开始，用户现在可以利用原生 Hudi 连接器来查询 Hudi 表
+- HUDI-4500：Support restore to savepoint with holes in the timeline
+- 乐观并发控制的多个写入器支持基于文件系统的锁；
+- Flink INSERT 操作支持异步Clustering；
+
 ## 0.11.0
 
+- 支持多级索引
 - Bucket索引：
   - **Bucket Pruning：**利用表的 Bucket 分布对读取数据进行剪枝。
   - **Bucket Join：**利用表的 Bucket 分布减少 Join/Aggregate 带来的 shuffle 操作
-
 - COW表的加密：Spark 3.2 + Parquet 1.2的特性
+
+- **添加CALL命令以支持在 Hudi 表上调用更多操作**
+- 针对Spark 3.1、Spark 3.2版本增加了schema功能的演进
+
+
 
 
 
@@ -48,7 +61,7 @@
 
 - 添加了对使用 Spark SQL 的 DDL/DML 的支持；
 
-- 支持时间旅行（Time travel）；
+- SQL 支持时间旅行（Time travel）；
 
 - Hudi 现在可以在 Spark 中注册为数据源表；
 

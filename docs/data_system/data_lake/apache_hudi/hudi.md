@@ -276,65 +276,7 @@ Hudi采用了MVCC设计，**压缩操作会将日志和基本文件合并以产�
 
 ### 索引
 
-Hudi 通过`HoodieKey`有 Min/Max 统计和BloomFilter，用于快速定位 Record 所在的文件。**索引机制提供高效的`upsert`操作**（区分消息是INSERT还是UPDATE）：
-
-- 将 Hoodie key （**记录键+分区路径**）到 file id (FileGroup) 之间的映射关系；
-- 映射数据第一次写入文件后保持不变，一个 FileGroup 包含了一批 record 的所有版本记录
-
-![image.png](pics/1634262176627-df874e73-b984-43dc-b497-7a4893a44d07.png)
-
-Hudi索引可以根据其查询分区记录的能力进行分类：
-
-1） **全局索引**：**不需要分区信息**即可查询记录键映射的文件ID。比如，写程序可以传入null或者任何字符串作为分区路径（partitionPath），但索引仍然会查找到该记录的位置。全局索引在记录键在**整张表中保证唯一的情况下非常有用**，但是**查询的消耗随着表的大小呈函数式增加**。
-
-2） **非全局索引**：非全局索引**依赖分区路径**（partitionPath），对于**给定的记录键，它只会在给定分区路径下查找该记录**。这比较适合总是**同时生成分区路径和记录键的场景**，同时还能享受到更好的扩展性，因为**查询索引的消耗只与写入到该分区下数据集大小**有关系。
-
-
-
-#### 索引类型
-
-- **HBaseIndex**：本质上是全局索引；
-- **BloomIndex**：Bloom索引，通过base file（parquet）的footer的meta区记录record key组成的BloomFilter；
-  - 动态布隆过滤器（设置`hoodie.bloom.index.filter.type=DYNAMIC_V0`），根据文件里存放的记录数量来调整大小从而达到设定的伪正率。
-- **SimpleIndex**：a lean join of the incoming update/delete records against keys extracted from the table on storage；
-- **InMemoryHashIndex**：内存中ConcurrentMap，Spark 内存索引当前是用来测试的索引；
-
-- **Flink State-based Index**：HUDI 在 0.8.0 版本中实现的 Flink witer，采用了 Flink 的 state 作为底层的 index 存储，每个 records 在写入之前都会先计算目标 bucket ID，不同于 BloomFilter Index，避免了每次重复的文件 index 查找；
-
-#### 场景
-
-**场景一：对事实表的延迟更新**
-
-- 特点：大**部分更新会发生在最新的几个分区上而小部分会在旧的分区**
-- 适用索引：**布隆索引**
-
-- 原理：因为查询索引可以靠设置得当的布隆过滤器来剪枝很多数据文件。另外，如果生成的键可以以某种顺序排列，参与比较的文件数会进一步通过范围剪枝而减少。**Hudi用所有文件的键域来构造区间树**，这样能来高效地依据输入的更删记录的键域来排除不匹配的文件。
-
-  <img src="pics/640.gif" alt="图片" style="zoom:67%;" />
-
-**场景二：对事件表的去重**
-
-- 特点：**大部分都是仅追加的数据，插入和更新只存在于最新的几个分区中**。由于重复事件可能发生在整个数据管道的任一节点，在存放到数据湖前去重是一个常见的需求。
-- 适用索引：**布隆索引**
-
-- 原理：我们可以利用作为首类处理对象的时间来构造由事件时间戳和事件id（event_ts+event_id)组成的键，这样插入的记录就有了单调增长的键。这会在最新的几个分区里大幅提高剪枝文件的效益。
-
-  <img src="pics/640.gif" alt="图片" style="zoom:67%;" />
-
-**场景三：对维度表的随机更删**
-
-- 特点：**更新量通常很小但所接触的分区和数据文件会很多，范围涉及从旧到新的整个数据集**。有时因为没有很好的分区条件，这些表也会不分区。
-- 适用索引：简单索引
-
-- 原理：更新操作通常会触及表里大多数文件从而导致布隆过滤器依据输入的更新对所有文件标明真正(true positive)。最终会导致，**即使采用了范围比较，也还是检查了所有文件。**使用`简单索引`对此场景更合适，因为它不采用提前的剪枝操作，而是直接和所有文件的所需字段连接。如果额外的运维成本可以接受的话，也可以采用HBase索引，其对这些表能提供更加优越的查询效率。
-
-<img src="pics/640.gif" alt="图片" style="zoom:67%;" />
-
-#### Future（Data skip index）
-
-- [RFC-27](https://cwiki.apache.org/confluence/display/HUDI/RFC-27+Data+skipping+index+to+improve+query+performance) ：在元数据表上添加额外的索引形式，作为新分区，添加索引列范围，它可以扩展到许多小文件，并支持更快的更改。
-- [RFC-8](https://cwiki.apache.org/confluence/display/HUDI/RFC-08++Record+level+indexing+mechanisms+for+Hudi+datasets)：Record level indexing mechanisms for Hudi datasets
-- [point-lookup-ish queries](https://github.com/apache/hudi/pull/2487) 
+详细内容见 [Hudi 索引技术](./index.md)
 
 
 
