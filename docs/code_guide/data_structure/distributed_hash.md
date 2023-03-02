@@ -24,7 +24,7 @@
 
 ## 一致性Hash算法
 
-> 论文：< [Consistent hashing and random trees:Distributed Caching Protocols for Relieving Hot Spots on the World Wide Web](./pdf/1997-Consistent Hashing and Random Trees.pdf) >
+> 论文： [Consistent hashing and random trees:Distributed Caching Protocols for Relieving Hot Spots on the World Wide Web](./pdf/1997-Consistent Hashing and Random Trees.pdf) 
 
 算法流程：
 
@@ -47,7 +47,11 @@
 
 ### 实现
 
-TODO: link to source
+> [Java一致性Hash](https://gitee.com/oscsc/data-structure-and-algorithm/blob/master/src/main/java/com/xliu/cs/algs/hash/ConsistentHash.java)
+
+对 Hash 算法有要求，对近似的 key 其Hash的结果应该均匀分布在不同空间：
+
+- 比如对 局域网的IP 进行 Hash，则Java String `hashcode`出来的值会分布在一个空间；
 
 ### Hash槽
 
@@ -75,7 +79,7 @@ Redis Cluster包含了16384个哈希槽，每个Key通过计算后都会落在�
 - 将冲突链首尾连接形式冲突环，保证头指针指向任何一个item都可以遍历环上所有数据
 - 通过**lock-free移动头指针**，动态指向热度较高的item（或根据算法计算出的最优item位置）
 
-<img src="pics/hotring.png" alt="图片" style="zoom:80%;" />
+<img src="pics/hotring.png" alt="图片" style="zoom: 50%;" />
 
 #### 有序环
 
@@ -85,7 +89,7 @@ Redis Cluster包含了16384个哈希槽，每个Key通过计算后都会落在�
 - key简化：利用tag来减少key的比较开销，字典序：order = (tag, key)
   - tag是哈希值的一部分，每个key计算的哈希值，前k位用来哈希表的定位，后n-k位作为tag；
 
-<img src="pics/order_hash_compare.jpeg" alt="图片" style="zoom: 67%;" />
+<img src="pics/order_hash_compare.jpeg" alt="图片" style="zoom: 50%;" />
 
 以 itemB 举例：
 
