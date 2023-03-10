@@ -157,6 +157,7 @@ mvn clean时调用的就是这个插件，主要作用就是清理构建目录�
 
 ```xml
 <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-compiler-plugin</artifactId>
     <configuration>
         <source>1.8</source>

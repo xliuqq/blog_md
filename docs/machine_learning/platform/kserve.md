@@ -166,9 +166,22 @@ ingress: |-
 
 ### 模型支持
 
-> https://kserve.github.io/website/0.9/modelserving/v1beta1/serving_runtime/
+> https://kserve.github.io/website/0.10/modelserving/v1beta1/serving_runtime/
 
-
+| Model Serving Runtime                                        | Exported model                                               | HTTP                | gRPC        | Default Serving Runtime Version                              | Supported Framework (Major) Version(s)                       | Examples                                                     |
+| :----------------------------------------------------------- | :----------------------------------------------------------- | :------------------ | :---------- | :----------------------------------------------------------- | :----------------------------------------------------------- | :----------------------------------------------------------- |
+| [Custom ModelServer](https://github.com/kserve/kserve/tree/master/python/kserve/kserve) | --                                                           | v1, v2              | v2          | --                                                           | --                                                           | [Custom Model](https://kserve.github.io/website/0.10/modelserving/v1beta1/serving_runtime/custom/custom_model) |
+| [LightGBM MLServer](https://mlserver.readthedocs.io/en/latest/runtimes/lightgbm.html) | [Saved LightGBM Model](https://lightgbm.readthedocs.io/en/latest/pythonapi/lightgbm.Booster.html#lightgbm.Booster.save_model) | v2                  | v2          | v1.0.0 (MLServer)                                            | 3                                                            | [LightGBM Iris V2](https://kserve.github.io/website/0.10/modelserving/v1beta1/serving_runtime/lightgbm) |
+| [LightGBM ModelServer](https://github.com/kserve/kserve/tree/master/python/lgbserver) | [Saved LightGBM Model](https://lightgbm.readthedocs.io/en/latest/pythonapi/lightgbm.Booster.html#lightgbm.Booster.save_model) | v1                  | --          | v0.10 (KServe)                                               | 3                                                            | [LightGBM Iris](https://kserve.github.io/website/0.10/modelserving/v1beta1/serving_runtime/lightgbm) |
+| [MLFlow ModelServer](https://docs.seldon.io/projects/seldon-core/en/latest/servers/mlflow.html) | [Saved MLFlow Model](https://www.mlflow.org/docs/latest/python_api/mlflow.sklearn.html#mlflow.sklearn.save_model) | v2                  | v2          | v1.0.0 (MLServer)                                            | 1                                                            | [MLFLow wine-classifier](https://kserve.github.io/website/0.10/modelserving/v1beta1/serving_runtime/mlflow) |
+| [PMML ModelServer](https://github.com/kserve/kserve/tree/master/python/pmmlserver) | [PMML](http://dmg.org/pmml/v4-4-1/GeneralStructure.html)     | v1                  | --          | v0.10 (KServe)                                               | 3, 4 ([PMML4.4.1](https://github.com/autodeployai/pypmml))   | [SKLearn PMML](https://kserve.github.io/website/0.10/modelserving/v1beta1/serving_runtime/pmml) |
+| [SKLearn MLServer](https://github.com/SeldonIO/MLServer)     | [Pickled Model](https://scikit-learn.org/stable/modules/model_persistence.html) | v2                  | v2          | v1.0.0 (MLServer)                                            | 1                                                            | [SKLearn Iris V2](https://kserve.github.io/website/0.10/modelserving/v1beta1/serving_runtime/sklearn/v2) |
+| [SKLearn ModelServer](https://github.com/kserve/kserve/tree/master/python/sklearnserver) | [Pickled Model](https://scikit-learn.org/stable/modules/model_persistence.html) | v1                  | --          | v0.10 (KServe)                                               | 1                                                            | [SKLearn Iris](https://kserve.github.io/website/0.10/modelserving/v1beta1/serving_runtime/sklearn/v2) |
+| [TFServing](https://www.tensorflow.org/tfx/guide/serving)    | [TensorFlow SavedModel](https://www.tensorflow.org/guide/saved_model) | v1                  | *tensorflow | 2.6.2 ([TFServing Versions](https://github.com/tensorflow/serving/releases)) | 2                                                            | [TensorFlow flower](https://kserve.github.io/website/0.10/modelserving/v1beta1/serving_runtime/tensorflow) |
+| [TorchServe](https://pytorch.org/serve/server.html)          | [Eager Model/TorchScript](https://pytorch.org/docs/master/generated/torch.save.html) | v1, v2, *torchserve | *torchserve | 0.7.0 (TorchServe)                                           | 1                                                            | [TorchServe mnist](https://kserve.github.io/website/0.10/modelserving/v1beta1/serving_runtime/torchserve) |
+| [Triton Inference Server](https://github.com/triton-inference-server/server) | [TensorFlow,TorchScript,ONNX](https://github.com/triton-inference-server/server/blob/r21.09/docs/model_repository.md) | v2                  | v2          | 21.09-py3 (Triton)                                           | 8 (TensoRT), 1, 2 (TensorFlow), 1 (PyTorch), 2 (Triton) [Compatibility Matrix](https://docs.nvidia.com/deeplearning/frameworks/support-matrix/index.html) | [Torchscript cifar](https://kserve.github.io/website/0.10/modelserving/v1beta1/serving_runtime/triton/torchscript) |
+| [XGBoost MLServer](https://github.com/SeldonIO/MLServer)     | [Saved Model](https://xgboost.readthedocs.io/en/latest/tutorials/saving_model.html) | v2                  | v2          | v1.0.0 (MLServer)                                            | 1                                                            | [XGBoost Iris V2](https://kserve.github.io/website/0.10/modelserving/v1beta1/serving_runtime/xgboost) |
+| [XGBoost ModelServer](https://github.com/kserve/kserve/tree/master/python/xgbserver) | [Saved Model](https://xgboost.readthedocs.io/en/latest/tutorials/saving_model.html) | v1                  | --          | v0.10 (KServe)                                               | 1                                                            | [XGBoost Iris](https://kserve.github.io/website/0.10/modelserving/v1beta1/serving_runtime/xgboost) |
 
 ### 单模型部署
 
@@ -178,7 +191,8 @@ ingress: |-
 apiVersion: "serving.kserve.io/v1beta1"
 kind: "InferenceService"
 metadata:
-  name: "torchscript-cifar"
+  name: "flower-sample"
+  namespace: default
 spec:
   predictor:
     model:
@@ -236,6 +250,10 @@ curl -v -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v1
 
 
 
+### 二进制数据
+
+
+
 ### 示例
 
 #### 基础
@@ -285,7 +303,7 @@ spec:
 apiVersion: "serving.kserve.io/v1beta1"
 kind: "InferenceService"
 metadata:
-  name: "tensorflow-pvc"
+  name: "tensorflow-kserve"
 spec:
   predictor:
     model:
@@ -297,14 +315,16 @@ spec:
 查看部署状态
 
 ```shell
-$ kubectl get isvc tensorflow-pvc
-NAME            URL                                         READY     ...           AGE
-tensorflow-pvc   http://tensorflow-pvc-default.example.com   True                2m15s
+$ kubectl get isvc tensorflow-kserve
+NAME            URL                                             READY     ...           AGE
+tensorflow-pvc   http://tensorflow-kserve-default.example.com   True                2m15s
 ```
 
 
 
-#### Ingress配置
+#### Ingress 配置
+
+InferenceService的annotation会添加到 Ingress 的 annotation，因此通过对 InferenceService 添加注解，实现对 Nginx Ingress Controller的路由的配置定义。
 
 
 
@@ -312,7 +332,33 @@ tensorflow-pvc   http://tensorflow-pvc-default.example.com   True               
 
 支持 S3， PVC 和 URI。
 
+通过 `webhook`修改container，注入`initConatainer`（`kserve/storage-initializer`）
 
+- 通过`emptyDir`将模型数据在`initContainer`和`container`间传递。
 
-### Transformers（TODO）
+## Transformers
 
+> an `InferenceService` component which does **pre/post processing** alongside with model inference
+>
+> - transformer service calls to predictor service
+
+对输入数据做预处理/后处理。
+
+`Kserve.Model`定义三个 handlers，`preprocess`, `predict` 和 `postprocess`，顺序执行，且上个输出作为下个输入。
+
+- `predict`默认是通过获取`predict_host`进行 rest/grpc 调用；
+  - `predict_host`默认会作为参数传递，默认`REST`调用；
+
+[自定义转换示例](https://github.com/kserve/kserve/tree/release-0.10/python/custom_transformer)
+
+## InferenceGraph
+
+>  consist of many models to make a single prediction. 
+>
+> - e.g. a face recognition pipeline may need to first locate faces in a image, then compute the features of the faces to match records in a database
+
+示例
+
+https://kserve.github.io/website/0.10/modelserving/inference_graph/image_pipeline/#deploy-inferencegraph
+
+## 模型解释

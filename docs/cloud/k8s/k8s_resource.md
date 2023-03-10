@@ -778,6 +778,12 @@ nginx 配置的upstream，是通过lua脚本动态处理，需要通过相应的
 
 `kubectl ingress-nginx backends`
 
+配置修改：
+
+- 通过对`Ingress`的`annotation`进行操作，实现配置修改
+
+`nginx.ingress.kubernetes.io/proxy-body-size: "50m"`
+
 ### [Apache APISIX Ingress](https://apisix.apache.org/docs/ingress-controller/getting-started/)
 
 
