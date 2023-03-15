@@ -392,3 +392,59 @@ $ ipvsadm -C
 ```bash
 $ kubectl delete node k8s-node1
 ```
+
+
+
+## 节点下线
+
+**停止节点调度**（在k8s master节点操作）
+
+- nodeName:  待下线节点
+
+```bash
+kubectl cordon nodeName
+```
+
+**强制驱逐待下线节点当前pod及删除pod本地数据**（在k8s master节点操作）
+
+- nodeName:  待下线节点
+- `--ignore-daemonsets`：删除 daemonsets；
+
+```bash
+kubectl drain nodeName --ignore-daemonsets --delete-local-data --force
+```
+
+**删除待下线节点**（在k8s master节点操作）
+
+- nodeName:  待下线节点
+
+```bash
+kubectl delete nodes nodeName
+```
+
+查看节点下线情况
+
+```bash
+kubectl get nodes
+```
+
+**清理已下线节点k8s组件及数据**（在已下线节点操作）
+
+```bash
+# 会停止 kubelet 并清楚相关配置
+kubeadm reset
+
+rm -rf /var/lib/kubelet/
+rm -rf ~/.kube
+rm -rf /bin/kubelet
+rm /usr/local/bin/kubectl
+rm /usr/local/bin/kubeadm
+rm /usr/local/bin/kubelet
+rm -rf /etc/kubernetes/
+
+docker rmi $(docker images –qa)
+docker rmi $(docker images)
+docker rmi $(docker images | grep "none" | awk '{print $3}')
+systemctl disable docker.service
+systemctl stop docker
+```
