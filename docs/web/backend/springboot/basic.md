@@ -1,25 +1,5 @@
 # 基础
 
-## 配置文件加载
-
-SpringBoot 启动会扫描以下位置的 application.yml 或者 application.properties 文件作为SpringBoot的默认配置文件。
-
-```shell
-# 优先级由高到低
--file:./config/
--file:./
--classpath:/config/
--classpath:/
-```
-
-还可以通过**spring.config.location来改变默认的配置文件位置。**
-
-```shell
-java -jar spring-boot-02-config-02.0.0.1-SNAPSHOT.jar  --spring.config.location=G:/application.properties 
-```
-
-
-
 ## 注解
 
 ### 常用注解

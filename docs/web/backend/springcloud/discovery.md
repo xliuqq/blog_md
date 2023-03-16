@@ -2,7 +2,7 @@
 
 ## 对比
 
-除了Nacos，Eureka，Consul外，仍可以基于Zookeeper/Etcd 自行实现一套服务发现机制。
+除了**Nacos，Eureka，Consul外，仍可以基于Zookeeper/Etcd 自行实现一套服务发现机制**。
 
 DNS服务发现，因为固有的缓存缺陷，暂不考虑。
 
@@ -39,7 +39,7 @@ Consul 使用 Raft 算法来保证一致性（需要单独部署服务）
 
 ## Euerka
 
-> Euerka 2.0 未发布过，1.0 仍在维护。
+> Euerka 2.0 未发布过，1.0 仍在维护，但不再开发。
 
 ![img](pics/eureka_arch.png)
 

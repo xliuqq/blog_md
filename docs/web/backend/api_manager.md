@@ -47,6 +47,8 @@
 
 具体代码见 [根据注解生成Yaml](https://gitee.com/luckyQQQ/lifelearning/tree/master/java/spring/springboot-springdoc-openapi-generate-yaml)
 
+
+
 ## OpenAPI/Swagger 3
 
 ### 规范
@@ -103,3 +105,4 @@ https://github.com/swagger-api/swagger-codegen
 
 
 ### Swagger 添加自定义注解的信息（TODO）
+

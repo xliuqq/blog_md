@@ -15,13 +15,13 @@
 spring:
   application:
     name: spring-cloud-gateway
-  # 开启 Gateway 服务注册中心服务发现
+  # 开启 Gateway 服务注册中心服务发现（对内置支持的服务发现通用）
   cloud:
     gateway:
       discovery:
         locator:
           enabled: true
-# Eureka Server 配置
+# Eureka Server 配置，不同的服务发现不同机制
 eureka:
   client:
     service-url:
@@ -60,4 +60,10 @@ spring.cloud.gateway.httpclient.websocket.max-frame-payload-length
 # Proxy ping frames to downstream services, defaults to true
 spring.cloud.gateway.httpclient.websocket.proxy-ping
 ```
+
+
+
+## Swagger集成
+
+采用 SpringDoc
 
