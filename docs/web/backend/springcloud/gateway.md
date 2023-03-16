@@ -65,5 +65,36 @@ spring.cloud.gateway.httpclient.websocket.proxy-ping
 
 ## Swagger集成
 
-采用 SpringDoc
+采用 SpringDoc，重写 SwaggerUiConfigProperties 的配置信息。
+
+- 引入 `springdoc-openapi-webflux-ui`依赖，而非`springdoc-openapi-ui`。
+
+```java
+@Bean
+public List<GroupedOpenApi> apis(SwaggerUiConfigProperties configProperties, RouteDefinitionLocator routeLocator) {
+	List<GroupedOpenApi> groups = new ArrayList<>();
+    // 获取所有可用的服务地址
+    List<RouteDefinition> definitions = routeLocator.getRouteDefinitions().collectList().block();
+    if (CollectionUtils.isEmpty(definitions)) {
+        return groups;
+    }
+    Set<AbstractSwaggerUiConfigProperties.SwaggerUrl> urls = new HashSet<>();
+    definitions.stream().filter(route -> route.getUri().getHost() != null)
+        .distinct()
+        .forEach(route -> {
+                // service low case
+                String name = route.getUri().getHost().toLowerCase(Locale.ROOT);
+                // 排查 Eureka 和网关服务
+                if (!name.contains("eureka") && !name.contains("gateway")) {
+                    AbstractSwaggerUiConfigProperties.SwaggerUrl swaggerUrl = new AbstractSwaggerUiConfigProperties.SwaggerUrl();
+                    swaggerUrl.setName(name);
+                    swaggerUrl.setUrl(String.format(API_URI, name));
+                    urls.add(swaggerUrl);
+                }
+            }
+        );
+    configProperties.setUrls(urls);
+    return groups;
+}
+```
 
