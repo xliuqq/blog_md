@@ -1,5 +1,7 @@
 # 序列化
 
+> [示例项目](https://gitee.com/oscsc/jvm/tree/master/serialize)
+
 ## JDK
 
 序列版本UID（serial version UID），流的唯一标识符：

@@ -50,7 +50,7 @@ Maven预先定义好的描述符有bin，src，project，jar-with-dependencies�
 ```xml
     <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>3.3.0</version>
         <configuration>
             <descriptorRefs>
                 <descriptorRef>jar-with-dependencies</descriptorRef>
