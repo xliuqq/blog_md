@@ -10,6 +10,15 @@
 
 ## Metrics
 
+> 每个进程都会初始化 MetricsSystem
+>
+> - SparkEnv 会初始化 MetricsSystem，但并不启动；
+>   - Driver：SparkContext 创建Driver env，并启动每个配置的 Sink（将 servlet的 sink 添加到 UI 中）；
+>   - Executor：CoarseGrainedExecutorBackend 创建 Executor Env，并启动每个配置的 Sink（但并没有UI，无法添加 servlet）；
+> - ExternalShuffleService
+> - Standalone Master
+> - Standlone Worker
+
 有两种，一种在Driver端（通过心跳获取，包括Driver/Executor的metrics），另一种则是每个进程单独的Metrics。
 
 ### Driver UI

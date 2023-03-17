@@ -279,7 +279,7 @@ nav:
         - 介绍: web/backend/springcloud/README.md
         - 网关: web/backend/springcloud/gateway.md
         - 服务发现: web/backend/springcloud/discovery.md
-      
+    - 指标系统: web/metrics.md  
     - 分布式追踪:
       - 概览: web/trace/tracing.md
     - 实时消息推送: web/msg_notify.md
