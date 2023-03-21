@@ -1,8 +1,10 @@
-# Prometheus
+# [Prometheus](https://prometheus.io/docs/)
 
 服务监控系统和时间序列数据库。
 
 > 一个监控系统，它不仅仅包含了时间序列数据库，还有全套的抓取、检索、绘图（集成Grafana）、报警的功能。
+>
+> 时间戳是 Prometheus 的**采集（Pull）时间**。
 
 ## 架构
 
@@ -122,7 +124,46 @@ docker run  -d \
 
 
 
-## Gateway
+## 配置
+
+启动时：`--storage.tsdb.retention=90d `
+
+```yaml
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+ 
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      # - alertmanager:9093
+ 
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+ 
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+    static_configs:
+    - targets: ['localhost:9090']
+```
+
+
+
+## [Gateway](https://github.com/prometheus/pushgateway)
+
+> 允许临时和批处理作业向 Prometheus 暴露其指标
+>
+> - Pushgateway  持久化推送给它的监控数据，即使监控已下线，Prometheus 还会拉取到旧数据，需手动清理 Pushgateway 不要的数据。
 
 客户端使用push的方式上报监控数据到`pushgateway`，`prometheus`会定期从`pushgateway`拉取数据。
 
@@ -134,25 +175,42 @@ docker run  -d \
 劣势：
 
 - gateway会成为瓶颈，单点故障；
-- 丢失自动的实例监控监控；
-- 必须手动删除任何过时的指标，或者自己自动执行这个生命周期同步。
+- 丢失自动的实例监控，只能监控到 gateway 状态；
+- 必须**手动删除任何过时的指标**，否则 Prometheus 会一直拉取到旧数据。
 
 
 
-### 配置
+### Gateway 配置
+
+默认情况下 Pushgateway 不保留指标：
+
+- `--persistence.file` 标志允许指定一个文件，将推送的指标保存在其中，这样当 Pushgateway 重新启动后指标仍然存在。
+
+### Prometheus配置
 
 `/etc/prometheus/prometheus.yml`
 
 ```yaml
   - job_name: "pushgateway"	
-    honor_labels: true			#检测是否有重复的标签
+    honor_labels: true			# 用于解决拉取数据标签有冲突，当设置为 true, 以拉取数据为准，否则以服务配置为准
     file_sd_configs:
     - files:
       - targets/pushgateway/*.json
       refresh_interval: 5m				#服务发现间隔
 ```
 
-从 pushgateway 抓取的指标的`instance` label 为 pushgateway 的主机和端口配置。
+当prometheus拉取目标时，它会自动添加一些标签到时间序列中，用于标识被拉取的目标：
+
+- job：目标所属的任务名称
+- instance：targets的 ip:port
+
+从 pushgateway 抓取的指标的`instance` label 为 pushgateway 的主机和端口配置。这可能会和你附加推送到 Pushgateway 指标上的 `job` 和 `instance` 标签冲突，这个时候 Prometheus **会将这些标签重命名为 `exported_job` 和 `exported_instance`**。
+
+希望保留推送到 Pushgateway 的指标的 `job` 和 `instance` 标签，这个时候只需要在 Pushgateway 的抓取配置中设置 `honor_labels: true`。
+
+### 使用
+
+[Prometheus Client SDK](https://prometheus.io/docs/instrumenting/clientlibs/) 推送和 API 推送。
 
 
 
@@ -160,3 +218,18 @@ docker run  -d \
 
 https://github.com/prometheus/client_java#exporting
 
+
+
+### 数据格式
+
+metrics数据都包含：**指标名称、标签和采样数据**。
+
+- **指标名称**：支持ASCII字符、数字、下划线和冒号，如`node_cpu_seconds_total`；
+- **标签**：K/V格式，区分不同的实例，如`node_network_receive_bytes_total{device="eth0"} #表示eth0网卡的数据`；
+- **采样数据**：包括一个float64值，和毫秒级的unix时间戳；
+
+
+
+### Metric类型
+
+Counter（计数器），Gauge（仪表盘），Histogram（直方图），Summary（摘要）

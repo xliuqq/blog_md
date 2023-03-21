@@ -6,9 +6,9 @@
 
 > Spark 使用其作为指标框架。
 
-[Dropwizard Metrics](https://link.jianshu.com?t=http://metrics.dropwizard.io) 能够从**各个角度度量已存在的java应用**的成熟框架，简便地以**jar包的方式集成**进系统，可以以http、ganglia、graphite、log4j等方式提供全栈式的监控视野。
+[Dropwizard Metrics](http://metrics.dropwizard.io) 能够从**各个角度度量已存在的java应用**的成熟框架，简便地以**jar包的方式集成**进系统，可以以http、ganglia、graphite、log4j等方式提供全栈式的监控视野。
 
-2023/3/15版本：4.2.0
+2023/3/15版本：4.2.17
 
 ### Maven
 
@@ -233,3 +233,9 @@ Web-Application的 metrics（`metrics-servlet`）： status codes(meters), the n
 ### 三方库
 
 > https://metrics.dropwizard.io/4.2.0/manual/third-party.html
+
+
+
+## [Prometheus Client](https://github.com/prometheus/client_java)
+
+> Prometheus instrumentation library for JVM applications
