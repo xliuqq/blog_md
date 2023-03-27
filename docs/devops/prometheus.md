@@ -103,6 +103,7 @@ scrape_configs:
     scrape_interval: 5s
     static_configs:
       - targets: ['localhost:9090']
+    metrics_path: '/metrics/executors/prometheus'
 ```
 
 
@@ -126,7 +127,7 @@ docker run  -d \
 
 ## 配置
 
-启动时：`--storage.tsdb.retention=90d `
+启动时：`--storage.tsdb.retention=90d `，数据的保留时间。
 
 ```yaml
 global:
@@ -192,11 +193,9 @@ scrape_configs:
 
 ```yaml
   - job_name: "pushgateway"	
-    honor_labels: true			# 用于解决拉取数据标签有冲突，当设置为 true, 以拉取数据为准，否则以服务配置为准
-    file_sd_configs:
-    - files:
-      - targets/pushgateway/*.json
-      refresh_interval: 5m				#服务发现间隔
+    honor_labels: true			#检测是否有重复的标签
+    static_configs:
+    - targets: ["127.0.0.1:19090"]
 ```
 
 当prometheus拉取目标时，它会自动添加一些标签到时间序列中，用于标识被拉取的目标：

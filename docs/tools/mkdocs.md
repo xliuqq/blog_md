@@ -62,3 +62,8 @@ https://squidfunk.github.io/mkdocs-material/setup/setting-up-a-blog/#posts
 
 python markdown 插件，支持更多的markdown格式。
 
+
+
+### 数学公式支持
+
+参考：[MathJax - Material for MkDocs (squidfunk.github.io)](https://squidfunk.github.io/mkdocs-material/reference/mathjax/?h=math#mkdocsyml)
