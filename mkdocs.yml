@@ -202,6 +202,12 @@ nav:
 
   - 计算引擎:
     - Spark:
+      - 概览: distributed_computing/spark/README.md
+      - Spark SQL:
+        - 基础: distributed_computing/spark/spark_sql/README.md
+        - 特性: distributed_computing/spark/spark_sql/features.md
+        - 数据源: distributed_computing/spark/spark_sql/datasource.md
+        - CLI: distributed_computing/spark/spark_sql/sql_cli.md
       - Spark on Yarn: distributed_computing/spark/spark_yarn.md
       - Spark Yarn RestAPI: distributed_computing/spark/spark_yarn_rest.md
       - Spark Metrics: distributed_computing/spark/spark_monitor.md

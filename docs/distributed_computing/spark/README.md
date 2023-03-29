@@ -1,7 +1,5 @@
 # Spark
 
-[TOC]
-
 ## Spark基本原理、构架和编程技术
 
 - 为什么会有Spark？

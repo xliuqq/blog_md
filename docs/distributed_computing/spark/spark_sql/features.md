@@ -1,152 +1,89 @@
-# Spark SQL
+# Spark SQL 原理特性
 
-http://spark.apache.org/docs/latest/sql-programming-guide.html
+## 向量化执行和代码生成
 
+### Java向量化
 
+向量化代码：
 
-## DataFrame
-
-Koalas：基于 Spark DataFrame 实现的分布式 Pandas DataFrame，已经被集成到 Spark 3.x 中。
-
-
-
-
-
-## SQL语法
-
-### 辅助语句
-
-#### refresh
-
-`REFRESH` is used to invalidate and refresh all the cached data (and the associated metadata) for all Datasets that contains the given data source path. Path matching is by prefix, i.e. “/” would invalidate everything that is cached.
-
-```sql
-df = spark.read.format("hudi").load(basePath+"/*/*")
-df.createOrReplaceTempView("track_log")
-# 刷新表的元数据和data
-spark.sql("refresh table mytable")
+```java
+for (int i-0; i < pos.length; i++) {
+    pos[i] = pos[i] + mov[i];
+}
 ```
 
+Java代码向量化执行：
 
-
-## Hive
-
-[Spark的Hive版本的管理](https://spark.apache.org/docs/latest/sql-data-sources-hive-tables.html)
-
-
-
-
-
-## 自定义数据源
-
-> [Spark原理图解：DataSource V1 API与自定义数据源](https://mp.weixin.qq.com/s/gSRchNJNPo6STVw4rDyZeg)
-
-### DataSource V1与V2
-
-Spark 2.3以前数据源相关的API一般叫做V1 API，它以RDD为基础，向上扩展schema信息，形成DataFrame。
-
-之后的版本则是另一种实现思路，直接基于新的接口在DataFrame的思路上提供数据。
+- **自动的**：**不能手动控制，只能由 JVM 自动处理。**没有办法做到像 C++ 一样直接调一个底层的 CPU 指令；
+- **隐式的**：**代码层面无法找到向量化的显式调用，整个过程是隐式的**，比如上面的 for 循环被向量化执行；
+- **不可靠的**：**依赖于 JVM 运行期的热点代码跟踪以及 JIT ，所以整个过程是不可靠的**；
 
 
 
-在`DataFrameReader`中，会先找 V2 实现，找不到则会再找 V1 实现；
+### 火山迭代模型（Volcano Iterator Model）
 
-```scala
-DataSource.lookupDataSourceV2(source, sparkSession.sessionState.conf)
-		  .map {...}
-          .getOrElse(loadV1Source(paths: _*))
-```
+现在大多数大数据系统或者说数据库底层，对 SQL 进行处理时通常会采用的模型。
+
+模型具有**易抽象、易实现**、以及能够通过**算子组合表达复杂查询**这三个优势。
+
+- 大量虚函数的调用，就可能会导致 CPU 的中断和耗时
+
+<img src="pics/image-20220429162701122.png" alt="image-20220429162701122" style="zoom:67%;" />
 
 
 
-### V1自定义
+### Spark Code Generation
 
-关键点:
+- 减少基本类型的自动装箱；
+- 避免多态调用（火山迭代模型）；
+- 利用SIMD批量处理数据（JVM向量化）；
+- 其它Fix（算子融合/缩减栈深）；
 
-- `DataSourceRegister`，标识是数据源服务类，Spark会以它来扫描实现类；
-- RelationProvider，标识是关系型的数据源，可以在Spark SQL中使用；
-- BaseRelation，描述DataFrame的Schema信息 ；
-- TableScan, 提供无参的数据扫描服务；PrunedScan，提供列裁剪的数据扫描服务；PrunedFilteredScan，提供列裁剪和过滤下推的数据扫描服务。三个scan接口任选其一
 
-流程：
 
-- `loadV1Source`中调用`DataSource`的`apply`进行初始化，并调用其`resolveRelation`创建`BaseRelation`，然后通过`SparkSession`创建`DataFrame`返回；
+### 整体Stage代码生成（Whole-stage code generation）
 
-自定义
+**使得计算引擎的物理执行速度能达到 hard code 的性能**：
 
-- 实现类必须继承DataSourceRegister，否则无法使用简称自动扫描到该实现类
-- 实现类需要继承RelationProvider，才能标识为关系型的数据源，在SparkSQL才能使用
-- shortName中的简称用于使用时format中指定格式
-- 一般在实现中会通过option()传递自定义参数，参数会传入parameters
-- 在createRelation需要获取相关信息，创建Schema，这里写死模拟了一下。正常如果是mysql之类的，需要连接数据库获取对应表的字段以及类型信息。
+- 对物理执行的多次调用转换为代码 for 循环，减少中间执行的函数调用次数
+
+示例：*select count(\*) from store_sales where ss_item_sk = 1000*
+
+通常物理计划的代码是这样实现的：
 
 ```scala
-class TestProvider extends DataSourceRegister with RelationProvider {
-    override def shortName(): String = "test"
+class Filter(child: Operator, predicate: (Row => Boolean)) {
+	def next(): Row = {
+        var current = child.next()
 
-    override def createRelation(sqlContext: SQLContext,
-                                parameters: Map[String, String]): BaseRelation = {
-        // 1 通过参数等生成schema信息
-        val schema = StructType(Seq(
-            StructField("name", StringType, nullable = true),
-            StructField("age", IntegerType, nullable = true),
-            StructField("address", StringType, nullable = true)
-        ))
-
-        // 2 创建BaseRelation
-        TestRelation(schema)(sqlContext.sparkSession)
+        while (current != null && !predicate(current)) {
+            current == child.next();
+        }
+        return current
     }
 }
-
-case class TestRelation(override val schema: StructType)
-                       (@transient val spark: SparkSession)
-    extends BaseRelation with PrunedFilteredScan {
-    override def sqlContext: SQLContext = spark.sqlContext
-
-    override def buildScan(requiredColumns: Array[String],
-                           filters: Array[Filter]): RDD[Row] = {
-        // 构建查询返回RDD，根据requiredColumns进行列裁剪，filters进行谓词下推
-        spark.createDataFrame(Seq(Stud("a", 10, "aaa"), Stud("b", 20, "bbb")))
-            .rdd
-    }
-}
-
-case class Stud(name: String, age: Int, address: String)
-
 ```
 
-使用，注意还需要单独配置SPI的发现文件：
+但是真正如果我们用 hard code 写的话，代码是这样的：
 
 ```scala
-import org.apache.spark.sql.SparkSession
-
-object Test2 {
-  def main(args: Array[String]): Unit = {
-    val spark: SparkSession = SparkSession.builder()
-      .master("local")
-      .getOrCreate()
-
-    val df = spark.read.format("xingoo")
-      .load()
-
-      df.select("name")
-        .filter("age > 15")
-        .show(false)
-  }
+var count = 0
+for (ss_item_sk in store_sales) {
+    if (ss_item_sk == 1000) {
+        count += 1
+    }
 }
 ```
 
+原因：
 
-
-## 特性
-
-### 向量化执行和代码生成
-
-具体见[向量化介绍](./vectorized.md)
+- 避免**virtual function dispatch**；next()等函数调用在操作系统层面，会被编译为virtual function dispatch。
+- 通过**CPU Register存取中间数据**，而不是内存缓冲：在Volcano Iterator Model中，每次一个operator将数据交给下一个operator，都需要将数据写入内存缓冲中。然而在手写代码中，JVM JIT编译器会将这些数据写入CPU Register。
+- **Loop Unrolling** 和 **SIMD**；
 
 
 
-### [自适应查询执行设计（AQE，Spark 3.0）](https://spark.apache.org/docs/latest/sql-performance-tuning.html#adaptive-query-execution)
+## [自适应查询执行设计（AQE，Spark 3.0）](https://spark.apache.org/docs/latest/sql-performance-tuning.html#adaptive-query-execution)
 
 下图表示了使用 DataFrames 执行简单的分组计数查询时发生的分布式处理：
 
@@ -172,7 +109,7 @@ Spark 在第一阶段（stage）确定了适当的分区数量，但对于第二
 
 `spark.sql.adaptive.enabled `：是否开启自适应优化，默认`true`。
 
-#### 自适应调整分区数
+### 自适应调整分区数
 
 Spark 将会把连续的 shuffle partitions 进行合并（coalesce contiguous shuffle partitions）以减少分区数。
 
@@ -197,7 +134,7 @@ Spark 将会把连续的 shuffle partitions 进行合并（coalesce contiguous s
 
 <img src="pics/640-16510548159066.png" alt="图片"  />
 
-#### 动态将 Sort Merge Joins 转换成 Broadcast Joins
+### 动态将 Sort Merge Joins 转换成 Broadcast Joins
 
 Spark 估计参加 join 的表数据量小于广播大小的阈值（`spark.sql.autoBroadcastJoinThreshold`）时，其会将 Join 策略调整为 broadcast hash join。但是，很多情况都可能导致这种大小估计出错，比如表的统计信息不准确等（且统计信息只能支持Hive或者文件系统）。
 
@@ -209,7 +146,7 @@ AQE，Spark 可以利用**运行时的统计信息**动态调整 Join 方式，�
 
 - `spark.sql.adaptive.localShuffleReader.enabled`：sort merge转为broadcast join时，是否开启本地读shuffle数据，默认`true`；
 
-#### 动态将Sort Merge Joins转换为 Shuffled hash join
+### 动态将Sort Merge Joins转换为 Shuffled hash join
 
 AQE converts sort-merge join to shuffled hash join when **all post shuffle partitions** are smaller than a threshold。
 
@@ -219,7 +156,7 @@ AQE converts sort-merge join to shuffled hash join when **all post shuffle parti
 
 
 
-#### 动态优化倾斜的 join
+### 动态优化倾斜的 join
 
 AQE 倾斜 Join 优化从 shuffle 文件统计信息中自动检测到这种倾斜。然后，它将倾斜的分区分割成更小的子分区，这些子分区将分别从另一端连接到相应的分区。
 
@@ -239,9 +176,9 @@ AQE 倾斜 Join 优化从 shuffle 文件统计信息中自动检测到这种倾�
 - **spark.sql.adaptive.skewJoin.skewedPartitionFactor**：如果一个分区的大小大于这个数乘以分区大小的中值（median partition size），并且也大于`spark.sql.adaptive.skewedPartitionThresholdInBytes` 这个属性值，那么就认为这个分区是倾斜的。
 - **spark.sql.adaptive.skewedPartitionThresholdInBytes**：判断分区是否倾斜的阈值，默认为 256MB，这个参数的值应该要设置的比 spark.sql.adaptive.advisoryPartitionSizeInBytes 大。
 
-## 
 
-### 动态分区裁减（Dynamic Partition Pruning，简称 DPP）
+
+## 动态分区裁减（Dynamic Partition Pruning，简称 DPP）
 
 > 开启了动态分区裁减，那么 AQE 将不会被触发。
 

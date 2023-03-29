@@ -37,8 +37,8 @@
 - [springdoc-openapi](https://github.com/springdoc/springdoc-openapi) : 在SpringBoot中使用OpenAPI 3的注解；
 
 - [springdoc-openapi-maven-plugin](https://github.com/springdoc/springdoc-openapi-maven-plugin) : 根据 OpenAPI 3的注解生成OpenAPI 3的Yaml，依赖于 `spring-boot-maven` 插件
+  - Maven在**集成测试阶段**（integration-test）运行 openapi 插件（通过`mvn verify`）。
 
-- Maven在**集成测试阶段**（integration-test）运行openapi插件（通过`mvn verify`）。
 
 
 问题点：

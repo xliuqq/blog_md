@@ -47,6 +47,15 @@ metrics.gauge("key.jobs.size")
 
 ### 指标类型
 
+```
+2023-03-22 17:09:02.016 [INFO ] c.c.m.Slf4jReporter$InfoLoggerProxy.log[473 line]- type=GAUGE, name=call.times, value=10
+2023-03-22 17:09:02.016 [INFO ] c.c.m.Slf4jReporter$InfoLoggerProxy.log[473 line]- type=COUNTER, name=count, count=-10
+2023-03-22 17:09:02.016 [INFO ] c.c.m.Slf4jReporter$InfoLoggerProxy.log[473 line]- type=HISTOGRAM, name=histogram, count=10, min=0, max=2, mean=0.9639057667940371, stddev=0.7820338303861577, p50=1.0, p75=2.0, p95=2.0, p98=2.0, p99=2.0, p999=2.0
+2023-03-22 17:09:02.016 [INFO ] c.c.m.Slf4jReporter$InfoLoggerProxy.log[473 line]- type=METER, name=requests, count=10, m1_rate=0.38646381163615817, m5_rate=0.3968026648037416, m15_rate=0.398904212905539, mean_rate=0.3524120972991338, rate_unit=events/second
+```
+
+
+
 #### Meters
 
 **meter**：**测量事件随时间变化的速率**，以及1分钟、5分钟、15分钟内的**移动平均值**；
@@ -64,7 +73,7 @@ public void handleRequest(Request request, Response response) {
 
 #### Gauges
 
-guage: 量表是对**一个值的瞬时测量**。
+guage: 量表是对**一个值的瞬时测量**。（比如 CPU 的使用率等）
 
 ```java
 // 只是注册Guage这个metric，Reporter获取的时候才会触发计算（即每次都会进行调用，获取最新的值）
@@ -76,7 +85,7 @@ metrics.register(MetricRegistry.name(String.class, "test", "size"),
 
 #### Counters
 
-> 可用于统计单次时间
+> 可用于统计单次时间，一般用来统计一直增长的指标。
 
 是一个`AtomicLong`实例的gauge，可以执行increment 和 decrement函数。
 
@@ -236,6 +245,209 @@ Web-Application的 metrics（`metrics-servlet`）： status codes(meters), the n
 
 
 
-## [Prometheus Client](https://github.com/prometheus/client_java)
+## [Prometheus Metrics Client](https://github.com/prometheus/client_java)
 
 > Prometheus instrumentation library for JVM applications
+
+### 指标类型
+
+#### Counter
+
+> Counters go **up**, and **reset** when the process restarts.
+
+示例：
+
+```java
+import io.prometheus.client.Counter;
+class YourClass {
+  static final Counter requests = Counter.build()
+     .name("requests_total").help("Total requests.").register();
+
+  void processRequest() {
+    requests.inc();
+    // Your code here.
+  }
+}
+```
+
+#### Guage
+
+> Gauges can go up and down.
+
+示例
+
+```java
+class YourClass {
+  static final Gauge inprogressRequests = Gauge.build()
+     .name("inprogress_requests").help("Inprogress requests.").register();
+
+  void processRequest() {
+    inprogressRequests.inc();
+    // Your code here.
+    inprogressRequests.dec();
+  }
+}
+```
+
+#### Summary
+
+> monitor distributions, like latencies or request sizes.
+
+默认提供 sum、count 指标，可添加 95%, 90% 的统计信息。
+
+示例
+
+```java
+private static final Summary requestLatency = Summary.build()
+    .name("requests_latency_seconds")
+    .help("request latency in seconds")
+    .quantile(0.5, 0.01)    // 0.5 quantile (median) with 0.01 allowed error
+    .quantile(0.95, 0.005)  // 0.95 quantile with 0.005 allowed error
+    .register();
+
+private static final Summary receivedBytes = Summary.build()
+    .name("requests_size_bytes")
+    .help("request size in bytes")
+    .register();
+
+public void processRequest(Request req) {
+    // 计时
+    Summary.Timer requestTimer = requestLatency.startTimer();
+    try {
+        // Your code here.
+    } finally {
+        requestTimer.observeDuration();
+        // 数量统计
+        receivedBytes.observe(req.size());
+    }
+}
+```
+
+时窗：一定时间内的 Summary 而不是整个APP生命周期，可以通过**滑动窗口**配置
+
+```java
+Summary requestLatency = Summary.build()
+    .name("requests_latency_seconds")
+    .help("Request latency in seconds.")
+    .maxAgeSeconds(10 * 60)
+    .ageBuckets(5)
+    // ...
+    .register();
+```
+
+10分钟的时间窗口，5个bucket，即每2分钟滑动一次。
+
+#### Histogram
+
+> monitor distributions, like latencies or request sizes.
+
+每个桶中**累积**值的数量，bucket 可以配置，形成柱状图。
+
+如果需要计算 φ-quantiles，需要在server端通过histogram_quantile()函数实现。
+
+#### Labels
+
+所有的指标可以有标签，进行组合。
+
+```java
+class YourClass {
+  static final Counter requests = Counter.build()
+     .name("my_library_requests_total").help("Total requests.")
+     .labelNames("method").register();
+
+  void processGetRequest() {
+    requests.labels("get").inc();
+    // Your code here.
+  }
+}
+```
+
+
+
+### 指标注册
+
+推荐使用静态变量的方式进行注册（有全局的默认registry）。
+
+```java
+static final Counter requests = Counter.build()
+   .name("my_library_requests_total").help("Total requests.").labelNames("path").register();
+```
+
+### Exemplars
+
+> supported for `Counter` and `Histogram`
+
+ [OpenMetrics](http://openmetrics.io/) 格式特性，允许将 metrics 跟 traces 关联。
+
+DefaultExemplarSampler 内置支持 [OpenTelemetry tracing](https://github.com/open-telemetry/opentelemetry-java)
+
+### Collectors
+
+默认包含 GC，内存池，类加载和线程数量的指标。
+
+```java
+DefaultExports.initialize();
+```
+
+#### Logging
+
+logging collectors for [log4j, log4j2 and logback](https://github.com/prometheus/client_java#logging).
+
+#### Caches
+
+Guava/Caffeine  cache collector
+
+#### Hibernate
+
+#### Jetty
+
+#### Servlet Filter
+
+#### Spring AOP
+
+add `simpleclient_spring_web` as a dependency, annotate a configuration class with `@EnablePrometheusTiming`, then annotate your Spring components as such:
+
+```java
+@Controller
+public class MyController {
+  @RequestMapping("/")
+  @PrometheusTimeMethod(name = "my_controller_path_duration_seconds", help = "Some helpful info here")
+  public Object handleMain() {
+    // Do something
+  }
+}
+```
+
+
+
+#### DropwizardExports Collector
+
+将 Dropwizard 的指标，转换成 prometheus 的指标。
+
+```java
+// Dropwizard MetricRegistry
+MetricRegistry metricRegistry = new MetricRegistry();
+new DropwizardExports(metricRegistry).register();
+```
+
+- 将不支持的字符，转换为"_"，如
+
+```
+Dropwizard metric name:
+org.company.controller.save.status.400
+Prometheus metric:
+org_company_controller_save_status_400
+```
+
+### Exporting
+
+#### HTTP
+
+client library 中，提供`HTTP`, `Servlet`, `SpringBoot`, `Vert.x` 集成。
+
+```java
+HTTPServer server = new HTTPServer.Builder()
+    .withPort(1234)
+    .build();
+```
+

@@ -1,4 +1,0 @@
-[toc]
-
-# Spark SQL
-

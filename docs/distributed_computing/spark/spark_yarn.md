@@ -1,5 +1,3 @@
-[toc]
-
 # Spark Yarn
 
 ## 架构
