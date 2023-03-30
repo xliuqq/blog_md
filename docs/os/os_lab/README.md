@@ -1,6 +1,6 @@
-# OS Lab 2022
+# OS Lab 2023
 
-> https://jyywiki.cn/OS/2022/
+> https://jyywiki.cn/OS/2023/
 >
 > 参考书：
 >
@@ -8,17 +8,15 @@
 > - [CSAPP] Randal E. Bryant and David R. O'Hallaron. *Computer Systems: A Programmer's Perspective* (3ed). Pearson, 2017. (作为手册和参考书查阅)
 
 - [Parallel and Distributed Computation: Numerical Methods](https://web.mit.edu/dimitrib/www/pdc.html)
-- 
-
-## 1. 操作系统概述
 
 
 
-### L0: 直接运行在硬件上的小游戏 (amgame)
+大纲：
 
-
-
-### M1: 打印进程树 (pstree)
+1.  [操作系统概述](https://jyywiki.cn/OS/2023/build/lect1.ipynb)
+   - 内容
+   - 代码
+2. 
 
 
 

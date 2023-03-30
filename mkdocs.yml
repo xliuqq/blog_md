@@ -246,6 +246,9 @@ nav:
     - Linux Shell:
       - basic: os/linux/shell/basic.md
       - args: os/linux/shell/args.md
+    - OSLabCourse:
+      - 大纲: os/os_lab/README.md
+      - 操作系统概述: os/os_lab/1_os_introduction.md
 
   - 机器学习:
     - 图像视频:
