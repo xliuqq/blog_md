@@ -495,49 +495,27 @@ After an exception has been raised, the native code must first clear the excepti
 
 ### Java Call C/C++ 
 
-流程：
+代码工程见[JNI](https://gitee.com/oscsc/jvm/tree/master/native/jni)
 
-1. 类`com.test.JNIDemo`定义一个方法，该方法是在C/C++中实现
+注意
 
-   ```java
-   package com.test;
-   
-   public class JNIDemo {
-       
-       //定义一个方法，该方法在C中实现
-       public native void testHello();
-       
-       public static void main(String[] args){
-           //加载C文件，或 System.load("Library Absoulte Path");
-           System.loadLibrary("TestJNI");
-           JNIDemo jniDemo = new JNIDemo();
-           jniDemo.testHello();
-       }
-   }
-   ```
+- 生成 .h 
 
-2. 编译java文件，生成class文件；
+  ```shell
+  # JDK 10以下
+  javah  -classpath .  -jni .\src\main\java\com\xliu\cs\jvm\jnative\jni\JNIDemo.java
+  # JDK 10之后，生成 .h 文件在 c/ 目录下
+  javac  -classpath . -encoding UTF-8 .\src\main\java\com\xliu\cs\jvm\jnative\jni\JNIDemo.java -h c
+  ```
 
-3. 生成对用的`JniDemo.h`文件:
+- 编译时的链接路径
 
-   ```shell
-   javah  -classpath  .  -jni com.test.JNIDemo
-   ```
+  ```shell
+  # Linux
+  gcc -shared -fPIC -D_REENTRANT -I${JAVA_HOME}/include/linux -I${JAVA_HOME}/include -I/home/wjp/4C/4JNI/demo1/ JNIDemo.c -o libJNIDemo.so
+  ```
 
-4. 生成动态链接库
-
-   ```shell
-   # Windows下：
-   gcc -shared JNIDemo.c -o JNIDemo.dll
-   
-   # Linux 下：
-   gcc -shared -fPIC -D_REENTRANT -I${JAVA_HOME}/include/linux -I${JAVA_HOME}/include -I/home/wjp/4C/4JNI/demo1/ JNIDemo.c -o libJNIDemo.so
-   
-   # Mac 下：
-   gcc -dynamiclib JNIDemo.c -o JNIDemo.jnilib
-   ```
-
-5. 将C/C++库文件添加到PATH中（可选），然后执行java程序即可。
+  
 
 **jobject obj的解释:**
 
