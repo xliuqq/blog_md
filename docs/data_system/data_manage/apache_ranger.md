@@ -62,7 +62,7 @@ Apache Ranger是一个Hadoop集群**数据安全管理**的框架，提供集中
 
 ## 权限模型
 
-”用户-资源-权限”：
+### 用户-资源-权限
 
 - 用户：User或者Group；
 - 资源：不同组件对应的业务资源不一样；
@@ -74,6 +74,10 @@ Apache Ranger是一个Hadoop集群**数据安全管理**的框架，提供集中
 | Hbase    | Read Write Create Admin                                   |
 | Hive     | Select Create Update Drop Alter Index Lock Read Write All |
 | Yarn     | submit-app admin-queue                                    |
+
+### 实现
+
+数据库设计
 
 
 

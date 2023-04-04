@@ -9,14 +9,13 @@
 
 - [Parallel and Distributed Computation: Numerical Methods](https://web.mit.edu/dimitrib/www/pdc.html)
 
-
+  
 
 大纲：
 
-1.  [操作系统概述](https://jyywiki.cn/OS/2023/build/lect1.ipynb)
-   - 内容
+1.  [操作系统概述](./01-os_introducation.md)
    - 代码
-2. 
+2. [应用视角的操作系统]()(./02-os_appview.md)
 
 
 

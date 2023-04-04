@@ -1,5 +1,7 @@
 # 操作系统概述
 
+> 讲义：https://jyywiki.cn/OS/2023/build/lect1.ipynb
+>
 > 课外书籍：**Operating Systems: Three Easy Pieces（V1.00）** 
 >
 > - [Preface 前言](./book_os_three_pieces/00-preface.pdf)
