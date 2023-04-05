@@ -28,9 +28,16 @@ SPI机制的约定：
 ## 使用
 
 ```java
-ServiceLoader<UploadCDN> uploadCDN = ServiceLoader.load(UploadCDN.class);
-for (UploadCDN u : uploadCDN) {
-    u.upload("filePath");
+// 默认使用 线程的 classloader
+final Iterator<T> iterator uploadCDN = ServiceLoader.load(UploadCDN.class).iterator();
+// 可以定义多个实现，如果某个实现的类的依赖未引入（会报错），则继续下一个
+while (iterator.hasNext()) {
+    try {
+        return iterator.next();
+    } catch (ServiceConfigurationError ignore) {
+        // ignore
+    }
 }
+return null;
 ```
 
