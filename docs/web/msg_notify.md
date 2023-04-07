@@ -13,6 +13,8 @@
 
 ## 长轮询(Comet)
 
+> 示例代码见：[LongPullingCode](https://gitee.com/oscsc/web-tech/tree/master/message_notify/LongPulling)
+
 客户端主动拉`pull`模型，应用长轮询（`Long Polling`）
 
 - 由服务端控制响应客户端请求的返回时间，来减少客户端无效请求的一种优化手段；
@@ -33,12 +35,6 @@
 
 - **竞态分析**：如果在前端重新建立连接时，后端接收到新消息，此时前端还没有建立连接，该消息会丢失，**需要根据业务设计相应方案；**
 
-- 
-
-  
-
-具体代码见：[LongPullingCode](https://gitee.com/oscsc/web-tech/tree/master/message_notify/LongPulling)
-
 ### 缺点
 
 长轮询相比于短轮询在性能上提升了很多，但依然会产生较多的请求，在响应之后，会引起请求突然激增。
@@ -46,6 +42,8 @@
 
 
 ## SSE
+
+> 示例代码见：[SSE 代码](https://gitee.com/oscsc/web-tech/sse)
 
 服务器发送事件(`Server-sent events`)，简称`SSE`。
 
@@ -67,7 +65,7 @@ SSE在服务器和客户端之间打开一个单向通道，服务端响应的�
 | 支持CORS                       | 不支持CORS，协议和端口都必须相同             |
 
 - 以1次/秒或者更快的频率向服务端传输数据，那应该用WebSocket；
-- 客户端和服务端脚本之间具有网络服务器情况时，一个SSE连接不仅使用一个套接字，还会占用一个Apache线程或进程
+- 客户端和服务端脚本之间具有网络服务器情况时，一个SSE连接不仅使用一个套接字，还会占用一个Apache线程或进程；
 
 ### 实现
 
@@ -87,11 +85,11 @@ SSE在服务器和客户端之间打开一个单向通道，服务端响应的�
   retry: 重连时间
   ```
 
-详细代码见：[SSE 代码](https://gitee.com/oscsc/web-tech/sse)
+
 
 ### Nginx 转发 SSE
 
-- nginx upstream 超时连接关闭（upstream timeout），前端会自动进行重连；
+- nginx upstream 超时连接关闭（upstream timeout）时，前端会自动进行重连；
 
 ```conf
 proxy_set_header Upgrade $http_upgrade;
@@ -120,6 +118,8 @@ proxy_cache off;
 ### 实现
 
 https://mp.weixin.qq.com/s/U-fUGr9i1MVa4PoVyiDFCg
+
+
 
 ## Websocket
 

@@ -1,16 +1,50 @@
 # 缓存
 
-## 单机缓存
+## [OSChina J2Cache](https://gitee.com/ld/J2Cache)(两级缓存)
+
+> 第一级缓存使用内存(同时支持 Ehcache 2.x、Ehcache 3.x 和 Caffeine)；
+>
+> 第二级缓存使用 Redis(推荐)/Memcached。
+
+**数据更新**
+
+- 从数据库中读取最新数据，**依次更新 L1 -> L2** ，发送广播清除某个缓存信息
+- 接收到广播（手工清除缓存 & 一级缓存自动失效），从 L1 中清除指定的缓存信息
+
+**Region**: 不同的数据会有不同的 TTL 策略：
+
+- 因为Java 本地缓存不可以针对不同的 key 设置不同的 TTL 时间；
+- **不同的 region 来存放不同的缓存数据，指定数据量和TTL时间；**
 
 
 
-## 分布式缓存
+## [Ali J2tCache](https://github.com/oschina/J2Cache)（两级缓存）
 
+> 基于Java的缓存系统封装，提供统一的API和注解来简化缓存的使用。
+>
 > 
 
-### 相关问题
+原生的支持TTL、两级缓存、分布式自动刷新，还提供了Cache接口用于手工缓存操作。 
 
-#### 一致性问题
+当前有四个实现，RedisCache、TairCache、CaffeineCache(in memory)和一个简易的LinkedHashMapCache(in memory)。
+
+
+
+JetCache存在问题：
+
+-  二级缓存结构下：local cache的一致性问题
+
+
+
+## Spring CacheManager
+
+
+
+
+
+## 相关问题
+
+### 一致性问题
 
 > 缓存最好设置 TTL，至少最终一致性。
 >
@@ -53,16 +87,18 @@
 
 
 
-#### 缓存击穿
+### 缓存击穿
 
 缓存中没有而数据库中有（一般缓存到期），访问量大的情况下，同时去读取数据库
 
 - 根因：1）缓存失效；2）并发访问数据库
 - 解决方案：
   - 设置永不过期；
-  - 加锁，分布式锁；
+  - 加锁，分布式锁；（或者每个实例加锁，实例数不会很多）
 
-#### 缓存雪崩
+
+
+### 缓存雪崩
 
 某个集中的时间，缓存全部失效，查询全部到数据库，压力大
 
@@ -73,7 +109,9 @@
 - 解决：创建**不同的缓存失效时间**
 
 
-#### 缓存穿透
+
+
+### 缓存穿透
 
 **数据中不存在的数据**
 
@@ -84,67 +122,4 @@
 
 
 ### Redis
-
-- 支持多种数据类型，包括 Json（支持索引）和Graph；
-
-#### 客户端缓存（Redis 6）
-
-支持客户端（APP端）缓存，无需手动的Pub/Sub，保持客户端和Redis的数据一致性；
-
-- **默认模式**：服务端会记录某个客户端具体访问过哪一些`key`，当这些`key`对应的值发生变化时，会**发送失效消息**给这些客户端。**服务端内存消耗大**；
-- **广播模式**：客户端需要订阅`key`的**特定前缀**，每当符合这个前缀的`key`对应的值发生改变时，客户端都会收到通知消息。
-
-#### 发布订阅（Pub/Sub）
-
-
-
-#### 持久化
-
-- **RDB**：根据指定的规则“**定时**”将内存中的数据存储在硬盘上，默认；
-- **AOF**：每次执行命令后将命令本身记录下来。
-
-
-
-#### 集群方案
-
-Redis原生集群，Proxy集群Codis（[一致性Hash](../../distributed_consensus/distributed_hash.md#一致性Hash算法)）；
-
-
-
-## [OSChina J2Cache](https://gitee.com/ld/J2Cache)(两级缓存)
-
-> 第一级缓存使用内存(同时支持 Ehcache 2.x、Ehcache 3.x 和 Caffeine)；
->
-> 第二级缓存使用 Redis(推荐)/Memcached。
-
-**数据更新**
-
-- 从数据库中读取最新数据，**依次更新 L1 -> L2** ，发送广播清除某个缓存信息
-- 接收到广播（手工清除缓存 & 一级缓存自动失效），从 L1 中清除指定的缓存信息
-
-**Region**: 不同的数据会有不同的 TTL 策略：
-
-- 因为Java 本地缓存不可以针对不同的 key 设置不同的 TTL 时间；
-- **不同的 region 来存放不同的缓存数据，指定数据量和TTL时间；**
-
-
-
-## [Ali J2tCache](https://github.com/oschina/J2Cache)（两级缓存）
-
-> 基于Java的缓存系统封装，提供统一的API和注解来简化缓存的使用。
->
-> 
-
-原生的支持TTL、两级缓存、分布式自动刷新，还提供了Cache接口用于手工缓存操作。 
-
-当前有四个实现，RedisCache、TairCache、CaffeineCache(in memory)和一个简易的LinkedHashMapCache(in memory)。
-
-
-
-JetCache存在问题：
-
--  二级缓存结构下：local cache的一致性问题
-
-
-
-## Spring CacheManager
+## 

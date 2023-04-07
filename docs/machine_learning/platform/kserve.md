@@ -95,7 +95,7 @@ POST `v2/models/${MODEL_NAME}[/versions/${MODEL_VERSION}]/infer`
 > - 通过管理`Ingress`，控制路由，因此部署 Ingress-Nginx 即可。
 
 #### 创建 `IngressClass`
-> https://kserve.github.io/website/0.9/admin/kubernetes_deployment/
+> https://kserve.github.io/website/0.10/admin/kubernetes_deployment/
 
 
 以 `Nginx`为例，参考 https://kubernetes.github.io/ingress-nginx/deploy/#quick-start，注意[跟 K8s 的版本依赖](https://github.com/kubernetes/ingress-nginx#supported-versions-table)
@@ -258,7 +258,7 @@ curl -v -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v1
 
 #### 基础
 
-创建 PV 和PVC
+创建模型的 PV 和PVC
 
 ```yaml
 apiVersion: v1
