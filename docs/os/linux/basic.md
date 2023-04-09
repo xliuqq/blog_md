@@ -1,5 +1,7 @@
 # 基础
 
+> [GNU CoreUtils](https://github.com/coreutils/coreutils)
+
 ## SElinux
 
 安全增强型 Linux（Security-Enhanced Linux），一个 Linux 内核模块，也是 Linux 的一个安全子系统。
@@ -569,6 +571,10 @@ proxy_password=代理服务器密码
 
 ## 调试相关命令
 
+> 工具命令
+>
+> [Coreutils - GNU core utilitieshttps://www.gnu.org/software/binutils/)
+
 ### ldd
 
 打印共享对象依赖关系，可以显示依赖的库的路径（静态依赖），not found的依赖由运行时决定（如配置LD_LIBRARY_PATH）。
@@ -586,8 +592,6 @@ $ ldd /bin/ls
         libattr.so.1 => /lib64/libattr.so.1 (0x00007fea9ea0e000)
         libpthread.so.0 => /lib64/libpthread.so.0 (0x00007fea9e7f2000)
 ```
-
-
 
 ### ltrace
 
@@ -613,85 +617,9 @@ fclose(0x7ff7baae61c0)                                             = 0
 +++ exited (status 0) +++
 ```
 
-
-
-### strings
-
-打印文件中的可打印字符的字符串。
-
-```shell
-$ strings /bin/ls
-```
-
-
-
-### readelf
-
-显示有关 ELF 文件的信息。
-
-ELF（ *可执行和可链接文件格式(Executable and Linkable File Format)*）是可执行文件或二进制文件的主流格式，不仅是 Linux 系统，也是各种 UNIX 系统的主流文件格式
-
-```shell
-$ readelf -h /bin/ls
-ELF Header:
-  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00
-  Class:                             ELF64
-  Data:                              2's complement, little endian
-  Version:                           1 (current)
-  OS/ABI:                            UNIX - System V
-  ABI Version:                       0
-  Type:                              EXEC (Executable file)
-  Machine:                           Advanced Micro Devices X86-64
-  Version:                           0x1
-  Entry point address:               0x4042d4
-  Start of program headers:          64 (bytes into file)
-  Start of section headers:          115696 (bytes into file)
-  Flags:                             0x0
-  Size of this header:               64 (bytes)
-  Size of program headers:           56 (bytes)
-  Number of program headers:         9
-  Size of section headers:           64 (bytes)
-  Number of section headers:         31
-  Section header string table index: 30
-```
-
-### objdump
-
-从对象文件中显示信息。读取二进制或可执行文件，并将汇编语言指令转储到屏幕上。
-
-```shell
-$ objdump -d /bin/ls | head
-
-/bin/ls:     file format elf64-x86-64
-
-Disassembly of section .init:
-
-0000000000402150 <_init@@Base>:
-  402150:       48 83 ec 08             sub    $0x8,%rsp
-  402154:       48 8b 05 6d 8e 21 00    mov    0x218e6d(%rip),%rax        # 61afc8 <__gmon_start__>
-  40215b:       48 85 c0                test   %rax,%rax
-```
-
-
-
-针对`symbol not found`，通过`objdump -T`查看符号链接，如
-
-```shell
-$ objdump -T /usr/lib/x86_64-linux-gnu/libdde-file-manager.so.1 | grep hasPartitionTableEv
-0000000000000000      DF *UND*  0000000000000000              _ZNK12DBlockDevice17hasPartitionTableEv
-
-# 可以通过 ldd .so + awk + xargs + objdump -T 搜索包含该符号定义的so
-$ objdump -T /usr/lib/x86_64-linux-gnu/libudisks2-qt5.so | grep hasPartitionTableEv
-0000000000045cb0 g    DF .text  000000000000003d  Base        _ZNK12DBlockDevice17hasPartitionTableEv
-```
-
-
-
-
-
 ### strace
 
-跟踪系统调用和信号，见[使用案例](./Performance.md#strace)
+跟踪系统调用和信号，见[使用案例](./tuning.md#strace)
 
 ```shell
 $ strace -f /bin/ls
@@ -713,23 +641,5 @@ munmap(0x7f9679569000, 4096)            = 0
 close(2)                                = 0
 exit_group(0)                           = ?
 +++ exited with 0 +++
-```
-
-### nm
-
-列出对象文件中的符号和地址信息。
-
-```shell
-$ nm hello | tail
-0000000000600e20 d __JCR_END__
-0000000000600e20 d __JCR_LIST__
-00000000004005b0 T __libc_csu_fini
-0000000000400540 T __libc_csu_init
-                 U __libc_start_main@@GLIBC_2.2.5
-000000000040051d T main
-                 U printf@@GLIBC_2.2.5
-0000000000400490 t register_tm_clones
-0000000000400430 T _start
-0000000000601030 D __TMC_END__
 ```
 

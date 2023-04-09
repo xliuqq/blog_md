@@ -2,7 +2,7 @@
 
 > Supervisor is a client/server system that allows its users to control a number of processes on UNIX-like operating systems.
 
-一个Python开发的通用的进程管理程序，可以管理和监控Linux上面的进程，能**将一个普通的命令行进程变为后台daemon，并监控进程状态，异常退出时能自动重启**，但它不能管理原本就是daemon的进程。
+一个Python开发的通用的进程管理程序，可以管理和监控Linux上面的进程，能**将一个普通的命令行进程变为后台daemon，并监控进程状态，异常退出时能自动重启**，但它**不能管理原本就是daemon的进程**。
 
 ## 安装
 

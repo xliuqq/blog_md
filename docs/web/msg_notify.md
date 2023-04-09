@@ -65,7 +65,7 @@ SSE在服务器和客户端之间打开一个单向通道，服务端响应的�
 | 支持CORS                       | 不支持CORS，协议和端口都必须相同             |
 
 - 以1次/秒或者更快的频率向服务端传输数据，那应该用WebSocket；
-- 客户端和服务端脚本之间具有网络服务器情况时，一个SSE连接不仅使用一个套接字，还会占用一个Apache线程或进程
+- 客户端和服务端脚本之间具有网络服务器情况时，一个SSE连接不仅使用一个套接字，还会占用一个Apache线程或进程；
 
 ### 实现
 
@@ -89,7 +89,7 @@ SSE在服务器和客户端之间打开一个单向通道，服务端响应的�
 
 ### Nginx 转发 SSE
 
-- nginx upstream 超时连接关闭（upstream timeout），前端会自动进行重连；
+- nginx upstream 超时连接关闭（upstream timeout）时，前端会自动进行重连；
 
 ```conf
 proxy_set_header Upgrade $http_upgrade;
