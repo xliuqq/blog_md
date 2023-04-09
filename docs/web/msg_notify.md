@@ -13,6 +13,8 @@
 
 ## 长轮询(Comet)
 
+> 示例代码见：[LongPullingCode](https://gitee.com/oscsc/web-tech/tree/master/message_notify/LongPulling)
+
 客户端主动拉`pull`模型，应用长轮询（`Long Polling`）
 
 - 由服务端控制响应客户端请求的返回时间，来减少客户端无效请求的一种优化手段；
@@ -33,12 +35,6 @@
 
 - **竞态分析**：如果在前端重新建立连接时，后端接收到新消息，此时前端还没有建立连接，该消息会丢失，**需要根据业务设计相应方案；**
 
-- 
-
-  
-
-具体代码见：[LongPullingCode](https://gitee.com/oscsc/web-tech/tree/master/message_notify/LongPulling)
-
 ### 缺点
 
 长轮询相比于短轮询在性能上提升了很多，但依然会产生较多的请求，在响应之后，会引起请求突然激增。
@@ -46,6 +42,8 @@
 
 
 ## SSE
+
+> 示例代码见：[SSE 代码](https://gitee.com/oscsc/web-tech/sse)
 
 服务器发送事件(`Server-sent events`)，简称`SSE`。
 
@@ -87,7 +85,7 @@ SSE在服务器和客户端之间打开一个单向通道，服务端响应的�
   retry: 重连时间
   ```
 
-详细代码见：[SSE 代码](https://gitee.com/oscsc/web-tech/sse)
+
 
 ### Nginx 转发 SSE
 
@@ -121,108 +119,81 @@ proxy_cache off;
 
 https://mp.weixin.qq.com/s/U-fUGr9i1MVa4PoVyiDFCg
 
-## Websocket
+
+
+## WebSocket
 
 在`TCP`连接上进行全双工通信的协议
 
-### 实现
+### SOCKJS
 
-springboot整合websocket，先引入`websocket`相关的工具包，和SSE相比额外的开发成本。
+> 当今主流浏览器都支持 Websocket，因此 [SOCKJS 不再需要](https://stomp-js.github.io/guide/stompjs/rx-stomp/using-stomp-with-sockjs.html)
+>
+> - 除非反向代理（如Nginx）的配置不支持WebSocket.
 
-```xml
-<!-- 引入websocket -->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-websocket</artifactId>
-</dependency>
-```
+使用 SOCKJS （模拟 Websocket 协议）
 
-使用`@ServerEndpoint`注解标注当前类为一个websocket服务器，客户端可以通过`ws://localhost:7777/webSocket/10086`来连接到WebSocket服务器端。
+- [sockjs-client](https://github.com/sockjs/sockjs-client) 提供**浏览器兼容性**，优先使用原生的WebSocket，如果某个浏览器不支持WebSocket，SockJS会自动降级为SSE 或者 长轮询；
 
-```java
-@Component
-@Slf4j
-@ServerEndpoint("/websocket/{userId}")
-public class WebSocketServer {
-    //与某个客户端的连接会话，需要通过它来给客户端发送数据
-    private Session session;
-    private static final CopyOnWriteArraySet<WebSocketServer> webSockets = new CopyOnWriteArraySet<>();
-    // 用来存在线连接数
-    private static final Map<String, Session> sessionPool = new ConcurrentHashMap<String, Session>();
-   
-    @OnOpen
-    public void onOpen(Session session, @PathParam(value = "userId") String userId) {
-        try {
-            this.session = session;
-            webSockets.add(this);
-            sessionPool.put(userId, session);
-            log.info("websocket消息: 有新的连接，总数为:" + webSockets.size());
-        } catch (Exception e) {
-        }
-    }
-    /** 接收消息 */
-    @OnMessage
-    public void onMessage(String message) {
-        log.info("websocket消息: 收到客户端消息:" + message);
-    }
-    
-    /** 发送单点消息 */
-    public void sendOneMessage(String userId, String message) {
-        Session session = sessionPool.get(userId);
-        if (session != null && session.isOpen()) {
-            try {
-                log.info("websocket消: 单点消息:" + message);
-                session.getAsyncRemote().sendText(message);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-}
-```
+**心跳**
 
-前端初始化打开WebSocket连接，并监听连接状态，接收服务端数据或向服务端发送数据。
+- SockJS 协议要求 servers 发送心跳消息，排除代理导致的连接挂起。（Spring SockJS 默认 `heartbeatTime` 为 25s）；
+- When using STOMP over WebSocket and SockJS, if the STOMP client and server negotiate heartbeats to be exchanged, the SockJS heartbeats are disabled.
+
+### [STOMP](../data_system/messagequeue/STOMP.md)
+
+使用 STOMP（定义Websocket的数据格式），消息的订阅和发送。
+
+- STOMP即Simple Text Orientated Messaging Protocol，简单文本定向消息协议；
+- [stompjs](https://github.com/stomp-js/stompjs) 客户端，1.1 版本提供心跳机制（默认10s，但会跟 broker 连接时协调出最终的in/out心跳）；
+  - 连接稳定性，支持自动重连；
+
+
+**事务支持**
 
 ```javascript
-<script>
-    var ws = new WebSocket('ws://localhost:7777/webSocket/10086');
-    // 获取连接状态
-    console.log('ws连接状态：' + ws.readyState);
-    //监听是否连接成功
-    ws.onopen = function () {
-        console.log('ws连接状态：' + ws.readyState);
-        //连接成功则发送一个数据
-        ws.send('test1');
-    }
-    // 接听服务器发回的信息并处理展示
-    ws.onmessage = function (data) {
-        console.log('接收到来自服务器的消息：');
-        console.log(data);
-        //完成通信后关闭WebSocket连接
-        ws.close();
-    }
-    // 监听连接关闭事件
-    ws.onclose = function () {
-        // 监听整个过程中websocket的状态
-        console.log('ws连接状态：' + ws.readyState);
-    }
-    // 监听并处理error事件
-    ws.onerror = function (error) {
-        console.log(error);
-    }
-    function sendMessage() {
-        var content = $("#message").val();
-        $.ajax({
-            url: '/socket/publish?userId=10086&message=' + content,
-            type: 'GET',
-            data: { "id": "7777", "content": content },
-            success: function (data) {
-                console.log(data)
-            }
-        })
-    }
-</script>
+// start the transaction
+const tx = client.begin();
+// send the message in a transaction
+client.publish({
+  destination: '/queue/test',
+  headers: { transaction: tx.id },
+  body: 'message in a transaction',
+});
+// commit the transaction to effectively send the message
+tx.commit();
 ```
+
+### Spring
+
+> https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#websocket-server
+>
+> On the Servlet stack, the Spring Framework provides both server (and also client) support for the SockJS protocol；
+
+- 跨域问题，the default behavior for WebSocket and SockJS is to accept **only same-origin requests**. ；
+  - nginx 配置 `proxy_set_header Host $host;`
+  - 或者 spring 配置 `setAllowedOriginPatterns("*")`；
+
+- 事件问题：
+  - `SessionDisconnectEvent`需要幂等处理，一个WS连接(Session)可能会被发送多次；
+
+#### Simple Broker
+
+> The built-in simple message broker handles subscription requests from clients, stores them in memory, and broadcasts messages to connected clients that have matching destinations. 
+
+纯 WebSocket 的心跳问题（不使用 SockJS）：
+
+- [显式定义Client/Server的心跳](https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#websocket-stomp-handle-simple-broker)
+
+#### 外部 Broker
+
+> [支持 RabbitMQ, ActiveMQ 等](https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#websocket-stomp-handle-broker-relay)
+
+#### 认证
+
+通过[`configureClientInboundChannel()`注册消息处理](https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#websocket-stomp-authentication-token-based)，进行验证。
+
+
 
 ### nginx 转发 Websocket
 

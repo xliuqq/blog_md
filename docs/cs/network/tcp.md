@@ -104,15 +104,9 @@ TCP_KEEPCNT、TCP_KEEPIDLE、TCP_KEEPINTVL
 
 ## WebSocket
 
-单个TCP连接上进行[全双工](https://baike.baidu.com/item/全双工)通信的协议。
+**单个TCP连接上进行全双工通信**的协议。
 
-Websocket 通过[HTTP](https://baike.baidu.com/item/HTTP)/1.1 协议的101状态码进行握手。
+Websocket 通过HTTP 1.1 协议的101状态码进行握手。
 
 在 WebSocket API 中，浏览器和服务器只需要完成一次握手，两者之间就直接可以创建持久性的连接，并进行双向数据传输。
-
-
-
-### Demo
-
-见 `websocket_demo.zip `。
 

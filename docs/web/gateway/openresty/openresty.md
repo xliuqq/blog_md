@@ -45,3 +45,9 @@ make install
 
 ### websocket转发
 
+```ini
+proxy_set_header Upgrade $http_upgrade;
+proxy_set_header Connection "upgrade";
+proxy_http_version 1.1;
+```
+
