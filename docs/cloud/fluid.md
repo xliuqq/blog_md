@@ -10,7 +10,7 @@ dataloader中executing阶段，**定时20s**（很多处）进行更新？
 
 Runtime中worker 跟 pod 在一个节点么？ pod中的卷哪里来的？
 
-AlluxioRuntime申请的pod（master，worker，fuse）的网络是HostNetWork，意义是啥？
+AlluxioRuntime申请的pod（master，worker，fuse）的网络是HostNetWork，意义是啥？（使用宿主机网络）
 
 Runtime创建的PV的大小，常量100Gi？
 
@@ -414,9 +414,11 @@ Fluid 默认安装webhook的Deployment，对Pods的create/update进行回调，�
 
 ## CSI
 
+> Serverless 模式下，不触发 CSI::NodeStageVolume，因为会将 PVC 的 volume 重写为 hostPath；
+
 配置 FuseRecovery，FUSE的自动恢复；
 
-选择`fluid.io/s-default-fusedemo: "true"`的Volume绑定；
+选择`fluid.io/s-default-fusedemo: "true"`的Volume绑定；（fuse pod 什么时候创建？）
 
 配置 Fluid Driver，进行自定义存储驱动；
 

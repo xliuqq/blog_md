@@ -14,8 +14,8 @@
 大纲：
 
 1.  [操作系统概述](./01-os_introducation.md)
-   - 代码
-2. [应用视角的操作系统]()(./02-os_appview.md)
+   - [代码](https://gitee.com/oscsc/oslabcode/tree/master/ch01-os_introduction)
+2. [应用视角的操作系统](./02-os_appview.md)
 
 
 

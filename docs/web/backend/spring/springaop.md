@@ -19,6 +19,14 @@
 
 ## AOP：Aspect Oriented Programming 
 
+### 介绍
+
+使用 Jdk Proxy（目标类有接口） 或者 CGLIB Proxy（目标类没有接口）
+
+- spring aop 内置 cglib 源码（但不同包名）
+
+### 概念
+
 - OOP关注纵向，AOP关注横向，如日志、安全型、异常处理，散布在所有对象层次中；
 
   - 横切关注点：对哪些方法进行拦截，拦截后怎么处理？
@@ -53,6 +61,8 @@
   - after-returning：连接点正常返回时，returning制定返回值的名称，与advice的参数名一致；
   - after-throwing：连接点抛出指
   - 定异常时，执行advice
+  
+  
 
 ### 静态方法切点
 

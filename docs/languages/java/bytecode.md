@@ -19,7 +19,7 @@
 
 ### Apache Common BCEL
 
-> Apache Commons Bytecode Engineering Library
+> [Apache Commons Bytecode Engineering Library](https://github.com/apache/commons-bcel)
 
 
 
@@ -33,15 +33,5 @@
 </dependency>
 ```
 
-
-
-### AspectJ
-
-[AspectJ](http://www.eclipse.org/aspectj)作为 Java 中流行的 **AOP（aspect-oriented programming）** 编程扩展框架，其内部使用的是 **[BCEL框架](https://github.com/apache/commons-bcel)** 来完成其功能。
-
-- **在一些固定的切入点来进行操作**；
-- **匹配规则采用了类似正则表达式的规则**；
-- 对于运行中的java进行**无法在不重启的条件下执行新增MOCK**；
-- MOCK功能代码嵌入到目标函数中，**无法对MOCK功能代码进行卸载**，可能带来稳定性风险。
 
 

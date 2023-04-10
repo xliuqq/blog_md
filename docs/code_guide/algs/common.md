@@ -1,13 +1,87 @@
 # 算法
 
-## 四平方和三平方定理
+## 递归转循环
+
+> 代码实现见 [Java数据结构与算法](https://gitee.com/oscsc/data-structure-and-algorithm)的递归部分。
+
+递归转循环的通用方法：通过**手动模拟栈帧**的执行。
+
+```java
+// 树的后序遍历：递归版
+public static <E> void postOrderRecursive(BinaryTreeNode<E> root, List<E> store) {
+    if (root == null) {
+        return;
+    }
+    if (root.getLeft() != null) postOrderRecursive(root.getLeft(), store);
+    if (root.getRight() != null) postOrderRecursive(root.getRight(), store);
+    store.add(root.getVal());
+}
+
+// 树的后序遍历：非递归版
+public static <E> void postOrder(BinaryTreeNode<E> root, List<E> store) {
+    if (root == null) {
+        return;
+    }
+    Deque<Frame<E>> stack = new LinkedList<>();
+    stack.add(new Frame<>(root, store));
+    while (!stack.isEmpty()) {
+        Frame<E> current = stack.getLast();
+        switch (current.pc) {
+            case 0:
+                if (current.node == null) stack.removeLast();
+                break;
+            case 1:
+                if (current.node.getLeft() != null) stack.add(new Frame<>(current.node.getLeft(), store));
+                break;
+            case 2:
+                if (current.node.getRight() != null) stack.add(new Frame<>(current.node.getRight(), store));
+                break;
+            case 3:
+                store.add(current.node.getVal());
+                break;
+            case 4:
+                stack.removeLast();
+                break;
+        }
+        current.pc += 1;
+    }
+}
+// 栈帧保存的内容
+private static class Frame<E> {
+    int pc;
+    BinaryTreeNode<E> node;
+    List<E> store;
+    public Frame(BinaryTreeNode<E> node, List<E> store) {
+        this.pc = 0;
+        this.node = node;
+        this.store = store;
+    }
+}
+```
+
+
+
+
+
+## 极大极小算法
+
+极小极大实际上使用了DFS来遍历当前局势以后所有可能的结果，通过『最大化』自己和『最小化』对手的方法获取下一步的动作。
+
+- 需要一个局面评估器，评估当前步骤的得分，启发式算法；
+- α-β剪枝也是类似的思想，只不过效率更高，因为它删减了一些不需要遍历的结点。
+
+
+
+## 数学
+
+### 四平方和三平方定理
 
 - [四平方定理](https://en.wikipedia.org/wiki/Lagrange's_four-square_theorem)：任意自然数都可以表示成四个整型的平方和；
 - [三平方定理](https://en.wikipedia.org/wiki/Legendre's_three-square_theorem)：形式不为`4^n * ( 8 * k + 7)`的自然数可以表示成三个整型的平方和；
 
 
 
-## 洗牌算法（Fisher-Yates shuffle）
+### 洗牌算法（Fisher-Yates shuffle）
 
 概率均等
 
@@ -27,7 +101,7 @@ for i from 0 to n−2 do
 
 
 
-## 完美洗牌算法
+### 完美洗牌算法
 
 > 参考文献：A Simple In-Place Algorithm for In-Shuffle
 
@@ -57,10 +131,3 @@ for i from 0 to n−2 do
   <img src="pics/perfectshuffle.png" alt="三次反转示例" style="zoom: 50%;" />
 
   - 2 * (n-m) 的规模可以通过循环替代得到，n = n -  m， 继续处理，至 n <1
-
-## 极大极小算法
-
-极小极大实际上使用了DFS来遍历当前局势以后所有可能的结果，通过『最大化』自己和『最小化』对手的方法获取下一步的动作。
-
-- 需要一个局面评估器，评估当前步骤的得分，启发式算法；
-- α-β剪枝也是类似的思想，只不过效率更高，因为它删减了一些不需要遍历的结点。
