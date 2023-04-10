@@ -1,12 +1,6 @@
 # 认证授权
 
-## 接口权限（RBAC）
 
-基于资源的权限控制，**用户 -> 角色 -> 资源** 的映射关系。
-
-[Satoken](./satoken.md)
-
-[Apache Shiro](./shiro/shiro.md)
 
 ### 鉴权配置
 
