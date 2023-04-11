@@ -314,3 +314,6 @@ nav:
       - Typora: tools/markdown/typora.md
     - 开源协议声明: tools/licenses.md
 
+  - 证书:
+    - 系统分析师:
+      - 分析题: certifacte/system_analyser/anli.md
