@@ -336,7 +336,7 @@ Scala style 检查，
 <plugin>
     <groupId>net.alchim31.maven</groupId>
     <artifactId>scala-maven-plugin</artifactId>
-    <version>3.4.4</version>
+                <version>4.8.1</version>
     <executions>
         <execution>
             <id>eclipse-add-source</id>

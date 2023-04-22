@@ -1,7 +1,5 @@
 # Spark 序列化
 
-[TOC]
-
 ## 序列化方式
 
 ### Java Seralizer
