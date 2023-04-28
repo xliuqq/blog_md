@@ -1,5 +1,42 @@
 # TFServing
 
+## 保存的模型
+
+```python
+import tempfile
+
+# 版本路径是自行拼接
+MODEL_DIR = tempfile.gettempdir()
+version = 1
+export_path = os.path.join(MODEL_DIR, str(version))
+print('export_path = {}\n'.format(export_path))
+
+tf.keras.models.save_model(
+    model,
+    export_path,
+    overwrite=True,
+    include_optimizer=True,
+    save_format=None,
+    signatures=None,
+    options=None
+)
+
+print('\nSaved model:')
+!ls -l {export_path}
+```
+
+路径格式
+
+```shell
+ls /tmpfs/tmp/1
+
+drwxr-xr-x 2 kbuilder kbuilder  4096 Mar 15 10:34 assets
+-rw-rw-r-- 1 kbuilder kbuilder    57 Mar 15 10:34 fingerprint.pb
+-rw-rw-r-- 1 kbuilder kbuilder  8757 Mar 15 10:34 keras_metadata.pb
+-rw-rw-r-- 1 kbuilder kbuilder 77904 Mar 15 10:34 saved_model.pb
+drwxr-xr-x 2 kbuilder kbuilder  4096 Mar 15 10:34 variables
+```
+
 
 
 ## 接收图片base64作为输入
