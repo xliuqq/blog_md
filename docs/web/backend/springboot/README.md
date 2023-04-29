@@ -109,7 +109,48 @@ Spring DI注解：
 
 @ComponentScan是扫描整个包,但其实你可能只需注入一个或者几个指定的Bean，那我们可以考虑用 **@Import** 注解。
 
-#### spring.factories
+- 可以通过注解，表明是否需要引入；
+
+  ```java
+  @Retention(value = RetentionPolicy.RUNTIME)
+  @Target(value = {ElementType.TYPE})
+  @Documented
+  // 按实际引入
+  @Import(XXX.class)
+  public @interface EnableDataPermission {
+  }
+  ```
+
+  在 Application中添加，即可开启
+
+  ```java
+  @EnableDataPermission
+  @SpringBootApplication
+  public class Main {
+      public static void main(String[] args) {
+          SpringApplication.run(Main.class, args);
+      }
+  }
+  ```
+
+#### @EnableAutoConfiguration
+
+```java
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+// 自动配置包
+@AutoConfigurationPackage
+// 给IOC容器导入组件
+@Import(AutoConfigurationImportSelector.class)
+public @interface EnableAutoConfiguration {
+    String ENABLED_OVERRIDE_PROPERTY = "spring.boot.enableautoconfiguration";
+    Class<?>[] exclude() default {};
+
+    String[] excludeName() default {};
+}
+```
 
 上面两种注入方式都有个很明显缺点，就是如果我需要引用外部jar包的Bean的时候，都需要在当前项目配置 **@ComponentScan** 或者 **@Import** 去扫描才能注入当前Bean，这样显然不够友好。
 
@@ -119,8 +160,20 @@ Spring DI注解：
 - 在 META-INF 目录下新建文件 **spring.factories**
 - 在文件中添加下面配置
 
-```stylus
+```properties
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.third.bean.ConfigurationBean
+```
+
+**Spring Boot 3将移除对/META-INF/spring.factories的支持。**
+
+新的写法是创建一个新的文件：
+
+`/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`
+
+内容直接放配置类即可，如：
+
+```text
+com.example.swagger.SwaggerAutoConfiguration
 ```
 
 
