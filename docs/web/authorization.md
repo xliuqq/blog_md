@@ -74,6 +74,7 @@ RBAC3：统一模型，包含RBAC1和RBAC2；
 >
 > - 不做身份认证；
 > - 不管理用户列表或角色列表。
+> - 基于内存做快速匹配；
 
 
 
@@ -167,6 +168,26 @@ e = some(where (p.eft == allow))
 ```ini
 [matchers]
 m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
+```
+
+
+
+#### 内置的匹配函数
+
+对于 matcher，内置很多的匹配函数，对于 jcasbin，包括
+
+```java
+fm.addFunction("keyMatch", new KeyMatchFunc());
+fm.addFunction("keyMatch2", new KeyMatch2Func());
+fm.addFunction("keyMatch3", new KeyMatch3Func());
+fm.addFunction("keyMatch4", new KeyMatch4Func());
+fm.addFunction("keyMatch5", new KeyMatch5Func());
+fm.addFunction("keyGet", new KeyGetFunc());
+fm.addFunction("keyGet2", new KeyGet2Func());
+fm.addFunction("regexMatch", new RegexMatchFunc());
+fm.addFunction("ipMatch", new IPMatchFunc());
+fm.addFunction("eval", new EvalFunc());
+fm.addFunction("globMatch", new GlobMatchFunc());
 ```
 
 
@@ -282,3 +303,62 @@ m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 ### ABAC 的支持说明
 
 https://casbin.org/zh/docs/abac
+
+
+
+### 使用
+
+> 见 [Casbin SpringBoot 使用](https://gitee.com/oscsc/web-tech/authz/casbin/)。
+>
+> - Go 的支持度最好，Java 次之。
+
+
+
+#### 执行器
+
+Enforce 加载时，会将所有的数据都加载到内存中（`loadPolicy`）。
+
+类型（以Go语言为主，Java 无 CachedEnforcer）：
+
+- **Enforce**：非线程安全，对于策略的改动，会触发`Watch`/`WatchEx`；
+- **CachedEnforcer**：将结果缓存（通过rw锁保证并发安全），内部使用`Enforce`）（因此仍不是并发安全）；
+- **SyncedEnforcer**：使用 rw 锁提供同步访问，线程安全；
+- **DistributedEnforcer**：基于`SyncedEnforcer`；
+
+#### 适配器
+
+自动保存机制（`Auto-Save`），支持**自动**向存储回写内存中单个policy规则的变更（删除/更新）
+
+调用`SavePolicy()`会直接删除所有存储中的policy规则并将当前`Casbin enforcer`存储在内存中的policy规则悉数持久化到存储中。 因此，当内存中的policy规则过多时，直接调用`SavePolicy()`会引起一些性能问题。
+
+#### 监视器
+
+> https://casbin.org/zh/docs/watchers
+
+保持多个Casbin执行器实例之间的一致性
+
+- Java 的 **RedisWatch** 通过**`loadPolicy`重新构造内存**保证一致性（Redis仅用于发送更新消息），对于大量Rules可能存在性能问题；
+
+**WatcherEx**：支持多个实例之间的增量同步，但目前尚未实现 `WatcherEx`。 
+
+- Go 的 [**RedisWatchEx**](https://github.com/casbin/redis-watcher) 支持增量同步，Redis的消息提供不同类型的事件；
+- 对于 Java 而言，**暂时没有第三方库实现** `WatcherEx`，且需要配合**DistributedEnforcer**（提供Self相关方法，更新策略不会循环触发Watch）；
+- 不推荐使用 WatchEx，因为当服务异常时没法保证一致性，推荐使用 Dispatcher 实现；
+
+#### 分发器
+
+> Users need to ensure that the state of all instances is consistent before using dispatcher.
+
+提供同步递增策略变化的方法，以`raft`一致性协议为基础保证多个casbin实例间的一致性。
+
+当前只有 Go 语言提供 [Hashicorp Raft Dispatcher](https://github.com/casbin/hraft-dispatcher)。
+
+![overall architecture](pics/dispatcher-architecture.svg)
+
+### Casdoor
+
+> An open-source Identity and Access Management (IAM) / Single-Sign-On (SSO) platform with web UI supporting OAuth 2.0, OIDC, SAML and CAS.
+
+支持 OAuth 2.0、OIDC 和 SAML 的 UI 优先集中式身份验证/单点登录 (SSO) 平台，与 Casbin RBAC 和 ABAC 权限管理集成
+
+- 对子应用的鉴权，通过[`/api/enforce`](https://casdoor.org/zh/docs/permission/exposed-casbin-apis#enforce)，**不能获取所有的权限id，供前端进行菜单/按钮显示**；
