@@ -257,6 +257,8 @@ nav:
     - 自然语言处理NLP:
       - 动手做聊天机器人(TODO): machine_learning/nlp/chatbot.md
     - 示例案例: machine_learning/ai_demo/tools.md
+    - 部署平台:
+      - kserve: machine_learning/platform/kserve.md
     
   - Devops:
     - 概览: devops/devops.md
