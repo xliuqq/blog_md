@@ -8,6 +8,8 @@
 
 ## 原理
 
+> 通过添加Watchdog程序(一个小型的Golang HTTP服务器)，将任何Docker镜像都添加到一个serverless函数中。
+
 #### [经典 watchdog](https://github.com/openfaas/classic-watchdog)
 
 - 每次函数调用都启动单独的进程；

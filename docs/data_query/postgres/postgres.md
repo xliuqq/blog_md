@@ -33,4 +33,7 @@ PostgreSQL是目前**功能强大、技术先进、稳定可靠、生态良好�
 
 ## 安全机制
 
-<img src="C:\Users\Dell\AppData\Roaming\Typora\typora-user-images\image-20210714145418988.png" alt="image-20210714145418988" style="zoom:67%;" />
+
+
+## 基础
+

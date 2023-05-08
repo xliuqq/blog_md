@@ -209,6 +209,7 @@ nav:
         - 特性: distributed_computing/spark/spark_sql/features.md
         - 数据源: distributed_computing/spark/spark_sql/datasource.md
         - CLI: distributed_computing/spark/spark_sql/sql_cli.md
+      - Spark Graphx: distributed_computing/spark/spark_graphx.md
       - Spark on Yarn: distributed_computing/spark/spark_yarn.md
       - Spark Yarn RestAPI: distributed_computing/spark/spark_yarn_rest.md
       - Spark Metrics: distributed_computing/spark/spark_monitor.md
@@ -290,6 +291,8 @@ nav:
     - 软件工程: cs/software_engineering.md
   
   - Web服务:
+    - 实战：
+      - 数据权限: web/action/data_permission.md
     - 后端:
       - 接口管理设计: web/backend/api_manager.md
       - 刷库: web/backend/db_flush.md
@@ -316,3 +319,6 @@ nav:
       - Typora: tools/markdown/typora.md
     - 开源协议声明: tools/licenses.md
 
+  - 证书:
+    - 系统分析师:
+      - 分析题: certifacte/system_analyser/anli.md

@@ -22,6 +22,7 @@
 
 
 ```java
+// 如果启动进程的用户不是配置的超级用户，则可以通过环境变量 HADOOP_PROXY_USER 指定为相应的超级用户即可
 UserGroupInformation ugi =
                 UserGroupInformation.createProxyUser(userName, UserGroupInformation.getLoginUser());
 return ugi.doAs(action);
