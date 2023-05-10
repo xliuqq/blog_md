@@ -1,6 +1,6 @@
-# 线程
+# 进程
 
-> 测试代码见[代码库](https://gitee.com/oscsc/jvm/tree/master/thread)
+> 测试代码见[代码库](https://gitee.com/oscsc/jvm/tree/master/process)
 
 ## 子进程
 

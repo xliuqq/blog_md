@@ -159,7 +159,7 @@ nav:
       - 序列化: languages/java/serialize.md
       - 反射: languages/java/reflection.md
       - SPI: languages/java/spi.md
-      - 线程: languages/java/thread.md
+      - 进程: languages/java/process.md
       - 测试: languages/java/test.md
       - 类加载器: languages/java/classloader.md
       - 命令行工具: languages/java/cmd_tools.md
