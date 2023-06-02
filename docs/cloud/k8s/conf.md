@@ -174,7 +174,31 @@ kubectl describe pod $apiserver_pods -n kube-system
 
 
 
-## 磁盘限制（TODO）
+## 磁盘限制
 
 防止将宿主机的磁盘撑满，导致宿主机不可用。
 
+### ephemeral-storage
+
+> 在每个Kubernetes的节点上，kubelet的根目录(默认是/var/lib/kubelet)和日志目录(/var/log)保存在节点的主分区上，这个分区同时也会被**Pod的EmptyDir类型的volume、容器日志、镜像的层、容器的可写层所占用**。
+>
+> - kubelet会统计当前节点的主分区的可分配的磁盘资源，或者可以覆盖节点上kubelet的配置来自定义可分配的资源。
+> - 在创建Pod时会根据存储需求调度到满足存储的节点，在Pod使用超过限制的存储时会对其做**驱逐**的处理来保证不会耗尽节点上的磁盘空间。
+
+k8s 1.8开始引入的特性，限制容器存储空间的使用
+
+```yaml
+resources:
+  requests:
+    cpu: 1
+    memory: 2048Mi
+    ephemeral-storage: 2Gi
+  limits:
+    cpu: 2
+    memory: 2048Mi
+    ephemeral-storage: 5Gi
+```
+
+当ephemeral-storage超出限制时，会自动kill当前容器，此时通过`get pods -o yaml`查看容器信息如下
+
+<img src="pics/ephemeral_storage_kill.png" alt="ephemeral_storage_exceed" style="zoom: 50%;" />

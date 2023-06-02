@@ -7,13 +7,17 @@
 > - 声明较小的requests值供调度器使用；
 > - 给容器Cgroups设置的limits值相对较大；
 
+### 资源类型
+
 针对每个container，都可以配置:
 
 ```yaml
 spec.containers[].resources.limits.cpu
 spec.containers[].resources.limits.memory
+spec.containers[].resources.limits.ephemeral-storage
 spec.containers[].resources.requests.cpu
 spec.containers[].resources.requests.memory
+spec.containers[].resources.requests.ephemeral-storage
 ```
 
 ### Qos模型

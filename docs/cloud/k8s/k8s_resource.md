@@ -540,16 +540,16 @@ spec:
 
 ### 配置
 
-不需要定义`spec.selector`描述需要控制哪些Pods。
+**不需要定义`spec.selector`描述需要控制哪些Pods**。
 
 - Job Controller会自动为Pod模板加上`controller-uid=<随机字符串>`的标签，并在Job对象本身添加该标签对应的selector。
 
 重启策略： [`RestartPolicy`](https://kubernetes.io/zh/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy) 只能设置为 `Never` 或 `OnFailure` 
 
-- `Never`：失败，则重试重新创建Pod（`spec.backoffLimit	定义最大次数，指数时间递增）；
+- `Never`：失败，则重试重新创建Pod（`spec.backoffLimit`	定义最大次数，指数时间递增）；
 - `OnFailure`：失败不会新建Pod，而是不停尝试重启Pod里的容器；
 
-最大运行时间：
+最大运行时间：默认为0，不限制；
 
 - `spec.activeDeadlineSeconds`：限制运行时长，看到Pod终止原因（`reason: DeadlineExceeded`）；
 

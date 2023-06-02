@@ -83,12 +83,14 @@ nav:
       - gpu虚拟化: cloud/virtualize/gpu.md
   - 调度系统:
     - 概念: scheduler_system/README.md
-    - 调度的策略: scheduler_system/scheduler.md
     - Yarn:
       - 架构: scheduler_system/yarn/arch.md
       - GPU调度: scheduler_system/yarn/gpu.md
       - 自定义设备支持: scheduler_system/yarn/yarn_pluggable_device_framework.md
-    - DophinScheduler: scheduler_system/apache_dolphin_scheduler.md
+    - 工作流调度:
+      - DophinScheduler: scheduler_system/apache_dolphin_scheduler.md
+      - ArgoWorkflow: scheduler_system/argoworkflow.md
+    
   - 分布式共识/一致性:
     - 一致性: distributed_consensus/consistency.md
     - 共识: distributed_consensus/consensus.md
