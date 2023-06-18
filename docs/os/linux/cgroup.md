@@ -317,9 +317,45 @@ $ cat /proc/devices
 
 ```shell
 # the c indicates that /dev/tty is a character device, 195,0 is major and minor numbers of the device. The last w is write permission, so the above command forbids tasks to write to the /dev/tty.
-$ echo "c 195,0 w" > devices.deny
+$ echo "c 195:0 w" > devices.deny
 
-# 创建进程死循环执行nvidia-smi，记录进程号
-
-# 将进程号写到 tasks 里面，可以发现上面的脚本显示的GPU少了一个
 ```
+
+创建进程死循环`test.sh`执行 nvidia-smi，记录 test.sh 的进程号
+
+```shell
+# test.sh
+while true; do
+	nvidia-smi
+	sleep 1
+done
+```
+
+将进程号写到 tasks 里面，可以发现上面的脚本显示的GPU少了一个
+
+```txt
+Thu May 18 19:11:30 2023       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 460.73.01    Driver Version: 460.73.01    CUDA Version: 11.2     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  Tesla T4            Off  | 00000000:3B:00.0 Off |                    0 |
+| N/A   28C    P8    10W /  70W |      0MiB / 15109MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
+No devices were found
+No devices were found
+No devices were found
+```
+

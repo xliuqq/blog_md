@@ -83,12 +83,14 @@ nav:
       - gpu虚拟化: cloud/virtualize/gpu.md
   - 调度系统:
     - 概念: scheduler_system/README.md
-    - 调度的策略: scheduler_system/scheduler.md
     - Yarn:
       - 架构: scheduler_system/yarn/arch.md
       - GPU调度: scheduler_system/yarn/gpu.md
       - 自定义设备支持: scheduler_system/yarn/yarn_pluggable_device_framework.md
-    - DophinScheduler: scheduler_system/apache_dolphin_scheduler.md
+    - 工作流调度:
+      - DophinScheduler: scheduler_system/apache_dolphin_scheduler.md
+      - ArgoWorkflow: scheduler_system/argoworkflow.md
+    
   - 分布式共识/一致性:
     - 一致性: distributed_consensus/consistency.md
     - 共识: distributed_consensus/consensus.md
@@ -160,7 +162,7 @@ nav:
       - 反射: languages/java/reflection.md
       - 注解: languages/java/annotation.md
       - SPI: languages/java/spi.md
-      - 线程: languages/java/thread.md
+      - 进程: languages/java/process.md
       - 测试: languages/java/test.md
       - 类加载器: languages/java/classloader.md
       - 命令行工具: languages/java/cmd_tools.md
@@ -266,6 +268,8 @@ nav:
     - 自然语言处理NLP:
       - 动手做聊天机器人(TODO): machine_learning/nlp/chatbot.md
     - 示例案例: machine_learning/ai_demo/tools.md
+    - 部署平台:
+      - kserve: machine_learning/platform/kserve.md
     
   - Devops:
     - 概览: devops/devops.md
@@ -290,7 +294,7 @@ nav:
     - 实战: devops/action.md
   
   - Web服务:
-    - 实战：
+    - 实战:
       - 数据权限: web/action/data_permission.md
     - 后端:
       - 接口管理设计: web/backend/api_manager.md

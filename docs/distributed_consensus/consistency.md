@@ -146,6 +146,19 @@ RocketMQ 在4.3.0版中已经支持分布式事务消息，采用了***2PC（两
 
 
 
+## 一致性分类
+
+强一致性包括线性一致性和顺序一致性，其他的如最终一致都是弱一致性。
+
+- 线性一致性 Linearizability consistency ，也叫原子性
+- 顺序一致性 Sequential consistency
+- 因果一致性 Causal consistency
+- 最终一致性 Eventual consistency
+
+
+
+
+
 ## 拜占庭将军问题
 
 

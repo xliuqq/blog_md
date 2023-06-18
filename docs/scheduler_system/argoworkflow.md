@@ -1,6 +1,4 @@
-# 工作流引擎
-
-## Argo Workflow
+# Argo Workflow
 
 >  an open source container-native workflow engine for orchestrating parallel jobs on Kubernetes.
 
@@ -17,44 +15,64 @@ Argo workflows 则**假设「任务」之间是有依赖关系**的，针对这�
 
 <img src="pics/argo_demo.png" alt="img" style="zoom:50%;" />
 
-### 功能
+## 功能
 
-#### 分类
+### 分类
 
 > 当 Workflow （前端/后端/测试等）越来越多的时候，如果不做分类，一堆 WorkflowTemplate 堆在一起就会显得特别混乱。
 
 通过 **namespace / labels** 进行分类。
 
-#### 触发
+### 触发
 
 - 手动触发：手动提交一个 Workflow
 
 - 定时触发：[CronWorkflow](https://argoproj.github.io/argo-workflows/cron-workflows/)
 - 通过 Git 仓库变更触发：借助 [argo-events](https://github.com/argoproj/argo-events) 可以实现此功能，详见其文档
 
-#### secrets 管理
+### secrets 管理
 
 流水线，可以从 kubernetes secrets/configmap 中获取信息(Git 私钥、Harbor 仓库凭据、CD 需要的 kubeconfig)，将信息注入到环境变量中、或者以文件形式挂载到 Pod 中。
 
-#### Artifacts
+### Artifacts
 
 支持接入对象存储，做全局的 Artifact 仓库，本地可以使用 MinIO.
 
-#### 镜像构建
+### 镜像构建
 
 Kaniko 对构建缓存的支持也很好，可以直接将缓存存储在容器镜像仓库中。
 
 
 
-### 自定义资源
+## 信息传递
 
-#### [Workflow](https://argoproj.github.io/argo-workflows/fields/#workflow)
+Argo的步骤间可以传递信息，即下一步（容器）可以获取上一步（容器）的结果。结果传递有2种：
+
+1. 文件：上一步容器新生成的文件，会直接出现在下一步容器里面。
+
+2. 信息：上一步的执行结果信息（如某文件内容），下一步也可以拿到。
+
+[中转文件](https://github.com/argoproj/argo-workflows/blob/master/docs/workflow-executors.md)的约束：
+
+（1）“临时中转仓库”需要引入第三方软件（Minio）
+
+（2）文件不能太大
+
+（3）需要在用户容器侧，增加“代理”帮忙上传&下载文件。
+
+传递结果信息（Information）:
+
+- Pod里面的Annotation字段，当做临时中转仓库。先把信息记这里，下一步容器想要，就来这里取，约束比较大（特别是ETCD的单个对象不能超过1M大小）
+
+## 自定义资源
+
+### [Workflow](https://argoproj.github.io/argo-workflows/fields/#workflow)
 
 
 
-### 示例
+## 示例
 
-#### CLI
+### CLI
 
 提交运行
 
@@ -84,62 +102,4 @@ spec:
       command: [cowsay]
       args: ["hello world"]
 ```
-
-
-
-## [Tekton Pipelines](https://tekton.dev/)
-
-
-
-## [Apache Airflow](https://airflow.apache.org/)
-
-
-
-## [Couler](https://couler-proj.github.io/couler/)
-
-> a unified interface for constructing and managing workflows on different workflow engines, such as [Argo Workflows](https://github.com/argoproj/argo), [Tekton Pipelines](https://tekton.dev/), and [Apache Airflow](https://airflow.apache.org/).
-
-
-
-### 示例
-
-```python
-import couler.argo as couler
-from couler.argo_submitter import ArgoSubmitter
-
-couler.run_container(
-    image="docker/whalesay", command=["cowsay"], args=["hello world"]
-)
-
-submitter = ArgoSubmitter()
-result = couler.run(submitter=submitter)
-```
-
-
-
-## DophinScheduler
-
-> 分布式和可扩展的开源工作流协调平台，具有强大的DAG可视化界面。
-
-
-
-### 概念
-
-工作组（Worker组）：工作流运行时需要选定工作组，
-
-- 可用于对不同的节点进行分类，比如某个节点具备大数据环境，必须运行在该节点上；
-
-环境：绑定在 Worker 组，配置不同的环境变量信息；
-
-
-
-### 调度
-
-分配任务至同一 worker 组的不同机器上，默认提供了三种算法：
-
-- 加权随机（random）
-- 平滑轮询（roundrobin）
-- 线性负载（lowerweight），默认配置为线性加权负载
-
-
 
