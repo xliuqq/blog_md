@@ -24,7 +24,7 @@
 - 学术界谈论的 “操作系统” 是更广义的 “System”
   - 例子：对多台计算机抽象 (分布式系统)
 
-
+[随堂代码](https://gitee.com/oscsc/oslabcode/tree/master/ch01-os_introduction)
 
 **操作系统：软件硬件之间的桥梁**
 

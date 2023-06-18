@@ -27,7 +27,7 @@ markdown_extensions:
   - pymdownx.superfences
 
 extra_javascript:
-  - javascripts/mathjax.js
+  - .mkdocs/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 
@@ -73,7 +73,7 @@ nav:
       - 开源管理软件: cloud/k8s/KubeSphere.md
       - 交付平台: cloud/k8s/KubeVela.md
     - 虚拟化:
-      - 容器生态: cloud/virtualize/virtualize.md
+      - 基础: cloud/virtualize/README.md
       - docker:
         - 概念: cloud/virtualize/docker/docker.md
         - 使用: cloud/virtualize/docker/usage.md
@@ -158,6 +158,7 @@ nav:
       - Agent: languages/java/agent.md
       - 序列化: languages/java/serialize.md
       - 反射: languages/java/reflection.md
+      - 注解: languages/java/annotation.md
       - SPI: languages/java/spi.md
       - 线程: languages/java/thread.md
       - 测试: languages/java/test.md
@@ -223,7 +224,13 @@ nav:
         - 编程: distributed_computing/gpu/cuda/program.md
       - Rocm:
         - 编程: distributed_computing/gpu/cuda/hip.md
+  
+  - CS系统知识:
+    - 基础: cs/cs_basic.md
+    - 网络: cs/cs_network.md
+
   - 操作系统:
+    - 概览: os/cs_os.md
     - Linux 知识:
       - 基础: os/linux/basic.md
       - acls: os/linux/acls.md
@@ -245,6 +252,7 @@ nav:
       - updatedb: os/linux/updatedb.md
       - 进程快照: os/linux/process_snapshot.md
       - yum: os/linux/yum.md
+      - 零拷贝: os/linux/zero_coyp.md
     - Linux Shell:
       - basic: os/linux/shell/basic.md
       - args: os/linux/shell/args.md
@@ -280,13 +288,6 @@ nav:
     - 部署:
       - K8s集群交付: devops/sealer.md
     - 实战: devops/action.md
-
-  - CS系统知识:
-    - 基础: cs/cs_basic.md
-    - 操作系统: cs/cs_os.md
-    - 网络: cs/cs_network.md
-    - 数据库: cs/cs_db.md
-    - 软件工程: cs/software_engineering.md
   
   - Web服务:
     - 实战：
@@ -316,7 +317,3 @@ nav:
       - 公式: tools/markdown/math.md
       - Typora: tools/markdown/typora.md
     - 开源协议声明: tools/licenses.md
-
-  - 证书:
-    - 系统分析师:
-      - 分析题: certifacte/system_analyser/anli.md

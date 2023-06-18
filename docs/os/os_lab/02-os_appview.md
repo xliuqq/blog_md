@@ -12,7 +12,7 @@
 - 如何在操作系统上构造最小/一般/图形界面应用程序？
 - 什么是编译器？编译器把一段程序翻译成什么样的指令序列才算 “正确”？
 
-
+[随堂代码](https://gitee.com/oscsc/oslabcode/tree/master/ch02-os_app_view)
 
 ## 汇编代码的状态机模型
 

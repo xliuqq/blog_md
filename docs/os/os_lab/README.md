@@ -14,8 +14,23 @@
 大纲：
 
 1.  [操作系统概述](./01-os_introducation.md)
-   - [代码](https://gitee.com/oscsc/oslabcode/tree/master/ch01-os_introduction)
 2. [应用视角的操作系统](./02-os_appview.md)
+
+
+
+
+
+### [AbstractMachine: 抽象计算机](https://jyywiki.cn/OS/AbstractMachine/)
+
+> https://git.nju.edu.cn/jyy/os-workbench
+
+提供**运行 C 程序的框架代码和库**。裸机上的 C 语言运行环境，提供 5 组 (15 个) 主要 API，可以实现各类系统软件 (如操作系统)：
+
+- (TRM) `putch`/`halt` - 最基础的计算、显示和停机
+- (IOE) `ioe_read/ioe_write` - I/O 设备管理
+- (CTE) `ienabled`/`iset`/`yield`/`kcontext` - 中断和异常
+- (VME) `protect`/`unprotect`/`map`/`ucontext` - 虚存管理
+- (MPE) `cpu_count`/`cpu_current`/`atomic_xchg` - 多处理器
 
 
 
