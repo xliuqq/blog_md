@@ -1,5 +1,52 @@
 # 代码实战
 
+## Java 代码风格
+
+IDEA 正常的代码格式
+
+**常量和变量**
+
+- 有意义的命名；
+- 禁止魔法值，定义有意义的常量/枚举；
+
+**换行与高度**
+
+- 单方法长度不超过80行，单行长度 120字符；
+
+**控制语句**
+
+- 多层嵌套不超过三层，因条件判断和分支逻辑呈指数关系，（卫语句，策略模式，状态模式）；
+
+**注释**
+
+- Nothing is strange：需要注释；
+- Less is more：代码自解释；
+- Advance with the time：跟代码时刻保持一致；
+
+## POJO
+
+> Plain Ordinary Java Object：只含 get, set, toString 方法 的简单类
+
+DO: Domain Object
+
+BO: Bussiness Object
+
+DTO: Data Transfer Object
+
+VO: Viewer Object
+
+AO: Application Object
+
+## 基本类型和包装类型
+
+使用基本类型还是包装类型：
+
+- 所有的 POJO 类属性必须使用包装数据类型（区分默认值和NULL）；
+- RPC方法的返回值和参数必须使用包装数据类型；
+- 所有的局部变量推荐使用基本数据类型；
+
+
+
 ## DDD(领域驱动设计)
 
 > DDD: Domain Driven Design

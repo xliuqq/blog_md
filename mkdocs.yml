@@ -229,38 +229,41 @@ nav:
   
   - CS系统知识:
     - 基础: cs/cs_basic.md
-    - 网络: cs/cs_network.md
-
-  - 操作系统:
-    - 概览: os/cs_os.md
+    - 网络: 
+      - 基础: cs/network/README.md
+      - 常见协议: cs/network/protocols.md
+      - 内网穿透: cs/network/intranet_penetration.md
+      - http: cs/network/http.md
+      - tcp: cs/network/tcp.md
+    - 操作系统: cs/cs_os.md
     - Linux 知识:
-      - 基础: os/linux/basic.md
-      - acls: os/linux/acls.md
-      - bash: os/linux/bash.md
-      - cgroup: os/linux/cgroup.md
-      - chmod: os/linux/chmod.md
-      - chroot: os/linux/chroot.md
-      - firewall: os/linux/firewall.md
-      - ip: os/liunx/ip.md
-      - journald: os/linux/journald.md
-      - log: os/linux/log_and_rotate.md
-      - namespace: os/linux/namespace.md
-      - network: os/linux/network.md
-      - proc: os/linux/proc.md
-      - ramdisk: os/linux/ramdisk.md
-      - rsync: os/linux/rsync.md
-      - services: os/linux/services.md
-      - tuning: os/linux/tuning.md
-      - updatedb: os/linux/updatedb.md
-      - 进程快照: os/linux/process_snapshot.md
-      - yum: os/linux/yum.md
-      - 零拷贝: os/linux/zero_coyp.md
+      - 基础: cs/linux/basic.md
+      - acls: cs/linux/acls.md
+      - bash: cs/linux/bash.md
+      - cgroup: cs/linux/cgroup.md
+      - chmod: cs/linux/chmod.md
+      - chroot: cs/linux/chroot.md
+      - firewall: cs/linux/firewall.md
+      - ip: cs/liunx/ip.md
+      - journald: cs/linux/journald.md
+      - log: cs/linux/log_and_rotate.md
+      - namespace: cs/linux/namespace.md
+      - network: cs/linux/network.md
+      - proc: cs/linux/proc.md
+      - ramdisk: cs/linux/ramdisk.md
+      - rsync: cs/linux/rsync.md
+      - services: cs/linux/services.md
+      - tuning: cs/linux/tuning.md
+      - updatedb: cs/linux/updatedb.md
+      - 进程快照: cs/linux/process_snapshot.md
+      - yum: cs/linux/yum.md
+      - 零拷贝: cs/linux/zero_coyp.md
     - Linux Shell:
-      - basic: os/linux/shell/basic.md
-      - args: os/linux/shell/args.md
+      - basic: cs/linux/shell/basic.md
+      - args: cs/linux/shell/args.md
     - OSLabCourse:
-      - 大纲: os/os_lab/README.md
-      - 操作系统概述: os/os_lab/1_os_introduction.md
+      - 大纲: cs/os_lab/README.md
+      - 操作系统概述: cs/os_lab/1_os_introduction.md
 
   - 机器学习:
     - 图像视频:

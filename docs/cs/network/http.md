@@ -4,7 +4,7 @@ HTTP：**H**yper **T**ext **T**ransfer **P**rotocol
 
 Header
 
-- 空格编码是%20，但是application/x-www-form-urlencoded媒体类型会将空格编码为+号；
+- 空格编码是`%20`，但是application/x-www-form-urlencoded媒体类型会将空格编码为`+`号；
 
 
 
@@ -125,7 +125,17 @@ SSE是websocket的一种轻型替代方案。
 
 
 
-## websocket转发
+## WebSocket
+
+**单个TCP连接上进行全双工通信**的协议。
+
+Websocket 通过HTTP 1.1 协议的101状态码进行握手。
+
+在 WebSocket API 中，浏览器和服务器只需要完成一次握手，两者之间就直接可以创建持久性的连接，并进行双向数据传输。
+
+
+
+### WebSocket转发
 
 只支持 websocket
 

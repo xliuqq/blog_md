@@ -1,5 +1,3 @@
-[toc]
-
 # Java NIO
 
 Java中跟zero copy相关的主要集中在FileChannel和MappedByteBuffer中。
@@ -31,11 +29,11 @@ Selector 会不断地轮询注册在其上的 Channel，如果某个 Channel 上
 
 ## 零拷贝
 
-Zero拷贝的细节，见[该文档](../../os/IO.md#Linux OS的零拷贝（发送文件为例）)。
+Zero拷贝的细节，见[该文档](../../cs/linux/zero_copy.md)。
 
 ### MappedByteBuffer
 
-java nio提供的FileChannel提供`map()`方法，该方法可以在一个`打开的文件和MappedByteBuffer`之间建立一个虚拟内存映射，MappedByteBuffer继承于ByteBuffer，类似于一个基于内存的缓冲区，只不过该对象的数据元素存储在磁盘的一个文件中；
+java nio提供的FileChannel提供`map()`方法，该方法可以在一个`打开的文件和MappedByteBuffer`之间建立一个虚拟内存映射，`MappedByteBuffer`继承于`ByteBuffer`，类似于一个基于内存的缓冲区，只不过该对象的数据元素存储在磁盘的一个文件中；
 
 示例代码
 
@@ -44,7 +42,7 @@ public class MappedByteBufferTest {
     public static void main(String[] args) throws Exception {
         File file = new File("D://db.txt");
         long len = file.length();
-        byte[] ds = newbyte[(int) len];
+        byte[] ds = new byte[(int) len];
         MappedByteBuffer mappedByteBuffer = new FileInputStream(file).getChannel().map(FileChannel.MapMode.READ_ONLY, 0, len);
         for (int offset = 0; offset < len; offset++) {
             byte b = mappedByteBuffer.get();
@@ -58,7 +56,7 @@ public class MappedByteBufferTest {
 }
 ```
 
-MappedByteBuffer本身是一个抽象类，其实这里真正实例话出来的是DirectByteBuffer。
+MappedByteBuffer本身是一个抽象类，其实这里真正实例是DirectByteBuffer。
 
 ### DirectByteBuffer
 
@@ -96,7 +94,7 @@ public class ChannelTransfer {
 }
 ```
 
-### netty中零拷贝
+### Netty中零拷贝
 
 #### 避免数据流经用户空间
 

@@ -2,31 +2,48 @@
 
 > [示例项目](https://gitee.com/oscsc/jvm/tree/master/serialize)
 
+序列化 (Serialization)是将对象的**状态信息**转换为可以**存储或传输**的形式的过程。
+
+- 特定语言：如 JDK 序列化，Kryo 序列化；
+- 跨语言：如 Hessian, Protobuf, Thrift, Avro, Json 等；
+
 ## JDK
 
 序列版本UID（serial version UID），流的唯一标识符：
 
-- 默认根据类名称、实现接口、成员等信息自动生成，因此很容易出现兼容性问题；
+- **默认根据类名称、实现接口、成员等信息自动生成**，因此很容易出现兼容性问题；
+- `transient`修饰的变量，默认序列化不会进行序列化；
 
 
 
-### Serializable
+### 自定义序列化
 
 #### readObject & writeObject
 
-Java实现序列化，实现`Serializable`接口，该接口中没有任何的方法，但是要实现自定义的序列化方法时，需要重载`readObject`, `writeObject`和`readObjectNoData`且都是private
+Java实现序列化，实现`Serializable`接口，该接口中没有任何的方法，但是要实现自定义的序列化方法时，需要重载`readObject`, `writeObject`且都是private
 
 - 当`ObjectOutputStream`调用`writeObject`时，会根据`instanceof Serializable`，以及类的`ObjectStreamClass`（硬编码读取该三个方法），判断是否调用用户实现的方法还是默认的序列化方法；
 
-  
+
+```java
+private void writeObject(java.io.ObjectOutputStream out) throws IOException
+private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException;
+```
 
 除了基本的`writeObject`和`readObject`之外，以下三个函数也可以控制序列化和反序列化：
 
-- **readObjectNoData()** :用于初始化反序列化对象，当发生一些情况导致反序列化对象不能获得数据时调用；
+```java
+// readObjectNoData is used in an unusual case where the serializer (writer) is working with a version of a class with no base class, whereas the deserializer (reader) of the class has a version of the class that IS based on a subclass. The subclass can say "it's ok if my base class isn't in the serialized data - just make an empty one" by implementing readObjectNoData.
+// 序列化时用旧类，反序列化用新版本类（且变成子类），可以在父类上定义该方法，生成默认的父对象的成员值
+private void readObjectNoData() throws ObjectStreamException;
 
-- **writeReplace()** ：指派其他对象写入序列化的流中；
+// 实际序列化的对象将是作为writeReplace方法返回值的对象，而且序列化过程的依据是实际被序列化对象的序列化实现
+private Object writeReplace()
 
-- **readResolve()**：返回的对象替换反序列化创建的实例；
+// 再readObject()调用之后自动调用， 将反序列化之后的对象替换掉（可用于单例/枚举等场景）
+Object readResolve() throws ObjectStreamException;
+
+```
 
 
 
@@ -78,21 +95,24 @@ writeReplace.invoke(closure).asInstanceOf[java.lang.invoke.SerializedLambda]
  }
 ```
 
-## Kryo
+## [Kryo](](https://github.com/EsotericSoftware/kryo))
 
-> [Java 序列化框架](https://github.com/EsotericSoftware/kryo)
+> Java 主流的序列化框架。
 
 ###  
 
 ### 线程
 
-非线程安全，Each thread should have its own Kryo, Input, and Output instances.
+> [非线程安全]([GitHub - EsotericSoftware/kryo: Java binary serialization and cloning: fast, efficient, automatic](https://github.com/EsotericSoftware/kryo#thread-safety))，`Each thread should have its own Kryo, Input, and Output instances.`
+
+使用  ThreadLocal 或者 Pool 。
 
 
 
-### Demo
+## [Hessian](http://hessian.caucho.com/doc/hessian-serialization.html#toc)
 
+> 跨语言，一种动态类型、二进制序列化和 Web 服务协议，专为面向对象的传输而设计
 
+**注意子类和父类不能有同名字段，子类的属性总是会被父类的覆盖**：
 
- 
-
+- 当序列化对象是一个对象继承另外一个对象的时候，当一个属性在子类和有一个相同属性的时候，反序列化后子类属性总是为null。

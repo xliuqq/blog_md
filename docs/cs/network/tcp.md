@@ -1,11 +1,36 @@
 # TCP
 
+![image-20220331141655525](pics/image-20220331141655525.png)
+
+
+
 ## 三次握手协议
 
-状态：
+> 不论握手多少次都不能确认一条信道一定是“可靠”的，但通过3次握手可以至少确认它是“可用”的。
+>
+> 握手成功只能说明握手时的通信是正常的，并不能保证握手后的通信是正常的。
 
-- SYN_SENT
-- SYN_RECEIVED
+两次握手的问题：
+
+- 防止**已失效的连接请求报文段突然又传送到了服务端**，造成服务端资源的浪费。
+
+![establish_connection](pics/tcp_establish_connection.png)
+
+
+
+## 四次挥手
+
+![tcp_close_connection](pics/tcp_close_connection.png)
+
+**TIME_WAIT**：主动要求关闭的机器表示收到对方的**FIN**报文，并发送出**ACK**报文；
+
+- 等待的 **2MSL** 是报文在网络上生存的最长时间，超过阁值便将报文丢弃；
+- 确保被动方会接收到 ACK，变成 **CLOSED **状态；
+- **TIME_WAIT** 状态无法释放句柄资源，对于服务器来说，限制有效连接的创建数量，成为性能瓶颈；
+
+**CLOSE_WAIT**：被动要求关闭的机器收到对方请求关闭连接的**FIN**报文，在第一次**ACK**应答后；
+
+
 
 ## TCP保活
 
@@ -100,12 +125,4 @@ TCP_KEEPCNT、TCP_KEEPIDLE、TCP_KEEPINTVL
 - 考虑到如果网络出现拥塞的话就不会收到好几个重复的确认，所以发送方现在认为网络可能没有出现拥塞。所以此时不执行慢开始算法，而是将cwnd设置为ssthresh的大小，然后执行拥塞避免算法
 
 <img src="pics/fast_recovery.png" alt="fast_recovery" style="zoom:50%;" />
-
-## WebSocket
-
-**单个TCP连接上进行全双工通信**的协议。
-
-Websocket 通过HTTP 1.1 协议的101状态码进行握手。
-
-在 WebSocket API 中，浏览器和服务器只需要完成一次握手，两者之间就直接可以创建持久性的连接，并进行双向数据传输。
 
