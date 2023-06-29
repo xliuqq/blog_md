@@ -1,8 +1,24 @@
-[toc]
+# 开发工具
 
-# Jetbrain
+## VSCode
 
-## IDEA
+本地和远程开发。
+
+
+
+## JetBrains Gateway
+
+远程开发
+
+
+
+## Fleet
+
+类似 VSCode.
+
+
+
+## IDEA（Java/Scala）
 
 **maven helper** 
 
@@ -26,7 +42,7 @@
 
 
 
-## CLION
+## CLION（C++）
 
 ### include第三方头文件
 
@@ -38,7 +54,7 @@ include_directories("D:/Program Files/Java/jdk1.8.0_211/include/win32")
 
  
 
-## PyCharm
+## PyCharm（Python）
 
 - pycharm添加文件头注释
 
@@ -55,6 +71,10 @@ File->settings->Editor->File and Code Templates->Python Script
 # @File  : ${NAME}.py
 # @Software: ${PRODUCT_NAME}
 ```
+
+
+
+## GoLand（GO）
 
 
 

@@ -1,8 +1,10 @@
-# Tomcat
+# Servlet 容器
 
-Tomcat 9
+## Tomcat
 
-## 基础
+> Tomcat 9
+
+### 基础
 
 - **CATALINA_HOME**指定的是tomcat主目录，**CATALINA_BASE**指定的是实例的目录，添加脚本配置上面环境变量，通过CATALINA_HOME/bin/catalina.sh脚本执行；
 
@@ -33,7 +35,7 @@ Tomcat 9
 
 
 
-## 日志
+### 日志
 
 - 如果log4j依赖jar在Tomcat目录，则Tomcat该进程只会有一个该类的加载，**不同的webapps的log（无论是否声明为static）即使配置不同的输出文件，也会输出到同一个文件中**；
 
@@ -48,8 +50,8 @@ Tomcat 9
 
 
 
-## NIO
+### NIO
 
 - tomcat 的 **org.apache.coyote.http11.Http11NioProtocol **的Connector是一个使用 Java NIO 实现的异步 accept 请求的 connector；
   - 将 IO 线程和 业务线程分开；
-  - 使用固定的 acceptThread (网络 IO 线程, 负责 accept, read, write) 来异步处理(nio accept, read, write) n 个请求, 然后将请求入队, 最后使用固定的 requestProcessingThread (业务线程) 来处理业务逻辑, 业务逻辑的处理实际上也是同步的；
+  - 使用固定的 acceptThread (网络 IO 线程, 负责 accept, read, write) 来异步处理(nio accept, read, write) n 个请求, 然后将请求入队, 最后使用固定的requestProcessingThread (业务线程) 来处理业务逻辑, 业务逻辑的处理实际上也是同步的；

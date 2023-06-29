@@ -1,16 +1,207 @@
-# 刷库
+# DB 操作
 
-## 作用
+## JPA与ORM
+
+**ORM(Object Relation Mapping)** 思想是建立实体类和数据库元数据的自动映射关系，减少数据库访问层的代码编写；
+
+**JPA(Java Persistence API) 是Java EE5.0的平台标准的ORM规范，Hibernate兼容**。
+
+- @Entity代表是一个实体，表示与数据库有映射关系；
+- @Table表示与之对应的数据表，可以看到类属性与数据表的列是顺序对应的关系，属性上的注解表明了列的类型与状态；
+- @Column表示是表中的某个字段；
+- @Id表明是主键。当然也可以不使用注解，在xml中配置；
+
+- @Transient表示成员不是数据库中的字段；
+
+
+
+## Mybatis
+
+> 通过 SQL 操作
+
+```sql
+# Mysql 不管用=还是!=都是会把null过滤掉的，只能通过 is null 或 is not null
+id != ''
+```
+
+### 基础
+
+`#`和`$`的区别：
+
+- `#`将传入的数据都当成一个字符串，会对自动传入的数据加一个双引号。如：`order by #user_id#`，如果传入的值是111,那么解析成sql时的值为`order by "111"`, 如果传入的值是id，则解析成的sql为`order by "id"`.
+- `$`将传入的数据直接显示生成在sql中。如：`order by $user_id$`，如果传入的值是user_id，那么解析成sql时的值为`order by user_id`, 如果传入的值是id，则解析成的sql为`order by id`.
+- `#`方式能够很大程度防止sql注入，`$`方式无法防止Sql注入。
+- `$`方式一般用于传入数据库对象，例如传入表名。
+- 一般能用`#`的就别用`$`.
+
+
+
+### 示例
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.test.mapper.IndividualCustomerMapper">
+    <update id="updateAttributeGrayByID" parameterType="com.test.entity.CustomerDO">
+        UPDATE t_individualcustomer
+    	SET IsGray = #{isGray}
+    	WHERE CustomerID IN
+            <foreach collection="customerID" item="smid" index="index" open="(" separator="," close=")">
+          		#{smid}
+            </foreach>
+    </update>
+</mapper>
+```
+
+
+
+**Springboot配置**
+
+```xml
+<dependency>
+    <groupId>org.mybatis.spring.boot</groupId>
+    <artifactId>mybatis-spring-boot-starter</artifactId>
+    <version>2.1.3</version>
+</dependency>
+```
+
+```yaml
+# application.yml
+mybatis:
+    type-aliases-package: com.example.domain.model
+    type-handlers-package: com.example.typehandler
+    configuration:
+        map-underscore-to-camel-case: true
+        default-fetch-size: 100
+        default-statement-timeout: 30
+...
+```
+
+
+
+**Mybatis** 的具体配置
+
+| Property                                 | Description                                                  |
+| :--------------------------------------- | :----------------------------------------------------------- |
+| `config-location`                        | Location of MyBatis xml config file.                         |
+| `check-config-location`                  | Indicates whether perform presence check of the MyBatis xml config file. |
+| `mapper-locations`                       | Locations of Mapper xml config file.                         |
+| `type-aliases-package`                   | Packages to search for type aliases. (Package delimiters are “`,; \t\n`”) |
+| `type-aliases-super-type`                | The super class for filtering type alias. If this not specifies, the MyBatis deal as type alias all classes that searched from `type-aliases-package`. |
+| `type-handlers-package`                  | Packages to search for type handlers. (Package delimiters are “`,; \t\n`”) |
+| `executor-type`                          | Executor type: `SIMPLE`, `REUSE`, `BATCH`                    |
+| `default-scripting-language-driver`      | The default scripting language driver class. This feature requires to use together with mybatis-spring 2.0.2+. |
+| `configuration-properties`               | Externalized properties for MyBatis configuration. Specified properties can be used as placeholder on MyBatis config file and Mapper file. For detail see the [MyBatis reference page](http://www.mybatis.org/mybatis-3/configuration.html#properties). |
+| `lazy-initialization`                    | Whether enable lazy initialization of mapper bean. Set `true` to enable lazy initialization. This feature requires to use together with mybatis-spring 2.0.2+. |
+| `mapper-default-scope`                   | Default scope for mapper bean that scanned by auto-configure. This feature requires to use together with mybatis-spring 2.0.6+. |
+| `configuration.*`                        | Property keys for `Configuration` bean provided by MyBatis Core. About available nested properties see the [MyBatis reference page](http://www.mybatis.org/mybatis-3/configuration.html#settings). **NOTE**: This property cannot be used at the same time with the `config-location`. |
+| `scripting-language-driver.thymeleaf.*`  | Property keys for `ThymeleafLanguageDriverConfig` bean provided by MyBatis Thymeleaf. About available nested properties see the [MyBatis Thymeleaf reference page](http://www.mybatis.org/thymeleaf-scripting/user-guide.html#_configuration_properties). |
+| `scripting-language-driver.freemarker.*` | Properties keys for `FreeMarkerLanguageDriverConfig` bean provided by MyBatis FreeMarker. About available nested properties see the [MyBatis FreeMarker reference page](http://www.mybatis.org/freemarker-scripting/#Configuration). This feature requires to use together with mybatis-freemarker 1.2.0+. |
+| `scripting-language-driver.velocity.*`   | Properties keys for `VelocityLanguageDriverConfig` bean provided by MyBatis Velocity. About available nested properties see the [MyBatis Velocity reference page](http://www.mybatis.org/velocity-scripting/#Configuration). This feature requires to use together with mybatis-velocity 2.1.0+. |
+
+
+
+## Mybatis-plus
+
+> 用于单表操作
+
+### 返回自增主键
+
+实体对象 主键`IdType`要设置为`AUTO` 表示数据库ID自增，然后使用Mapper进行插入时，返回的实体就会包含主键值。
+
+```java
+// employee 在插入后，就会自动插入主键到对象中
+employeeService.saveOrUpdate(employee);
+baseMapper.insert(employee);
+```
+
+
+
+### 字段为null时不更新
+
+下面的方法，不会对实体中值为Null的属性（字段）进行更新。
+
+```java
+mapper.updateById(entity); 
+```
+
+Mybatis-plus默认配置中，对于参数字段为null时，会自动忽略。导致进行update操作时，无法将字段更新为null值。
+
+- 单个配置，每个参数上加注解。（但是如果其它场景不传入该值时，会导致会被更新，可能会出问题）
+
+  ```java
+  @TableField(updateStrategy = FieldStrategy.IGNORED)
+  ```
+
+- 使用**LambdaUpdateWrapper**（推荐）
+
+  ```java
+  LambdaUpdateWrapper<BizFile> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+  //过滤条件
+  lambdaUpdateWrapper.eq(BizFile::getId, bizFile.getId());
+  
+  //下面为设置值  		
+  //由于parentId会为空，所以要使用LambdaUpdateWrapper
+  lambdaUpdateWrapper.set(BizFile::getParentId, parentId);
+  lambdaUpdateWrapper.set(BizFile::getPath, newDirPath);
+  
+  //更新
+  this.update(null, lambdaUpdateWrapper);
+  ```
+
+  
+
+## Mybatis-plus-join
+
+> https://github.com/yulichang/mybatis-plus-join
+>
+> 多表连接的方案。
+
+
+
+## [BeanSearch](https://bs.zhxu.cn/)
+
+> 专注高级查询的**只读 ORM，天生支持联表**，免 DTO/VO 转换，使一行代码实现复杂列表检索成为可能！
+>
+> - **推荐** 在 **非事务性** 的 **动态** 检索场景中使用：如管理后台的订单查询等；
+>
+> - **不建议** 在 **事务性** 的 **静态** 查询场景中使用：如用户注册接口的查询账号已存在的场景；
+
+Bean Searcher 是一个**轻量级数据库条件检索引擎**，它的作用是**从已有的数据库表中检索数据**，它的目的是为了减少后端模板代码的开发，极大提高开发效率，节省开发时间，使得一行代码完成一个列表查询接口成为可能！
+
+- 不依赖具体的 Web 框架（即可以在任意的 Java Web 框架内使用）
+- 不依赖具体的 ORM 框架（即可以与任意的 ORM 框架配合使用，没有 ORM 也可单独使用）
+
+### 架构
+
+![img](pics/beansearch_architecture.jpg)
+
+### 与 Hibernate MyBatis 的区别
+
+首先，Bean Searcher 并不是一个完全的 `ORM` 框架，弥补他们在 `列表检索领域` 的不足。
+
+| 区别点           | Bean Searcher | Hibernate  | MyBatis    |
+| ---------------- | ------------- | ---------- | ---------- |
+| ORM              | **只读** ORM  | 全自动 ORM | 半自动 ORM |
+| 实体类可多表映射 | 支持          | 不支持     | 不支持     |
+| 字段运算符       | **动态**      | 静态       | 静态       |
+| CRUD             | Only R        | CRUD       | CRUD       |
+
+
+
+## 刷库
+
+### 作用
 
 1. 维护管理数据库的版本信息，记录当前服务数据库版本。
 2. 支持实现连续多版本自动升级。
 3. 对数据库操作进行控制，可将多个数据库操作声明成事务。
 
-## [开源Flyway](https://flywaydb.org/documentation/)
+### [开源Flyway](https://flywaydb.org/documentation/)
 
 
 
-### 介绍
+#### 介绍
 
 1. 可执行数据库脚本语句，进行数据库升级
 2. 管理数据版本，记录当前数据的版本信息
@@ -19,9 +210,9 @@
 
 
 
-## 自定义实现
+### 自定义实现
 
-### 核心业务实现逻辑
+#### 核心业务实现逻辑
 
 - 从sql_version.json 中获取所有的版本号及对应的脚本路径
 - 读取项目的数据库连接配置，连接数据库
@@ -31,9 +222,9 @@
 - 如果json版本号 > 表中的版本号，则按序执行对应的sql语句，如3.0版本的时候，不需要执行2.0的sql
 - sql执行全部成功，则返回true，否则以异常的形式抛出
 
-### 刷库规范定义
+#### 刷库规范定义
 
-#### bin目录下建upgrade_db.sh文件
+bin目录下建upgrade_db.sh文件
 
 ```shell
 #!/usr/bin/env bash
@@ -60,7 +251,7 @@ fi
 fi
 ```
 
-#### 集成common.util包
+集成common.util包
 
 核心代码如下：
 
@@ -340,7 +531,7 @@ public class Upgrade {
 }
 ```
 
-#### 新建script文件夹
+**新建script文件夹**
 
 目录结构如下：
 
@@ -402,3 +593,4 @@ public class VersionScriptEntity {
     }
 }
 ```
+

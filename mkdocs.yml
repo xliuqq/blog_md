@@ -231,10 +231,11 @@ nav:
     - 基础: cs/cs_basic.md
     - 网络: 
       - 基础: cs/network/README.md
-      - 常见协议: cs/network/protocols.md
-      - 内网穿透: cs/network/intranet_penetration.md
+      - LVS: cs/network/LVS.md
       - http: cs/network/http.md
-      - tcp: cs/network/tcp.md
+      - 内网穿透: cs/network/intranet_penetration.md
+      - 网络层协议: cs/network/protocols.md
+      - 传输层协议: cs/network/tcp.md
     - 操作系统: cs/cs_os.md
     - Linux 知识:
       - 基础: cs/linux/basic.md

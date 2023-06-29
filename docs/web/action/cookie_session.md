@@ -45,5 +45,4 @@ token的续期问题：refresh token + access token
 - access token 有效时间短，即使被截获，影响时间范围有限；
 - refresh token 不常用，不是所有的请求都会携带，所以更加安全；
 - 前端防止并发续期，其它请求等待当前续期的请求返回新的token，再执行；
-- 如果不止前端访问，
-  后端可以通过缓存，防止签发多个access token；
+- 如果不止前端访问，后端可以通过缓存，防止签发多个access token；

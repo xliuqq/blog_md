@@ -45,13 +45,13 @@
 
 - 但是在CI阶段，一般不进行verify，仅package不会运行spring，也就无法生成 Yaml；
 
-具体代码见 [根据注解生成Yaml](https://gitee.com/luckyQQQ/lifelearning/tree/master/java/spring/springboot-springdoc-openapi-generate-yaml)
+具体代码见 [根据注解生成Yaml](https://gitee.com/oscsc/web-tech/blob/master/api-doc/springboot-springdoc-openapi-generate-yaml)
 
 
 
-## OpenAPI/Swagger 3
+## 接口文档注解生成
 
-### 规范
+### OpenAPI/Swagger 3规范
 
 https://github.com/swagger-api/swagger-codegen
 
@@ -99,8 +99,8 @@ https://github.com/swagger-api/swagger-codegen
 
 示例项目见
 
-- [根据Yaml生成SpringBoot接口](https://gitee.com/luckyQQQ/lifelearning/tree/master/java/spring/spring-boot-openapi-generator)
-- [根据注解生成Yaml](https://gitee.com/luckyQQQ/lifelearning/tree/master/java/spring/springboot-springdoc-openapi-generate-yaml)
+- [根据Yaml生成SpringBoot接口](https://gitee.com/oscsc/web-tech/tree/master/api-doc/springboot-openapi-generator-code)
+- [根据注解生成Yaml](https://gitee.com/oscsc/web-tech/tree/master/api-doc/springboot-springdoc-openapi-generate-yaml)
 
 
 

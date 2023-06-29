@@ -10,8 +10,6 @@ OT的数据类型
 
 https://github.com/ottypes
 
-
-
 OT的问题：依赖于中心化的服务器
 
 

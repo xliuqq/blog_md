@@ -10,7 +10,7 @@ LVS的模型中有两个角色：
 
 Director Virtual IP：
 
-- 调度器用于与客户端通信的IP地址，简称为VIP
+- 调度器用于与客户端通信的IP地址，简称为 **VIP**
 
 Director IP：
 
@@ -28,7 +28,7 @@ Virtual Server via Network Address Translation
 
 通过网络地址转换（Network Address Translation）将一组服务器构成一个高性能的、高可用的虚拟服务器；
 
-![img](pics/clip_image001.png)
+<img src="pics/clip_image001.png" alt="img"  />
 
 优点：  
 
