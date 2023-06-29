@@ -1,8 +1,18 @@
 # PeerJS
 
+> 简化 WebRTC 的点对点通信、视频、音频调用。
+
+## WebRTC
+
+WebRTC（Web Real Time Communication）也叫做 **网络实时通信**，它可以 **允许网页应用不通过中间服务器就能互相直接传输任意数据，比如视频流、音频流、文件流、普通数据等**
+
+- 捕获视频和音频流
+- 进行音频和视频通信
+- 进行任意数据的通信
 
 
-## Server
+
+## PeerJS Server
 
 > [peers/peerjs-server: Server for PeerJS (github.com)](https://github.com/peers/peerjs-server)
 
@@ -59,7 +69,7 @@ Connecting to the server from client PeerJS
 </script>
 ```
 
-## Client
+## PeerJS Client
 
 ### 示例
 
