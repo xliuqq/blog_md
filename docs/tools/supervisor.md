@@ -1,4 +1,4 @@
-# Supervisor: A Process Control System
+# [Supervisor: A Process Control System](http://supervisord.org/)
 
 > Supervisor is a client/server system that allows its users to control a number of processes on UNIX-like operating systems.
 
@@ -7,7 +7,7 @@
 ## 安装
 
 ```bash
-pip  install supervisor
+pip install supervisor
 ```
 
 生成三个执行程序：

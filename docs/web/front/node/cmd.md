@@ -26,3 +26,18 @@ npm run是npm run-script的简写，执行的脚本配置在 **package.json** �
 npm install module_name **-S**  即  npm install module_name --save  写入dependencies
 
 npm install module_name **-D**  即  npm install module_name --save-dev 写入devDependencies
+
+
+
+## registry
+
+```bash
+npm --registry https://registry.npm.taobao.org install express
+```
+
+
+
+```bash
+npm config set registry https://registry.npm.taobao.org
+```
+

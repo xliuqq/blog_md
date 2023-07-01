@@ -6,7 +6,7 @@
 
 基于Etcd的watch机制，更新在毫秒级（推送的形式），而其他（如Kong）在5秒级别，且是拉取的形式。
 
-![flow-software-architecture](https://raw.githubusercontent.com/apache/apisix/master/docs/assets/images/flow-software-architecture.png)<img src="pics/flow-software-architecture.png" alt="flow-software-architecture" style="zoom: 50%;" />
+<img src="pics/flow-software-architecture.png" alt="flow-software-architecture" style="zoom: 50%;" />
 
 APISIX has two main parts:
 

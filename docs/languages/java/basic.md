@@ -66,11 +66,9 @@
 
 
 
-
-
 ## 函数
 
-- Java重载的方法（同名但签名不一样的函数）的匹配是按照声明类型匹配形参类型，而不是靠实际类型；
+- Java重载的方法（同名但签名不一样的函数）的匹配是**按照声明类型匹配形参类型**，而不是靠实际类型；
 
 
 **lombok.NonNull、javax.annotation.Nonnull** 和 **javax.validation.constraints.NotNull**的区别和使用场景：
@@ -87,7 +85,7 @@
 - 覆盖父类的方法时，访问权限不能变小（public > package > protected > private)；
 - 接口默认就是abstract public，其成员函数默认是abstract public，其成员变量默认是static final；
 - Java中**静态绑定**的情况：**调用类方法；初始化方法；私有方法**；其他都是动态绑定；
-- **this()和super()都必须在构造函数的第一行**，不会同时出现；
+- **this()和super()都必须在构造函数的第一行**，不会同时出现（先初始化再使用成员）；
 - 内部类的实例创建：`Outer.Inner in = new Outer().new Inner()`；静态内部类的创建：`Outer.Inner in = new Outer.Inner()`；
 
 ### 函数式接口（JDK8）
@@ -101,15 +99,22 @@
 
 - Java中字符串采用**Unicode编码**，一个char占两个字节；
   
-- \u是unicode编码；
-  - Java String 采用 [UTF-16编码](../unicode.md)；
+  - JDK8后，String 内部采用 `byte[]` 而不是 `char[]`
+  
+- `\u`是unicode编码；
 
-  - String的length方法返回的是Unicode的code units的数量；
+  - Java String 采用 [UTF-16编码](../unicode.md)；
+  - String的 length 方法返回的是Unicode的 code units 的数量；
+
+  ```java
+  // name.getBytes().length == 15 != (5 == name.length())
+  String name = "我是中国人";
+  System.out.println(name.getBytes().length + ":" + name.length());
+  ```
 
   - String中的**charAt**和**codePointAt**方法；
-
   - 非基本平面的String遍历方式
-  
+
   ```java
   // JDK 8, CharSequence#codePoints了返回IntStream
   "str".codePoints().forEach(c -> ...);
@@ -118,7 +123,7 @@
   String 的 **getBytes**方法，是将字符串转换为特定编码规则后的字节数组
 
   - 默认的是Charset.defaultCharset()；
-  
+
 - String的带Charset的构造方法，Charset指的是byte[]的编码方式；
 
 - **InputStreamReader读取二进制文本数据流时，可以指定Charset；**

@@ -4,7 +4,7 @@ HTTP：**H**yper **T**ext **T**ransfer **P**rotocol
 
 Header
 
-- 空格编码是%20，但是application/x-www-form-urlencoded媒体类型会将空格编码为+号；
+- 空格编码是`%20`，但是application/x-www-form-urlencoded媒体类型会将空格编码为`+`号；
 
 
 
@@ -125,45 +125,13 @@ SSE是websocket的一种轻型替代方案。
 
 
 
-## websocket转发
+## WebSocket
 
-只支持 websocket
+**单个TCP连接上进行全双工通信**的协议。
 
-```conf
-location /websocket/ {
-        proxy_pass http://myserver;
-        proxy_read_timeout 360s;   
-        proxy_redirect off;   
-        # 核心配置三行：配置连接为升级连接
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade; 
-        proxy_set_header Connection "upgrade";    
-        proxy_set_header Host $host:$server_port;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header REMOTE-HOST $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-}
-```
+Websocket 通过HTTP 1.1 协议的101状态码进行握手。
 
-支持http又支持 ws（可以见 [jupyterhub 的反向代理配置](https://jupyterhub.readthedocs.io/en/latest/reference/config-proxy.html)）
+在 WebSocket API 中，浏览器和服务器只需要完成一次握手，两者之间就直接可以创建持久性的连接，并进行双向数据传输。
 
-```conf
-	#自定义变量 $connection_upgrade
-    map $http_upgrade $connection_upgrade { 
-        default          keep-alive;  #默认为keep-alive 可以支持 一般http请求
-        'websocket'      upgrade;     #如果为websocket 则为 upgrade 可升级的。
-    }
- 
-    server {
-        ...
- 
-        location /chat/ {
-            proxy_pass http://backend;
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade; 
-            # 此处配置上面定义的变量
-            proxy_set_header Connection $connection_upgrade;
-        }
-    }
-```
+
 

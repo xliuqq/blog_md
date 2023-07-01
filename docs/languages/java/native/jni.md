@@ -590,14 +590,15 @@ void cpp2jni(int msg){
     bool isAttached = false;
     status = jvm->GetEnv((void**)&env, JNI_VERSION_1_4);
     if (status < 0) {
-        if (jvm->AttachCurrentThread(&env, NULL))将当前线程注册到虚拟机中
-        {
+        // 将当前线程注册到虚拟机中
+        if (jvm->AttachCurrentThread(&env, NULL)) {
             return;
         }
         isAttached = true;
     }
     //实例化该类
-    jobject jobject = env->AllocObject(global_class);//分配新 Java 对象而不调用该对象的任何构造函数。返回该对象的引用。
+    //分配新 Java 对象而不调用该对象的任何构造函数。返回该对象的引用。
+    jobject jobject = env->AllocObject(global_class);
     //调用Java方法
     (env)->CallVoidMethod(jobject, mid_method,msg);
  

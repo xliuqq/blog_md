@@ -1,10 +1,8 @@
-[toc]
-
 # Call Python
 
 ## GIL
 
-在使用python解释器时，要注意GIL（全局解释锁）的工作原理以及对性能的影响。GIL保证在任意时刻只有一个线程在解释器中运行。在多线程环境中，python解释器工作原理如下： Plain Text
+在使用CPython解释器时，要注意GIL（全局解释锁）的工作原理以及对性能的影响。GIL保证在任意时刻只有一个线程在解释器中运行。在多线程环境中，python解释器工作原理如下： Plain Text
 
 ```text
 1. 设置GIL
@@ -98,6 +96,16 @@ PyObject* args = Py_BuildValue("(o)", results);
 多返回值：PyArg_ParseTuple()
 
 具体例子：[1.7 Format Strings for PyArg_ParseTuple()](https://link.zhihu.com/?target=https%3A//docs.python.org/2.0/ext/parseTuple.html)
+
+### 释放引用
+
+> 在使用 `Py_DECREF` 函数时，需要确保对象的引用计数大于 0，否则会导致内存错误。通常情况下，在获取 Python 对象后，会自动增加其引用计数，因此需要在使用完后及时减少引用计数。
+
+```c++
+Py_DECREF(args);
+```
+
+
 
 ## Demo
 

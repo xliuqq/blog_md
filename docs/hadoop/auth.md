@@ -1,5 +1,3 @@
-[toc]
-
 # Hadoop 安全
 
 ## Authentication
