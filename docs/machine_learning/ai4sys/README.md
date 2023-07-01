@@ -4,6 +4,20 @@
 
 来源：https://ucbrise.github.io/cs294-ai-sys-fa19/#
 
+PPT：https://gitee.com/oscsc/ai4-sys-course
+
+
+
+[01.]
+
+[03. ML 生命周期](./ml_lifecycle.md)
+
+[05.深度学习框架](./deep_learning_frameworks.md)
+
+[06.分布式训练](./distributed_learning.md)
+
+
+
 
 
 - A Few Useful Things to Know About Machine Learning

@@ -13,6 +13,15 @@ TermIndex：
 - Term
 - Index
 
+  
+API 支持同步`io`，异步`async`；
+
+请求类型：`RaftClientRequest`
+
+- `writeRequestType()`
+- `dataStreamRequestType()`
+- `readRequestType()`
+- `watchRequestType()`
 
 
 **RaftPeer**：Raft 协议中的节点
@@ -25,7 +34,7 @@ TermIndex：
 - **Priority**
 - **StartupRole**
 
-**RaftGroup**
+**RaftGroup**：多个 Peer 组成的 Raft 集群
 
 - **RatfGroupId**：标识 Group 的唯一 Id
 - **Peers**：`List<RaftPeer>`
@@ -103,4 +112,3 @@ public classs AppStateMachine extends BaseStateMachine {
     }
 }
 ```
-
