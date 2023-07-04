@@ -265,7 +265,6 @@ nav:
     - OSLabCourse:
       - 大纲: cs/os_lab/README.md
       - 操作系统概述: cs/os_lab/1_os_introduction.md
-
   - 机器学习:
     - 图像视频:
       - 图像特征: machine_learning/imagevideo/image_feature.md
@@ -300,21 +299,24 @@ nav:
   - Web服务:
     - 实战:
       - 数据权限: web/action/data_permission.md
+      - 实时消息推送: web/action/msg_notify.md
     - 后端:
       - 接口管理设计: web/backend/api_manager.md
-      - 刷库: web/backend/db_flush.md
       - 操作日志: web/backend/operation_log.md
-      - SpringBoot: web/backend/springboot/README.md
+      - 数据库: web/backend/db.md
+      - Spring: 
+        - SpringBoot: web/backend/spring/springboot.md
       - SpringCloud: 
         - 介绍: web/backend/springcloud/README.md
         - 网关: web/backend/springcloud/gateway.md
         - 服务发现: web/backend/springcloud/discovery.md
-    - 指标系统: web/metrics.md  
-    - 分布式追踪:
-      - 概览: web/trace/tracing.md
-    - 实时消息推送: web/msg_notify.md
-    - 模板引擎: web/template_engine.md
+      - 分布式追踪:
+        - 概览: web/backend/trace/tracing.md
+      - 模板引擎: web/template_engine.md
+      - 指标系统: web/metrics.md  
+    - 认证: web/authentication.md
     - 授权: web/authroization.md
+    - 安全: web/security.md
     
   - 工具:
     - 静态网页生成: tools/static_web_generator.md

@@ -4,6 +4,12 @@
 
 
 
+Spark Connect supports most Scala APIs, including [Dataset](https://spark.apache.org/docs/3.4.1/api/scala/org/apache/spark/sql/Dataset.html), [functions](https://spark.apache.org/docs/3.4.1/api/scala/org/apache/spark/sql/functions$.html), and [Column](https://spark.apache.org/docs/3.4.1/api/scala/org/apache/spark/sql/Column.html).
+
+- 当前 （3.4.0）不支持 SparkContext 和 RDD 的API；
+
+  
+
 ## 架构
 
 ![spark-connect-api](./pics/spark-connect-api.png)
