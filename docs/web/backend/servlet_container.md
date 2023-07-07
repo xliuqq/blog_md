@@ -1,5 +1,27 @@
 # Servlet 容器
 
+常见的Servlet 容器有：Tomcat，Jetty，Undertow等。
+
+Tomcat负责请求连接，断开连接，连接校验等操作，Servlet主要处理内部数据操作。
+
+- Tomcat 可以理解成用于 http平台的服务器，能接受http的请求并分析；
+- Servlet是java内部的一种规范，准确的说，可以对参数进行分析，创建对象然后返回数据。
+
+
+
+## Servlet 
+
+> javax.servlet 规范，用于处理 HTTP 请求。
+
+- 实现 Servlet 接口，处理请求；
+- 定义`web.xml`，配置 URL 对应的处理的类全名；
+
+一般直接继承 **HttpServlet**。
+
+- **非线程安全**；
+
+
+
 ## Tomcat
 
 > Tomcat 9
@@ -27,11 +49,12 @@
 
 - **热部署**： 整个项目重新部署，包括你从新打上**.war** **文件。 会清空session** **，释放内存。项目打包的时候用的多。**
 
-- - 在server.xml -> context 属性中 设置 autoDeploy="true"
+  - 在server.xml -> context 属性中 设置 autoDeploy="true"
 
 - **热加载**：服务器会监听 class 文件改变，包括web-inf/class,web-inf/lib,web-inf/web.xml等文件，若发生更改，则局部进行加载，不清空session ，不释放内存。开发中用的多，但是要考虑内存溢出的情况。
 
-- - 在server.xml -> context 属性中 设置 reloadable="true"
+  - 在server.xml -> context 属性中 设置 reloadable="true"
+
 
 
 
@@ -55,3 +78,9 @@
 - tomcat 的 **org.apache.coyote.http11.Http11NioProtocol **的Connector是一个使用 Java NIO 实现的异步 accept 请求的 connector；
   - 将 IO 线程和 业务线程分开；
   - 使用固定的 acceptThread (网络 IO 线程, 负责 accept, read, write) 来异步处理(nio accept, read, write) n 个请求, 然后将请求入队, 最后使用固定的requestProcessingThread (业务线程) 来处理业务逻辑, 业务逻辑的处理实际上也是同步的；
+
+
+
+## UnderTow
+
+采用 Java 开发的灵活的高性能 Web 服务器，提供包括阻塞和基于 NIO 的非堵塞机制。

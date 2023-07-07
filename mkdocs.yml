@@ -2,6 +2,9 @@ site_name: XLiu知识空间
 site_description: 计算机体系的知识
 site_author: LiuZhiqiang(刘志强）
 site_url: https://xliuqq.github.io/blog_md/
+edit_url: https://gitee.com/luckyQQQ/blog_md
+repo_url: https://github.com/xliuqq/blog_md
+repo_name: xliuqq/blog_md
 docs_dir: docs
 site_dir: site
  
@@ -16,6 +19,9 @@ theme:
     - navigation.tabs.sticky
     - navigation.top
   language: 'zh'
+  icon:
+    repo: fontawesome/brands/github
+      
 
 markdown_extensions:
   - pymdownx.highlight:
@@ -26,10 +32,14 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.superfences
 
+extra:
+  github_repo: xliuqq/blog_md
+  
 extra_javascript:
   - .mkdocs/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  
 
 nav:
   - 主页: README.md
@@ -171,6 +181,7 @@ nav:
       - 三方包:
         - java和Python互相访问: languages/python/packages/java_python.md
         
+  
   - 数据查询:
     - SQL系统对比: data_query/sql_compare.md
     - SQL 基础知识:
@@ -184,7 +195,10 @@ nav:
       - 语法: data_query/presto/syntax.md
       - Raptorx和Presto on Spark: data_query/presto/presto_scale.md  
     - 基准测试(TPC): data_query/tpc.md
+  
   - 数据系统:
+    - 缓存系统:
+      - Redis(done): data_system/cache_system/redis.md
     - 消息队列:
       - Apache Pulsar: data_system/messagequeue/pulsar/apache_pulsar.md
       - STOMP协议: data_system/messagequeue/STOMP.md
@@ -301,7 +315,10 @@ nav:
       - 数据权限: web/action/data_permission.md
       - 实时消息推送: web/action/msg_notify.md
     - 后端:
-      - 接口管理设计: web/backend/api_manager.md
+      - servlet及容器(done): web/backend/servlet_container.md
+      - 全局ID生成器(done): web/backend/id_generator.md
+      - 接口管理设计(done): web/backend/api_manager.md
+      - 缓存(done): web/backend/cache.md
       - 操作日志: web/backend/operation_log.md
       - 数据库: web/backend/db.md
       - Spring: 

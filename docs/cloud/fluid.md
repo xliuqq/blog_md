@@ -365,8 +365,15 @@ engine#setup：创建 Master/Worker的StatefulSet，**FUSE**的DaemonSet，检�
 
 对于不同类型的Mount如何处理：
 
-- - Local和PVC转换为UFSPaths 和 UFSVolumes，挂载到Runtime的Master/Worker Pod中**"/underFSStorage"，即Alluxio root ufs**；
-  - HTTP等形式通过在MasterPod中执行`alluxio fs mount`；
+- Local和PVC转换为UFSPaths 和 UFSVolumes，挂载到Runtime的Master/Worker Pod中**"/underFSStorage"，即Alluxio root ufs**；
+  
+  - master/worker 的yaml 会自动添加 volumeMount 合 volume 信息；
+  
+- HTTP等形式通过在MasterPod中执行`alluxio fs mount`；
+
+  - 在 Engine 的  PrepareUFS 的 mountUFS 函数内执行命令
+
+  
 
 #### RuntimePortAllocator
 

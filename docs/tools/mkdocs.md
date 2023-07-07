@@ -11,6 +11,18 @@ pip install mkdocs-material
 
 ## 配置
 
+### 配置 Github 仓库链接
+
+```yaml
+repo_url: https://github.com/xliuqq/blog_md
+repo_name: xliuqq/blog_md
+theme:
+	icon:
+    	repo: fontawesome/brands/github
+```
+
+
+
 ### 多语言支持
 
 https://squidfunk.github.io/mkdocs-material/setup/changing-the-language/#site-language-selector
@@ -34,13 +46,36 @@ https://squidfunk.github.io/mkdocs-material/setup/changing-the-language/#site-la
 
 
 
-### plugins
+### PyMdown Extensions
+
+python markdown 插件，支持更多的markdown格式。
+
+```yaml
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+```
+
+
+
+### 数学公式
+
+参考：[MathJax - Material for MkDocs (squidfunk.github.io)](https://squidfunk.github.io/mkdocs-material/reference/mathjax/?h=math#mkdocsyml)
+
+
+
+## plugins
 
 集合列表
 
 https://github-wiki-see.page/m/mkdocs/mkdocs/wiki/MkDocs-Plugins#navigation--page-building
 
-#### search（内置）
+### search（内置）
 
 https://www.mkdocs.org/
 
@@ -50,20 +85,11 @@ https://www.mkdocs.org/
 
 A MkDocs plugin that injects the mkdocs.yml extra variables into the markdown template。
 
+### mkdocs-git-revision-date-localized-plugin
 
+support for adding the date of last update and creation of a document at the bottom of each page
 
-### 博客支持
+## 博客支持
 
 https://squidfunk.github.io/mkdocs-material/setup/setting-up-a-blog/#posts
 
-
-
-### PyMdown Extensions
-
-python markdown 插件，支持更多的markdown格式。
-
-
-
-### 数学公式支持
-
-参考：[MathJax - Material for MkDocs (squidfunk.github.io)](https://squidfunk.github.io/mkdocs-material/reference/mathjax/?h=math#mkdocsyml)
