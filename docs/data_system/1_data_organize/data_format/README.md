@@ -1,6 +1,6 @@
 #  数据存储格式
 
-像Apache Hive，Impala，Spark 这种数据分析引擎能够访问读取的文件格式。
+像Apache Hive，Impala，Spark 这种数据分析引擎能够访问读取的**文件格式**。
 - TextFile --- Hadoop TextInputFormat
 
   存储方式为行式存储，在检索时磁盘开销大，数据解析开销大，而对压缩的text文件，hive无法进行合并和拆分；

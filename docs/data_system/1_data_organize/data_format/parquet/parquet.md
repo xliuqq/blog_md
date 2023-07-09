@@ -1,6 +1,6 @@
-[toc]
-
 # Parquet
+
+> Apache Parquet is an open source, column-oriented **data file format** designed for efficient data storage and retrieval.
 
 ## 定义
 

@@ -1,6 +1,4 @@
-[toc]
-
-# Markdown公式
+## Markdown公式
 
 ## 行内与独行
 

@@ -5,8 +5,8 @@
 ## 安装
 
 ```
-pip install mkdocs
-pip install mkdocs-material
+pip install mkdocs-material -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install mkdocs-material -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 ## 配置
@@ -46,7 +46,7 @@ https://squidfunk.github.io/mkdocs-material/setup/changing-the-language/#site-la
 
 
 
-### PyMdown Extensions
+## PyMdown Extensions
 
 python markdown 插件，支持更多的markdown格式。
 
@@ -54,18 +54,102 @@ python markdown 插件，支持更多的markdown格式。
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
-  - pymdownx.arithmatex:
-      generic: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
 ```
 
+snippets:
+
+- adds the ability to embed content from arbitrary files into a document,
+
+### [数学公式MathJax](https://squidfunk.github.io/mkdocs-material/reference/mathjax/?h=math#mkdocsyml)
+
+`mkdocs.yaml`
+
+```yaml
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+```
+
+`javascripts/mathjax.js`
+
+```javascript
+window.MathJax = {
+  tex: {
+    inlineMath: [["\\(", "\\)"]],
+    displayMath: [["\\[", "\\]"]],
+    processEscapes: true,
+    processEnvironments: true
+  },
+  options: {
+    ignoreHtmlClass: ".*|",
+    processHtmlClass: "arithmatex"
+  }
+};
+
+document$.subscribe(() => { 
+  MathJax.typesetPromise()
+})
+```
+
+### [Diagrams](https://squidfunk.github.io/mkdocs-material/reference/diagrams/?h=mermaid)
+
+支持 mermaid
+
+```yaml
+markdown_extensions:
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+```
 
 
-### 数学公式
 
-参考：[MathJax - Material for MkDocs (squidfunk.github.io)](https://squidfunk.github.io/mkdocs-material/reference/mathjax/?h=math#mkdocsyml)
+### [Tabbed](https://squidfunk.github.io/mkdocs-material/reference/content-tabs/)
+
+配置
+
+```yaml
+markdown_extensions:
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true 
+```
+
+
+
+=== "C"
+
+    ``` c
+    #include <stdio.h>
+    
+    int main(void) {
+      printf("Hello world!\n");
+      return 0;
+    }
+    ```
+
+=== "C++"
+
+    ``` c++
+    #include <iostream>
+    
+    int main(void) {
+      std::cout << "Hello world!" << std::endl;
+      return 0;
+    }
+    ```
+
+
 
 
 
