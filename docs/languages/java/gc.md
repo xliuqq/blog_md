@@ -1,5 +1,7 @@
 # GC与内存
 
+
+
 ## 引用类型
 
 ### 强引用
@@ -58,15 +60,13 @@ pf.isEnQueued();　
 
 
 
-## 内存配置
+## 内存布局
 
 -Xmx -Xms
 
 -XX:InitialRAMPercentage、-XX:MaxRAMPercentage 和 -XX:MinRAMPercentage 
 
 
-
-## 内存分区
 
 
 

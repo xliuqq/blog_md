@@ -77,6 +77,58 @@
   - **@Nonnull**用在返回结果不为空的场景，主要由IDE识别并给出告警提示。
   - **@NotNull**主要用在Validator校验场景下，限制参数非空，如果不满足，则校验失败。
 
+
+
+## 异常与日志
+
+> Error 是不可控的错误，程序无法处理，必须人工介入；
+
+Exception 分为：
+
+- 受检异常：需要显式处理（try catch 或者 throws）；
+- 非受检异常（`RuntimeException`子类）
+
+finally 只用来清理资源、释放连接、关闭流等操作：
+
+- 不要在 finally 代码块中赋值，catch 中的 return 会先暂存，再执行 finally 中的代码；
+- 不要在 finally 中使用 return 语句，会使返回值的判断变得复杂；
+
+### try 跟 lock 
+
+- **try 代码块前调用 lock() 方法**，避免由于加锁失败导致 finally 调用 unlock 抛出异常；
+  - 对未加锁的对象解锁会抛出 unchecked 异常，导致**加锁失败的原因被覆盖**；
+
+```java
+Lock lock = new XXXLock();
+lock.lock();
+try {
+    // do something
+} finally {
+    lock.unlock();
+}
+```
+
+
+
+### 异常和错误码
+
+推荐规范
+
+- **对外提供的开放接口使用错误码**；
+- **内部开放的接口考虑使用 Result 对象**封装错误码和错误描述信息；
+  - 若调用方未捕获，则会产生运行时错误，导致程序中断；
+- **应用内部直接抛出异常对象**；
+
+
+
+### 返回 NULL
+
+> 契约式变成理念处于**防御式编程**理念的下风。
+
+防止 NPE 一定是调用方的责任（接收方服务可能会异常）。
+
+
+
 ## 类和接口
 
 ### 基本知识
@@ -147,7 +199,7 @@ java.nio.Files类，提供的文件的常见操作，如 创建、遍历、存�
 
 
 
-## Java Time
+### Java Time
 
 ```java
 long t1 = System.currentTimeMillis();
@@ -166,46 +218,6 @@ LocalDateTime 是没有时区概念的时间，ZonedDateTime是有时区概念�
 LocalDateTime.now(ZoneId.of("UTC")) 是根据UTC构建时间，默认是根据系统的时区创建时间；
 
 
-
-## Blas
-
-**Java Blas库：**
-
-- **[jblas]([http://jblas.org](http://jblas.org/))** is based on BLAS and LAPACK；
-- [Apache Commons Math](http://commons.apache.org/proper/commons-math/) for the most popular mathematics library in Java (not using netlib-java）；
-- **[Breeze](https://github.com/scalanlp/breeze)** for high performance linear algebra in Scala and Spark (builds on top of netlib-java 1.1.2)；
-
-免费版不再提供：
-
-- [Matrix Toolkits for Java](https://github.com/fommil/matrix-toolkits-java/) for high performance linear algebra in Java (builds on top of netlib-java)；
-
-- [**netlib-java**](https://github.com/fommil/netlib-java) is a wrapper for low-level BLAS, LAPACK and ARPACK（不再开发免费版）；
-
-
-
-**底层库安装**：
-
-- yum install atlas
-
-- yum install lapack
-
-
-
-**scala使用demo** 
-
-```scala
-import breeze.linalg.DenseMatrix  
-val m = DenseMatrix.rand(100, 100)  
-val res = m * m  
-```
-
-scala -cp spark-assembly-1.4.0-hadoop2.6.0.jar
-
-看到有类似一下信息输出则表明blas安装并调用成功：
-
-Dec 03, 2015 12:59:42 AM com.github.fommil.jni.JniLoader liberalLoad
-
-INFO: **successfully** loaded /tmp/jniloader4368196623437279381netlib-native_system-linux-i686.so
 
 
 
