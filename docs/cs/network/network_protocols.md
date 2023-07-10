@@ -11,6 +11,14 @@ NAT不仅完美地解决了lP地址不足的问题，而且还能够有效地避
 - **端口多路复用(PAT)**：多个主机共享一个合法的公网 IP 实现对Internet的访问，每个内部IP映射到公网上的一个端口；
 - **应用程序级网关技术ALG（Appliaction Level Gateway)**：传统的NAT技术只对传输层头部进行处理，支持对应用层协议中的地址信息进行转换；
 
+**SNAT**（Source Network Address Translation）指的是源地址转换，它将源IP地址和端口号进行转换。
+
+- 当一个内部设备向外部网络发送数据包时，SNAT会将源IP地址和端口号替换为一个公共IP地址和端口号，以隐藏内部网络的真实IP地址和端口号。这样可以避免内部网络受到攻击和侵入，并且可以实现多个内部设备共享一个公共IP地址的功能。
+
+**DNAT**（Destination Network Address Translation）指的是目标地址转换，它将目标IP地址和端口号进行转换。
+
+- 当外部网络向内部网络发送数据包时，DNAT会将目标IP地址和端口号替换为内部网络中的一个设备的IP地址和端口号，以实现内网穿透和访问内部网络中的设备。
+
 ### 端口多路复用 NAPT
 
 网络地址端口转换**NAPT**（Network Address Port Translation）：
@@ -22,7 +30,7 @@ NAT不仅完美地解决了lP地址不足的问题，而且还能够有效地避
 
 从同一个内网（IP，端口）发送到同一个目的IP和端口的请求都会被映射到同一个IP和端口：
 
-- （SourceIP, SourcePort,DestIP, DestPort）只要有一个发生变化都会使用不同的映射条目
+- （SourceIP, SourcePort,DestIP, DestPort）只要有**一个发生变化都会使用不同的映射条目**
 
 #### 锥形NAT（Cone NAT）
 
