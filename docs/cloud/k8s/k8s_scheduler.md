@@ -4,12 +4,12 @@
 
 > requests + limits : 大多数作业用到的资源其实远少于它所请求的资源限额
 >
-> - 声明较小的requests值供调度器使用；
+> - 声明较小的requests值供**调度器**使用；
 > - 给容器Cgroups设置的limits值相对较大；
 
 ### 资源类型
 
-针对每个container，都可以配置:
+**针对每个container**，都可以配置:
 
 ```yaml
 spec.containers[].resources.limits.cpu
@@ -51,6 +51,48 @@ iamgefs.available < 15%
 - 其次，Burstable类别，且发生“饥饿”的资源使用量超出 requests 的 Pod；
 - 最后，Guaranteed类别，且只有当 Guaranteed 类别的 Pod 的资源使用量超过 limits 限制，或者宿主机本身处于 Memory Pressure 状态时，Guaranteed 类别的 Pod 才可能被选中进行 Eviction 操作；
 
+
+
+**资源使用量超出 `limits` 的后果**
+
+CPU：
+
+- Container CPU 使用量可能允许超过 limit，也可能不允许；
+- Container **CPU 使用量超过 limit 之后，并不会被干掉**。
+
+Memory：
+
+- 如果 container 的**内存使用量超过 request**，那这个 node 内存不足时， 这个 **Pod 可能会被驱逐**；
+- Container 的**内存使用量超过 limit** 时，可能会被干掉（OOMKilled）。如果可重启，kubelet 会重启它。
+
+
+
+**Node 资源紧张时，按 QoS 分配资源比例**
+
+但只要 Guaranteed pods 需要资源，这些低优先级的 pods 就必须及时释放资源。 如何释放呢？
+
+对于 CPU 等 compressible resources，可以通过 CPU CFS shares，针对每个 QoS 分配一定比例的资源，确保在 CPU 资源受限时，每个 pod 能获得它所申请的 CPU 资源。
+
+对于 `burstable` cgroup,
+
+```ini
+/burstable/cpu.shares            = max(sum(Burstable pods cpu requests), MinShares) # MinShares == 2
+burstableLimit                  := allocatable — qosMemoryRequests[PodQOSGuaranteed]*percentReserve/100
+/burstable/memory.limit_in_bytes = burstableLimit
+```
+
+对于 `bestEffort` cgroup,
+
+```ini
+/besteffort/cpu.shares            = MinShares # MinShares == 2
+bestEffortLimit                  := burstableLimit — qosMemoryRequests[PodQOSBurstable]*percentReserve/100
+/besteffort/memory.limit_in_bytes = bestEffortLimit
+```
+
+这几个 cgroup [初始化之后](https://github.com/kubernetes/kubernetes/blob/v1.26.0/pkg/kubelet/cm/qos_container_manager_linux.go#L81), kubelet 会调用 [`UpdateCgroups()`](https://github.com/kubernetes/kubernetes/blob/v1.26.0/pkg/kubelet/cm/qos_container_manager_linux.go#L305) 方法来定期更新这三个 cgroup 的 resource limit。
+
+
+
 ### cpuset
 
 > 将容器绑定到某个 CPU 核上，减少CPU之间的上下文切换，提升容器性能。
@@ -58,6 +100,129 @@ iamgefs.available < 15%
 通过将 Pod 的 CPU 资源的 requests 和 limits 的值设置为相等即可达到 cpuset，具体绑定的核由 kubelet 决定。
 
 
+
+### 节点资源切分（预留）
+
+不是一台 node 的所有资源都能给 k8s 创建 pod 用
+
+**`[Allocatable] = [NodeCapacity] - [KubeReserved] - [SystemReserved] - [HardEvictionThreshold]`**
+
+- Allocatable：可以分配给 Pod 的资源信息
+- NodeCapacity：节点的资源信息
+
+资源预留（切分）相关的 kubelet 命令参数：
+
+- `--system-reserved=""`
+- `--kube-reserved=""`
+- `--qos-reserved=""`
+- `--reserved-cpus=""`
+
+是否需要对这些 reserved 资源用**专门的 cgroup 来做资源限额**（默认不启用），以确保彼此互不影响：
+
+- `--kube-reserved-cgroup=""`
+- `--system-reserved-cgroup=""`
+
+通过 kubelet 的config文件`/var/lib/kubelet/config.yaml`，可以查看相关参数信息
+
+### Cgroup Runtime Driver
+
+k8s 通过配置 cgroup 来限制 container/pod 能使用的最大资源量。这个配置有**两种实现方式**， 在 k8s 中称为 cgroup runtime driver：
+
+1. **`cgroupfs`**
+
+   这种比较简单直接，kubelet **往 cgroup 文件系统中写 limit** 就行。 这也是目前 k8s 的默认方式。
+
+2. **`systemd`**
+
+   所有 cgroup-writing 操作都必须**通过 systemd 的接口**，不能手动修改 cgroup 文件。 适用于 k8s cgroup v2 模式。
+
+### kubelet Cgroup 层级
+
+> cgroup v1 的说明。
+
+kubelet 会在 node 上创建了 4 个 cgroup 层级，从 node 的 **root cgroup** （一般都是 **`/sys/fs/cgroup`**）往下：
+
+1. **Node 级别**：针对 SystemReserved、KubeReserved 和 k8s pods 分别创建的三个 cgroup；
+2. **QoS 级别**：在 `kubepods` cgroup 里面，又针对三种 pod QoS 分别创建一个 sub-cgroup：
+3. **Pod 级别**：每个 pod 创建一个 cgroup，用来限制这个 pod 使用的总资源量；
+4. **Container 级别**：在 pod cgroup 内部，限制单个 container 的资源使用量。
+
+<img src="pics/k8s-cgroup-design.png" alt="img" style="zoom: 60%;" />
+
+#### Pod 级别 Cgroup
+
+为了防止一个 pod 的多个容器使用资源超标，k8s 引入了 引入了 pod-level cgroup，每个 pod 都有自己的 cgroup
+
+- 某些资源是这个 pod 的所有 container 共享的；
+- 每个 pod 也有自己的一些开销，例如 sandbox container；
+- Pod 级别还有一些内存等额外开销；
+
+#### QoS 级别 cgroup
+
+kubelet **`--cgroups-per-qos=true`** 参数（默认为 true）， 就会将所有 pod 分成三种 QoS，优先级从高到低：**`Guaranteed > Burstable > BestEffort`**。 
+
+每个 QoS 对应一个子 cgroup，设置**该 QoS 类型的所有 pods 的总资源限额**， 三个 cgroup 共同构成了 `kubepods` cgroup。 
+
+每个 QoS cgroup 可以认为是一个资源池，每个池子内的 pod 共享资源。
+
+#### Node 级别 cgroup
+
+所有的 k8s pod 都会落入 `kubepods` cgroup；
+
+- 所有 k8s pods 占用的资源都已经通过 cgroup 来控制，剩下的是 k8s 组件自身和操作系统基础服务所占用的资源，即 `KubeReserved` 和 `SystemReserved`
+-  k8s 无法管理这两种服务的资源分配，但能管理它们的限额：有足够权限给它们创建并设置 cgroup （kubelet 的参数）
+  - `--kube-reserved-cgroup=""`和`--system-reserved-cgroup=""`，**默认为空，表示不创建**，也就是系统组件和 pod 之间并没有严格隔离。
+
+### cgroup (v1) 配置目录
+
+**cgroup root**：`sys/fs/cgroup`
+
+**/kubepods（node 级别配置）**：按 resource controller 类型
+
+- `/sys/fs/cgroup/cpu/kubepods/`
+- `/sys/fs/cgroup/memory/kubepods/`
+
+**Qos 级别配置**
+
+- Burstable或BestEffort：**`/sys/fs/cgroup/{controller}/kubepods/{burstable|besteffort}`**
+- Guaranteed ：直接就是 **`/sys/fs/cgroup/{controller}/kubepods/`**， 没有单独的子目录
+  - 这种类型的 pod 都设置了 limits， 就无需再引入一层 wrapper 来防止这种类型的 pods 的资源使用总量超出限额
+
+**Pod级别配置**：配置在Qos cgroup 配置的下一级
+
+- 如 **`/sys/fs/cgroup/{controller}/kubepods/burstable/{pod_id}/`**
+
+**Container级别配置**：Pod 的下一级
+
+- 如 **`/sys/fs/cgroup/{controller}/kubepods/{pod_id}/{container_id}/`**
+
+### pod的 `requets/limits` 的计算
+
+> 代码：[`ResourceConfigForPod()`](https://github.com/kubernetes/kubernetes/blob/v1.26.0/pkg/kubelet/cm/helpers_linux.go#L119)
+
+pod 的 requests/limits 需要由 kubelet 综合统计 pod 的所有 container 的 request/limits 计算得到。 CPU 和内存的计算方式如下：
+
+```ini
+# 计算 pod 的 CPU request，通过 cpu.shares 能实现最小值控制
+pod<pod_id>/cpu.shares            = sum(pod.spec.containers.resources.requests[cpu])
+# 计算 pod 的 CPU limit，通过 cpu.cfs_quota_us 能实现最大值控制
+pod<pod_id>/cpu.cfs_quota_us      = sum(pod.spec.containers.resources.limits[cpu])
+
+# 计算 pod 的 Memory limit
+pod<pod_id>/memory.limit_in_bytes = sum(pod.spec.containers.resources.limits[memory])
+```
+
+注意，
+
+1. 如果其中**某个 container 的 cpu 字段只设置了 request 没设置 limit**， 则 pod 将只设置 `cpu.shares`，不设置 `cpu.cfs_quota_us`。
+
+2. 如果**所有 container 都没有设置 cpu request/limit**（等效于 `requests==limits==0`）， 则将 pod **cpu.share 将设置为 k8s 定义的最小值 2**。
+
+   ```ini
+    pod<pod_id>/cpu.shares = MinShares # const value 2
+   ```
+
+   这种 pod 在 node 空闲时最多能使用整个 node 的资源；但 node 资源紧张时，也最先被驱逐。
 
 
 

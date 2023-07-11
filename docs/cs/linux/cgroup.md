@@ -15,11 +15,11 @@ cgroup，其本身的作用只是任务跟踪。但其它系统（比如cpusets�
 
 ## 版本(v1/v2)
 
-Linux 中有两个 cgroup 版本：cgroup v1 和 cgroup v2。cgroup v2 是 Linux `cgroup` API 的下一个版本。
+Linux 中有两个 cgroup 版本：cgroup v1 和 cgroup v2。cgroup v2 是 Linux `cgroup` API 的下一个版本，v2 不兼容 v1。
 
 cgroup v2 提供一个具有增强资源管理能力的统一控制系统。 cgroup v2 对 cgroup v1 进行多项改进：
 
-- API 中单个统一的层次结构设计
+- API 中单个统一的层次结构设计，**v2 只有单个层级树**
 - 更安全的子树委派给容器
 - 更新的功能特性， 例如[压力阻塞信息（Pressure Stall Information，PSI）](https://www.kernel.org/doc/html/latest/accounting/psi.html)
 - **跨多个资源**的增强资源分配管理和隔离
@@ -36,6 +36,8 @@ cgroup2 on /sys/fs/cgroup/unified type cgroup2 (rw,nosuid,nodev,noexec,relatime)
 ```
 
 判断是否使用 cgroup v2：Yes if `/sys/fs/cgroup/cgroup.controllers` is present.
+
+
 
 ## 基本概念
 
