@@ -4,7 +4,40 @@
 
 ## 权限模型
 
+### 自主访问控制 DAC
+
+最早出现的是 DAC（Discretionary Access Control），在 DAC 中 **object owner** 有权**设置该 object 的访问权限**。
+
+- 通过授予 individuals/groups 以 read/write/execute 权限， object (file) 的创建者能完全控制该 object 的内容和权限。
+- 适用于**普通用户的文件权限**控制
+
+<img src="pics/RBAC_01.png" alt="img" style="zoom:67%;" />
+
+问题：**其权限传播可控性差**，**合规性很难保证，机密文件很容易被恶意 reshare 出去**。
+
+### MAC（强制访问控制）
+
+> **数字系统中，MAC 在理论要比在实际中简单** （easier in theory than in practice）
+>
+> - 一个功能完整的（full-on）MAC 系统是很难真正实现的。
+
+ 由 **administrator**（管理员）或 **administrative rule**（管理员级别的规则） 来**定义 rules**。
+
+<img src="pics/RBAC_02.png" alt="img" style="zoom:67%;" />
+
+MAC：文件 owner 只能设置一个文件 type，这个 type 包含了哪些权限是由 admin 或 policy 设置的。 用户能编辑文件内容，但无法修改文件权限。
+
+因此在 MAC 模型中，**一个人做某些事情的 能力是无法再分享给其他人**的，从而避免了文件被 reshare 的问题。
+
+**双因素登录**：2FA as MAC
+
+- 密码可以共享，但硬件 token 不能。密码是 DAC，而硬件 token 是 MAC。假设了第二因素（the second factor，即硬件 token）是不可分享的。
+
+
+
 ### RBAC
+
+> RBAC 是 **MAC 的一个子集**，它是一种特殊类型的 MAC。
 
 基于资源的权限控制，**用户 -> 角色 -> 资源** 的映射关系。
 
@@ -20,9 +53,16 @@ RBAC3：统一模型，包含RBAC1和RBAC2；
 
 ### ABAC
 
+> **对 RBAC 的改进，加了一些细节**（属性，Attributes）
+
  `基于属性的访问控制`，可以使用主体、客体或动作的属性，而不是字符串本身来控制访问。
 
 - 支持动态的属性判断等；
+- **属性**可以是位置、客户端设备平台、认证类型、用户的 http cookies 等
+- **属性的解析和认证**工作是**中心式的**，大部分都实现 在各家的 **identity provider** 中
+- 当系统判断是否授予某个用户对某资源的访问权限时，ABAC 系统 **除了检查他们的 RBAC role（group）**，还会检查**这个人携带的各种属性**。
+
+
 
 
 

@@ -1,8 +1,28 @@
 # 认证授权
 
+## RBAC 实践
+
+> [[译\] 基于角色的访问控制（RBAC）：演进历史、设计理念及简洁实现（Tailscale, 2021） (arthurchiao.art)](https://arthurchiao.art/blog/rbac-as-it-meant-to-be-zh/)
+
+根据**用户类型**（user types）而非 **文件类型**（file types）来创建 user groups
+
+**还没有谁实现过完整的 RBAC 模型**：
+
+1. 每个人都是一个 User (subject)。
+2. 每个 user 都有一个或多个 Roles。
+3. 每个 object（resource） 都有一个或多个 Tags。
+4. 一条 “security policy” **定义一个**将 `(Role, Tag)` 转换成 Entitlements 的 **公式**。
+5. 一个执行层（enforcement layer）负责 enforce security policy，并为每个 object 生成有效 entitlements 列表（ACL）。
+
+最终的产品在**理念设计上很简洁**：
+
+1. Device 或 container 的 owner 可以设置 tag；
+2. 安全团队决定谁 own 哪些 tag、每个 tag 关联了哪些 permissions、tags 会授权给哪些 roles；
+3. Identity/HR 团队决定哪些 users 应该属于哪些 roles。
 
 
-### 鉴权配置
+
+## 鉴权配置
 
 如何在接口信息上，生成**接口（数据）权限**信息
 
