@@ -1,19 +1,17 @@
-[toc]
-
-## 同步&互斥
+# 同步&互斥
 
 共享资源的互斥访问
 
 共享资源同步（同步是要保证两个线程事件执行的时序关系）
 
-### synchronized
+## synchronized
 
 ```java
 synchronized {
 }
 ```
 
-### wait & notify
+## wait & notify
 
 ```java
 synchronized {
@@ -32,7 +30,23 @@ synchronized {
 - 在没有通知的情况下，等待线程也可能（但很少）会苏醒过来，被称为“伪唤醒”（spurious wakeup）。
 - 一般情况下，优先使用notifyAll，而不是notify。
 
-### CountDownLatch 
+## CAS
+
+> CAS : Compare And Swap，乐观锁机制
+
+Java的原子类AtomicXXX 和 XXXAdder 都是使用CAS保证了线程安全。
+
+- **ABA问题**：我们拿到期望值A，再用CAS写新值C，这两个操作并不能保证原子性。因此，就有可能出现实际值已经改为B，又改回A，这种情况。当执行CAS时，不会识别ABA问题，只要看实际值还是A，就执行了。
+- 原子化的对象引用：对象引用都是封装类型，支持CAS操作。相关实现包括：AtomicReference、AtomicStampedReference和AtiomicMarkableReference。AtomicStampedReference和AtiomicMarkableReference解决了ABA问题。
+- 原子化数组：AtomicIntegerArray、AtomicLongArray和AtomicReferenceArray；
+- 原子化对象属性更新器：AtomicIntegerFieldUpdater、AtomicLongFiledUpdater和AtomicReferenceFieldUpdater
+- 原子化的累加器：DoubleAccumulator、DoubleAdder、LongAccumulator 和 LongAdder
+
+
+
+
+
+## CountDownLatch 
 
 **线程间同步，多用于任务划分场景，标记任务是否完成；**
 
@@ -80,13 +94,5 @@ class Worker implements Runnable {
 ```
 
 
-
-## Lock & ReentrantLock
-
-Lock 提供**无条件、可轮询、定时、可中断**的锁，解决了内置锁的问题：
-
-- 无法中断一个正在等待获取锁的线程，无法在请求获取一个锁时无限地等待下去；
-
-ReentrantLock：可**重入的加锁**语义；
 
 - 

@@ -1,5 +1,3 @@
-[toc]
-
 # Future
 
 异步执行的结果，可与ExecutorService线程池使用；**不提供回调函数**

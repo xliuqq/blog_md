@@ -1,8 +1,22 @@
-# 线程安全集合
+# 线程集合
+
+JDK 1.8 中的 Java 集合框架图（List/Queue/Set/Map）：
+
+- <font color='red'>红色</font>代表接口；<font color='blue'>蓝色</font>代表抽象类；<font color='green'>绿色</font>代表并发类；<font color='gray'>灰色</font>代表早期线程安全类（已废弃）。
+
+![java集合](pics/java_collections.png)
+
+## Map
+
+TreeMap 实现原理（TODO） 
+
+HashMap 实现原理（TODO）
+
+
 
 ## 同步容器类（废弃)
 
-### Vector、Hash Table
+### Vector、Hash Table、Stack
 
 Vector是ArrayList的所有操作加锁，Hash Table是HashMap的所有操作加锁
 
@@ -22,6 +36,8 @@ Vector是ArrayList的所有操作加锁，Hash Table是HashMap的所有操作加
 - 采用分段锁（Lock Striping）；
 - 弱一致性的迭代器；
 - `size`和`empty`操作被弱化，只是个估计值；
+
+实现原理（TODO）：
 
 #### ConcurrentSkipListMap
 
@@ -96,5 +112,4 @@ Vector是ArrayList的所有操作加锁，Hash Table是HashMap的所有操作加
 #### ConcurrentLinkedDeque
 
 - 无界的双端队列；
-
 

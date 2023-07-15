@@ -1,6 +1,8 @@
-[toc]
+## 锁
 
-# 死锁
+Lock 的实现原理
+
+
 
 ## 静态初始化死锁
 
@@ -26,7 +28,7 @@ public class StaticInitialDeadLockDemo {
 
 ### 示例2
 
-类A的静态初始化和类B的静态初始化互相引用，不同的线程中同时调用类A和类B的初始化；（示例2）
+类A的静态初始化和类B的**静态初始化互相引用**，不同的线程中同时调用类A和类B的初始化；（示例2）
 
 ```java
 public class StaticInitialDeadLockDemo2 {

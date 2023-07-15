@@ -2,6 +2,8 @@
 
 ## Thread类
 
+
+
 ### 中断
 
 调用线程的interupt方法时：
@@ -24,7 +26,10 @@
 
 **线程中异常应该自己捕获，线程中异常抛出，则线程停止运行**，但是**不会影响主线程和其它线程**；
 
-JVM发现一个线程因未捕获异常而退出，就会把该**异常交给Thread对象设置的UncaughtExceptionHandler**来处理，通过setUncaughtExceptionHandler方法来设置UncaughtExceptionHandler，比如把没有抓住地异常写入日志。
+JVM发现一个线程因未捕获异常而退出，就会把该**异常交给Thread对象设置的UncaughtExceptionHandler**来处理，比如把没有抓住地异常写入日志。
+
+- 全局的静态方法 `Thread::setDefaultUncaughtExceptionHandler` ；
+- 实例级的`setUncaughtExceptionHandler`的方式，处理子实例线程的异常（执行仍然在子线程中执行），
 
 
 
@@ -44,7 +49,7 @@ Java语言中线程一共有六种状态，分别是：
 
 6. 终止状态 TERMINATED；
 
-Java把OS的可运行与运行状态合一，因为这个语言层面上控制不了；把阻塞状态拆分成三种状态：BLOCKED、WAITING与TIMED_WAITING，对应不同阻塞场景
+Java 把 OS 的**可运行与运行状态合一**，因为这个语言层面上控制不了；把阻塞状态拆分成三种状态：BLOCKED、WAITING与TIMED_WAITING，对应不同阻塞场景
 
 **RUNNABLE与三种阻塞状态的转换**
 

@@ -1,10 +1,8 @@
-[toc]
-
 # Java 代码测试
 
 ## JUnit
 
-Java 单元测试。Junit 4，注释而不需继承通过反射机制
+Java 单元测试。Junit 5，注释而不需继承通过反射机制
 
 ### 命令运行
 
@@ -25,8 +23,8 @@ Java 单元测试。Junit 4，注释而不需继承通过反射机制
 - @Test
 
   - Test函数之间是互相独立的，不保证执行顺序；**每个Test都会创建一个对象的实例；**
-  - @Test(time = 1000L)，表明如果Test函数不在1000ms内完成，则测试失败；
-  - @Test(expected = NoSuchFileException.class)，则当Test函数抛出该异常时，测试不会失败；
+
+- @Timeout(value = 10)，表明如果Test函数不在10 s内完成，则测试失败；
 
 - @After
 
@@ -42,12 +40,23 @@ Java 单元测试。Junit 4，注释而不需继承通过反射机制
 - @Runwith(Parameterized.class)，默认是Junit4
   - 使用RunWith注解改变JUnit的默认执行类，并实现自已的Listener在平时的单元测试;JUnit允许用户指定其它的单元测试执行类，只需要我们的测试执行类继承类org.junit.runners.BlockJUnit4ClassRunner（继承基础类Runner也可），如Spring的执行类SpringJUnit4ClassRunner
 - @FixMethodOrder，指定Test的执行顺序；
+- @Tag 测试用例分组；
+- @TestFactory ：跟 DynamicTest 结合用作对生成动态测试用例，用于将数据的输入和输出和测试逻辑分开；
 
 ### 断言
 
 org.junit.Assert，第一个参数可以是出错时打印到信息（ErrorMessage, say what shoule happen）
 
 - assertTrue，assertEquals，assertNotNull，assertArrayEquals，fail
+- assertThrows：断言应该抛出什么异常；
+
+## [AssertJ](https://assertj.github.io/doc/)
+
+AssertJ - Fluent Assertions for Java
+
+```java
+assertThat(frodo.getAge()).as("check %s's age", frodo.getName()).isEqualTo(33);
+```
 
 ## JBehave
 
@@ -83,3 +92,8 @@ Mockito.when(mock(ClassA.class).method()).thenReturn().thenReturn();
 - 使用静态方法等时，@RunWith(PowerMockRunner.class) 和 @PrepareForTest(被测试的类）
 - 用法和Mockito一致，构造函数 whenNew()
 - 测试时的字节码和平时编译出来的字节码不一致
+
+
+
+## 代码覆盖率
+
