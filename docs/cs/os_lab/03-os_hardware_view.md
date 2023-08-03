@@ -8,8 +8,6 @@
 - 计算机硬件和程序员之间是如何约定的？
 - 听说操作系统也是程序。那到底是鸡生蛋还是蛋生鸡？
 
-[随堂代码](https://gitee.com/oscsc/oslabcode/tree/master/ch03-os_hardware_view)
-
 
 
 ## 计算机硬件的状态机模型

@@ -14,9 +14,13 @@
 大纲：
 
 1.  [操作系统概述](./01-os_introducation.md)
-2. [应用视角的操作系统](./02-os_appview.md)
-
-
+    - [随堂代码](https://gitee.com/oscsc/oslabcode/tree/master/ch01-os_introduction)
+2.  [应用视角的操作系统](./02-os_appview.md)
+    - [随堂代码](https://gitee.com/oscsc/oslabcode/tree/master/ch02-os_app_view)
+3.  [硬件视角的操作系统](03-os_hardware_view.md)
+    - [随堂代码](https://gitee.com/oscsc/oslabcode/tree/master/ch03-os_hardware_view)
+4.  [操作系统模型](04-os_python_modeling.md)
+    - [随堂代码](https://gitee.com/oscsc/oslabcode/tree/master/ch04-os_python_modeling)
 
 
 
