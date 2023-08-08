@@ -1,12 +1,37 @@
 # CGroup
 
-## 前提
+## 容器（Container）
 
-cgroup已经安装好，在 `/sys/fs/cgroup` 目录下。
+yarn container 默认不支持对cpu进行资源隔离，例如申请的1个vcore，实际上又启动了多线程，还有GC线程等都会造成资源使用不可控。
 
+内存限制，通过 Java 启动指定-Xmx，也不是Container真实的内存限制。
 
+### 类型
 
-## 配置
+#### DefaultContainerExecutor
+
+- 默认的executor，管理容器的执行；
+- 容器进程的用户是NodeManager的Unix User；
+- 安全性低且没有任何CPU资源隔离机制。
+
+#### LinuxContainerExecutor
+
+容器进程的用户：
+
+- 开启 full security 时，是提交应用的 Yarn User（因此需要在对应的NodeManager中，**该用户存在**，多租户下可能会有问题）；
+- 未开启 full security时，默认为 nobody用户，通过配置可以修改：
+  - `yarn.nodemanager.linux-container-executor.nonsecure-mode.limit-users`：是否在非安全模式下，限制运行用户为单个用户；
+  - `yarn.nodemanager.linux-container-executor.nonsecure-mode.local-user`：非安全模式下的运行用户；
+
+| yarn.nodemanager.linux-container-executor.nonsecure-mode.local-user | yarn.nodemanager.linux-container-executor.nonsecure-mode.limit-users | User running jobs         |
+| :----------------------------------------------------------- | :----------------------------------------------------------- | :------------------------ |
+| (default：nobody)                                            | (default：true)                                              | nobody                    |
+| yarn                                                         | (default：true)                                              | yarn                      |
+| yarn                                                         | false                                                        | (User submitting the job) |
+
+## Cgroup 配置
+
+> 前提：cgroup已经安装好，在 `/sys/fs/cgroup` 目录下。
 
 **yarn-site.xml** （cgroup专属配置）
 

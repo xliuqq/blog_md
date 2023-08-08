@@ -1,5 +1,7 @@
 # Yarn 
 
+> [Apache Hadoop YARN: Yet Another Resource Negotiator](./pdf/YARN-SOCC2013.pdf)
+
 服务化（Service）+ 事件驱动（Event/Dispatcher），模块间通过事件联系，异步、并发，更适合大型分布式系统。
 
 ## 架构
@@ -20,6 +22,12 @@
 - 单个节点上的资源管理
 - 处理来自ResourceManger的命令
 - 处理来自ApplicationMaster的命令
+
+#### Yarn Shuffle Service
+
+Yarn Shuffle Service作为线程运行在`NodeManager`进程中。
+
+
 
 ### Application Master
 
@@ -61,9 +69,7 @@ AM，RM，NM，Admin四个服务
 
 ## 事件
 
-YARN 将各种处理逻辑抽象成事件和对
-应事件调度器，并将每类事件的处理过程分割成多个步骤，用有限状态机表示。AsycDispatcher 是 YARN 的中央异步调度器。在 ResourceManager
-中，几乎所有的事件都通过 AsyncDispatcher 进行事件的派发。
+YARN 将各种处理逻辑抽象成事件和对应事件调度器，并将每类事件的处理过程分割成多个步骤，用有限状态机表示。AsycDispatcher 是 YARN 的中央异步调度器。在 ResourceManager中，几乎所有的事件都通过 **AsyncDispatcher** 进行事件的派发。
 
 <img src="pics/image-20210925185548457.png" alt="image-20210925185548457" style="zoom:80%;" />
 

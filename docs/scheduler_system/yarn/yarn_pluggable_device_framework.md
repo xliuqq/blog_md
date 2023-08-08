@@ -4,8 +4,6 @@
 
 - 依赖 `LinuxContainerExecutor ` 进行 Cgroup 隔离
 
-
-
 ## 配置
 
 `capacity-scheduler.xml`

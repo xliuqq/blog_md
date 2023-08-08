@@ -1,4 +1,6 @@
-# Yarn GPU（3.x版本）
+# Yarn GPU
+
+> https://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/UsingGpus.html
 
 ## 前提
 
@@ -6,23 +8,24 @@
 - YARN NodeManager 所在机器必须预先安装了 Nvidia Driver；
 - 如果使用 Docker 作为容器的运行时上下文，需要安装 nvidia-docker 1.0。
 
-
-
 注：**GPU资源的隔离，需要使用 LinuxContainerExecutor** (YARN-9419)，
+
+本节只关注 非 docker 的配置。
+
+## 配置
+
+> 以 hadoop 用户启动
+
+### capacity-scheduler.xml 
 
 ```xml
 <!-- For Capacity Scheduler capacity-scheduler.xml -->
 <property>
-  <name>yarn.scheduler.capacity.resource-calculator</name>
-  <value>org.apache.hadoop.yarn.util.resource.DominantResourceCalculator</value>
+  <name>yarn.scheduler.capacity.resource-calculator</name> <value>org.apache.hadoop.yarn.util.resource.DominantResourceCalculator</value>
 </property>
 ```
 
-## 配置
-
-### GPU调度
-
-#### resource-types.xml
+### resource-types.xml
 
 ```xml
 <configuration>
@@ -35,16 +38,44 @@
 
 `yarn-site.xml`中必须配置 `yarn.scheduler.capacity.resource-calculator`为`org.apache.hadoop.yarn.util.resource.DominantResourceCalculator`。
 
-### GPU隔离
+### yarn-site.xml
 
-#### yarn-site.xml
-
-在NodeManager端启用GPU隔离模块
+在NodeManager端启用GPU隔离模块，配置 CGroup。
 
 ```xml
 <property>
     <name>yarn.nodemanager.resource-plugins</name>
     <value>yarn.io/gpu</value>
+</property>
+<!-- cgroup 配置 -->
+<property>
+    <name>yarn.nodemanager.container-executor.class</name>
+    <value>org.apache.hadoop.yarn.server.nodemanager.LinuxContainerExecutor</value>
+</property>
+<!-- 使用LinuxContainerExecutor不会强制使用CGroups。如果希望使用CGroups，则必须将resource-handler-class设置为CGroupsLCEResourceHandler-->
+<property>
+    <name>yarn.nodemanager.linux-container-executor.resources-handler.class</name>
+    <value>org.apache.hadoop.yarn.server.nodemanager.util.CgroupsLCEResourcesHandler</value>
+</property>
+<!-- 默认为false，挂载cgroup的路径，当通过df命令查看，/sys/fs/cgroup目录没有被挂载时，将其设置为true可以自动挂载 -->
+<property>
+    <name>yarn.nodemanager.linux-container-executor.cgroups.mount</name>
+    <value>false</value>
+</property>
+<!-- Cgroup的所在路径 -->
+<property>
+    <name>yarn.nodemanager.linux-container-executor.cgroups.mount-path</name>
+    <value>/sys/fs/cgroup</value>
+</property>
+<!-- Nodemanager用户的所属主组，与container-executor.cfg中的配置保持一致，用于验证权限 -->
+<property>
+    <name>yarn.nodemanager.linux-container-executor.group</name>
+    <value>hadoop</value>
+</property>
+<!-- NM进程会自动生成该目录，与container-executor.cfg中的配置保持一致 -->
+<property>
+    <name>yarn.nodemanager.linux-container-executor.cgroups.hierarchy</name>
+    <value>/hadoop-yarn</value>
 </property>
 ```
 
@@ -52,7 +83,7 @@
 
 只有当管理员有特殊要求时，才需要在`yarn-site.xml`配置以下配置。
 
-##### 管理的GPU设备
+#### 管理的GPU设备
 
 `yarn.nodemanager.resource-plugins.gpu.allowed-gpu-devices`：默认auto。
 
@@ -62,83 +93,62 @@
   - GPU的索引格式为`index:minor_number[,index:minor_number...]`；
   - 示例"0:0,1:1,2:2,3:4"，管理的GPU为MinorNumber为0,1,2,4，其索引为0,1,2,3
 
-##### 发现GPU的命令
+#### 发现GPU的命令
 
-`yarn.nodemanager.resource-plugins.gpu.path-to-discovery-executables`：auto模式，指定nvidia-smi命令的绝对路径
+`yarn.nodemanager.resource-plugins.gpu.path-to-discovery-executables`：auto模式，指定 **nvidia-smi** 命令的绝对路径
 
-##### Docker插件相关的配置
-
-当用户需要在Docker容器中运行GPU应用程序时，可以自定义配置。如果管理员遵循nvidia-docker的默认安装/配置，则不需要它们。
-
-`yarn.nodemanager.resource-plugins.gpu.docker-plugin`：默认 nvidia-docker-v1
-
-- 为GPU指定docker命令插件。默认使用Nvidia docker V1.0, V2.x可以使用`nvidia -docker-v2`。
-
-`yarn.nodemanager.resource-plugins.gpu.docker-plugin.nvidia-docker-v1.endpoint`：默认http://localhost:3476/v1.0/docker/cli
-
-- 指定nvidia-docker-plugin的end point。请查看文档:https://github.com/NVIDIA/nvidia-docker/wiki了解更多细节。
-
-##### CGroups mount
-
-GPU隔离使用**CGroup设备控制器对每个GPU设备**进行隔离。接下来的配置应该添加到**yarn-site.xml来自动挂载CGroup子设备**，否则管理员必须手动创建device子文件夹来使用这个特性。
-
-`yarn.nodemanager.linux-container-executor.cgroups.mount`：默认true
-
-#### container-executor.cfg
+### container-executor.cfg
 
 **添加**以下内容
 
 ```ini
+# NM 的 Unix 用户组，跟 yarn-site 中保持一致
+yarn.nodemanager.linux-container-executor.group=hadoop
+# 允许使用的用户的 uid 最小值，防止有其他超级用户
+min.user.id=10
 [gpu]
 module.enabled=true
-```
-
-当用户需要在非docker环境下运行GPU应用时:
-
-```ini
 [cgroups]
 # This should be same as yarn.nodemanager.linux-container-executor.cgroups.mount-path inside yarn-site.xml
 root=/sys/fs/cgroup
 # This should be same as yarn.nodemanager.linux-container-executor.cgroups.hierarchy inside yarn-site.xml
-yarn-hierarchy=yarn
+yarn-hierarchy=/hadoop-yarn
 ```
 
-当用户需要在Docker环境下运行GPU应用时:
+注意权限问题
 
-1）在docker部分添加GPU相关设备
+- **该文件container-executor.cfg 及其的所有父目录(一直到/ 目录) owner** 都为 root；
+  - 二进制的 owner 必须是 root，属组必须与 NM 属组相同 (hadoop)，权限 0400；
 
-通过`ls /dev/nvidia*`查看
+- `bin/container-executor`的权限必须单独配置
+  - 二进制的 owner 必须是 root，属组必须与 NM 属组相同 (hadoop)，权限 6050；
+  - `chown root:hadoop bin/container-executor && chmod 6050 bin/container-executor`
 
-```ini
-[docker]
-docker.allowed.devices=/dev/nvidiactl,/dev/nvidia-uvm,/dev/nvidia-uvm-tools,/dev/nvidia1,/dev/nvidia0
+或者可以通过`yarn.nodemanager.linux-container-executor.path`重新指定 container-executor目录
+
+- `container-executor`是根据相对路径搜索`container-executor.cfg`
+- 这样相关的递归权限就容易设置；
+
+```xml
+<!-- yarn-site.xml --> 
+<property>
+    <name>yarn.nodemanager.linux-container-executor.path</name>
+    <value>/hadoop/bin/container-executor</value>
+</property>
+
+<!-- 
+/hadoop
+  - /bin
+	- container-executor
+  - /etc
+	- /hadoop
+      - container-executor.cfg
+-->
 ```
 
-2）添加*nvidia-docker*到volumn-driver白名单
+### 检查
 
-```ini
-[docker]
-...
-docker.allowed.volume-drivers
-```
-
-3）添加*nvidia-driver_<version>*到只读mount的白名单
-
-```ini
-[docker]
-...
-docker.allowed.ro-mounts=nvidia_driver_375.66
-```
-
-4）如果使用*nvidia-docker-v2*作为gpu docker插件，则添加nvidia到运行时白名单中。
-
-```ini
-[docker]
-...
-docker.allowed.runtimes=nvidia
-```
-
-
+`container-executor --checksetup`，没有任何提示表示配置成功，可以正常启动集群使用
 
 ## 使用
 
@@ -199,13 +209,9 @@ yarn jar <path/to/hadoop-yarn-applications-distributedshell.jar> \
        -num_containers 2
 ```
 
-
-
 ### 效果
 
 Yarn是没有通知container，可用的GPU卡号，而是通过cgroup device隔离，限定Container可以使用的卡号。
-
-
 
 ```shell
 ./bin/yarn jar share/hadoop/yarn/hadoop-yarn-applications-distributedshell-3.2.1.jar -jar share/hadoop/yarn/hadoop-yarn-applications-distributedshell-3.2.1.jar -shell_command '/home/experiment/anaconda3/bin/python /home/experiment/pytorch.py' -container_resources memory-mb=1024,vcores=1,yarn.io/gpu=1 -num_containers 2
@@ -240,4 +246,3 @@ print(x)
 
 ![No LCE](pics/yarn_gpu_no_lce.png)
 
-### TODO：devices设备的配置
