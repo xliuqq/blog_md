@@ -101,8 +101,11 @@ nav:
     - 概念: scheduler_system/README.md
     - Yarn:
       - 架构: scheduler_system/yarn/arch.md
-      - GPU调度: scheduler_system/yarn/gpu.md
-      - 自定义设备支持: scheduler_system/yarn/yarn_pluggable_device_framework.md
+      - Cgroup配置: scheduler_system/yarn/cgroup.md
+      - GPU调度配置: scheduler_system/yarn/gpu.md
+      - 自定义设备支持: scheduler_system/yarn/yarn_resource_model.md
+      - 节点标签和属性: scheduler_system/yarn/node_label_attributes.md
+      - Yarn应用编写: scheduler_system/yarn/write_applications.md
     - 工作流调度:
       - DophinScheduler: scheduler_system/apache_dolphin_scheduler.md
       - ArgoWorkflow: scheduler_system/argoworkflow.md
