@@ -134,8 +134,6 @@ POST http://rm-http-address:port/ws/v1/cluster/apps
 
 ## 3. Spark 提交原理
 
-
-
 当前只讨论`Yarn Cluster`模式，**Client模式下Driver在Client中，无法直接提供Yarn Rest服务**；
 
 - 客户端：`org.apache.spark.deploy.yarn.Client`
@@ -201,8 +199,6 @@ org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode cluster \
 
 ### 3.3 `Client`类
 
-
-
 - 在 HDFS 的 `/user/${user}/.sparkStaging/${appId}`下建立目录，用于Yarn的localResource，如下所示；
   - 上传spark配置`__spark_conf__.zip`和应用的jar包到HDFS的路径；
   - 对这两个文件，作为Yarn AM的 local resource；
@@ -246,8 +242,6 @@ drwx------. 2 hadoop hadoop  4096 Sep 26 15:32 __hadoop_conf__
 
 ### 3.4 `ApplicationMaster`类
 
-
-
 AM启动命令，类似如下：
 
 - `{{PWD}}`这个是HADOOP内置的变量的使用形式；
@@ -272,17 +266,11 @@ AM启动命令，类似如下：
 
 # 4 示例
 
-
-
 ## 4.1 创建应用，并获取应用ID
-
-
 
 ```
 POST http://rm-http-address:port/ws/v1/cluster/apps/new-application
 ```
-
-
 
 ## 4.2 执行应用
 
@@ -290,33 +278,23 @@ POST http://rm-http-address:port/ws/v1/cluster/apps/new-application
 
 ### 4.2.1 Spark自身的jars设置
 
-
-
 **AM** 设置，两种方案：
 
 - 通过Yarn local resource，将jar包上传到hdfs上，并在http请求体中配置每一个的jar的local resource（大概226个），或者**先手动合成一个jar包**，再配置（只需HDFS一份）；
 - 直接通过CLASSPATH，在Yarn的每个节点都在相同位置安装spark的jars文件，然后在HTTP请求体中的CLASSPATH指定该路径（所有Yarn nodemanager节点一份）；
-
-
 
 **Executor**设置，两种方案：
 
 - 通过Yarn local resource，Spark（`spark.yarn.jar`） 是通过先将Spark自身的jar包设置`spark.yarn.cache.filenames | timestamps | visibilities | sizes | types`，放在`__spark_conf__.properties`里，然后解析并配置为Executor的local resource；
 - 直接通过CLASSPATH，在`__spark_conf__.properties`里设置`spark.executor.extraClasspath`，路径为spark的jars文件（所有Yarn nodemanager节点一份）
 
-
-
 ### 4.2.2 Spark应用程度的jar设置
 
 因为应用程序本身的jar包，是不能预先存在集群上的，且上传到全部节点也不现实（除非有NFS等），因此对于应用程序本身的jar包，需要通过Yarn local resource进行配置，仍然分为AM和Executor两部分的配置。
 
-
-
 前提准备：
 
 - 将应用程序jar包，上传到HDFS上，获取到JDFS上该文件的路径、大小、时间戳等信息；
-
-
 
 **AM：**
 
@@ -335,8 +313,6 @@ POST http://rm-http-address:port/ws/v1/cluster/apps/new-application
 }
 ```
 
-
-
 **Executor**：
 
 - 在`_spark_conf__.properties`，配置`spark.yarn.cache.filenames | timestamps | visibilities | sizes | types`，如下所示
@@ -349,13 +325,9 @@ spark.yarn.cache.sizes=2017859
 spark.yarn.cache.types=FILE
 ```
 
-
-
 ### 4.2.2 Spark配置
 
 #### 构建`__spark_conf__.zip`
-
-
 
 根据3.3节内容，可知zip包格式如下：
 
@@ -371,8 +343,6 @@ spark.yarn.cache.types=FILE
 # hadoop 配置，优先级比__hadoop_conf__高
 - _spark_hadoop_conf__.xml
 ```
-
-
 
 `__spark_conf__.zip`作为AM的Yarn local resource，在HTTP请求格式，类似如下：
 
@@ -394,8 +364,6 @@ spark.yarn.cache.types=FILE
 
 `__spark_conf__.properties`中的配置，可以作为HTTP请求体中的command的java 系统配置传入（形式`-Dspark.a.b.c=de`的格式
 
-
-
 ### 4.2.3 调用Restful
 
 注：
@@ -403,19 +371,11 @@ spark.yarn.cache.types=FILE
 - 对于Spark 自身的jar包，采用所有节点相同目录部署的形式；
 - Spark自身应用程序的jar包，采用Yarn local resource的形式；
 
-
-
 Yarn RM接口：`POST http://rm-http-address:port/ws/v1/cluster/apps`
-
-
 
 #### 只需要 `__spark_conf__.properties`
 
-
-
 注: 如果只需要`__spark_conf__.properties` 文件，也可以只设置这个文件的local resource，上传到HDFS也可以只上传该文件，而不需要整个`__spark_conf__.zip`
-
-
 
 `__spark_conf__.properties`示例：
 
@@ -524,10 +484,6 @@ spark.yarn.cache.types=FILE
 }
 ```
 
-
-
-
-
 #### 采用`__spark_conf__.zip`传递配置
 
 其中有**注释的配置，需要进行修改后，删除注释**，再进行调用：
@@ -607,5 +563,3 @@ spark.yarn.cache.types=FILE
   "am-black-listing-requests": null  
 }
 ```
-
-#### 
