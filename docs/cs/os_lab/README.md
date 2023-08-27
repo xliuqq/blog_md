@@ -2,6 +2,8 @@
 
 > https://jyywiki.cn/OS/2023/
 >
+> - [The Hitchhiker’s Guide to Operating Systems](./pdfs/The Hitchhiker’s Guide to Operating Systems.pdf)
+>
 > 参考书：
 >
 > - [OSTEP] Remzi H. Arpaci-Dusseau and Andrea C. Arpaci-Dusseau. *[Operating Systems: Three Easy Pieces](http://pages.cs.wisc.edu/~remzi/OSTEP/)*. Arpaci-Dusseau Books, 2018.

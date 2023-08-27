@@ -47,7 +47,7 @@
 - 获取到**类路径（classpath）下的资源路径**信息
 
   - ClassLoader.getResource(String classpathFilePath)，类似“双亲委派机制”，以 / 开头的资源是在ClassLoader目录下的资源，并非指的是当前应用的类加载路径下的资源。<font color="red">如果资源是位于classpath下的不要以 / 开头</font>；
-  - Class<?>.getResource(String      classpathFilePath)，当路径信息不以 / 开头时，获取的是相对于当前类所在路径的相对资源；<font color="red">当路径信息以 / 开头时，则获取的是当前应用类加载路径下的资源</font>
+  - Class<?>.getResource(String  classpathFilePath)，当路径信息不以 / 开头时，获取的是相对于当前类所在路径的相对资源；<font color="red">当路径信息以 / 开头时，则获取的是当前应用类加载路径下的资源</font>
 
 - jar中的文件的获取方式：
 
