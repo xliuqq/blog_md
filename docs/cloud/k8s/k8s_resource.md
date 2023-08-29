@@ -221,13 +221,13 @@ Terminated：已经开始执行并且或者正常结束或者因为某些原因�
 Pod里的**容器的健康检查**：支持`exec`执行命令（返回0表示健康），或者`httpGet`，`tcpsocket`请求；
 
 - `livenessProbe`：指示容器是否正在运行。
-  - 存活态探测失败，则 kubelet 会杀死容器， 并且容器将根据其重启策略决定；
+  - 存活态探测失败，则 kubelet 会杀死容器， 并且容器将**根据其重启策略决定**；
   - 如果容器不提供存活探针， 则默认状态为 Success。
-- `readinessProbe`：指示容器是否准备好为请求提供服务
-  - 就绪态探测失败， 端点控制器将从与 Pod 匹配的所有Services的端点列表中删除该 Pod 的 IP 地址；
+- `readinessProbe`：指示容器是否准备好为请求提供服务（用于 Service做负载均衡）
+  - 就绪态探测失败（Pod的状态为 NotReady）， 端点控制器将从与 Pod 匹配的**所有Services的端点列表中删除该 Pod 的 IP 地址**；
   - 容器不提供就绪态探针，则默认状态为 `Success`。
-- `startupProbe`：指示容器中的应用是否已经启动
-  - 提供了启动探针，则所有其他探针都会被 禁用，直到此探针成功为止；
+- `startupProbe`：指示容器中的应用是否已经启动，只执行一次。
+  - 提供了启动探针，则**所有其他探针都会被禁用**，直到此探针成功为止；
   - 启动探测失败，`kubelet` 将杀死容器，而容器依其重启策略进行重启；
   - 如果容器没有提供启动探测，则默认状态为 `Success`。
 
@@ -850,6 +850,8 @@ Secret、ConfigMap、Downward API三种信息，可以通过**环境变量的方
 
 在容器中会生成`${container_mount_path}/${secret_name}`文件，文件内容为对应的值，且etcd中值更新时，**文件内容也会更新**。
 
+- 对于以 [subPath](https://kubernetes.io/zh-cn/docs/concepts/storage/volumes#using-subpath) 形式挂载 Secret 卷的容器而言， 它们无法收到自动的 Secret 更新。
+
 #### kubernetes.io/dockerconfigjson
 
 作为 docker 私有镜像的认证配置，通过
@@ -1123,7 +1125,40 @@ spec:
 
 
 
-## MutatingWebhookConfiguration（TODO）
+## MutatingWebhookConfiguration
+
+> Webhook 默然按照字母序进行各个 Webhook 的调用，为了保证 Fluid Webhook 能够在最后一个调用，设置 reinvocationPolicy: IfNeeded（在 Webhook 阶段，如果在调用后其被其他 webhook 修改，则再次调用该 Webhook）即可。
+
+示例
+
+```yaml
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: fluid-pod-admission-webhook
+webhooks:
+  - name: schedulepod.fluid.io
+    rules:
+      - apiGroups:   [""]
+        apiVersions: ["v1"]
+        operations:  ["CREATE","UPDATE"]
+        resources:   ["pods"]
+    clientConfig:
+      service:
+        namespace: fluid-system
+        name: fluid-pod-admission-webhook
+        path: "/mutate-fluid-io-v1alpha1-schedulepod"
+        port: 9443
+      caBundle: Cg==
+    timeoutSeconds: 20
+    failurePolicy: Fail
+    sideEffects: None   # 说明此 Webhook 是否有副作用
+    admissionReviewVersions: ["v1","v1beta1"]
+    reinvocationPolicy: Never #在一次录取评估中，Webhook 被调用的次数不会超过一次
+    namespaceSelector:
+      matchLabels:
+        fluid.io/enable-injection: "true"
+```
 
 
 

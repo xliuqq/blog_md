@@ -1,5 +1,7 @@
 # Knative
 
+> [knative doesn't allow you to mount custom volumes](https://github.com/knative/serving/issues/11069#issuecomment-857838668)
+
 Knative 是以 **Kubernetes** 的一组自定义资源类型（CRD）的方式来安装
 
 - 自动完成代码到容器的构建

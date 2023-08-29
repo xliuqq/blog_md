@@ -204,6 +204,8 @@ nav:
       - 语法: data_query/presto/syntax.md
       - Raptorx和Presto on Spark: data_query/presto/presto_scale.md  
     - 基准测试(TPC): data_query/tpc.md
+    - MySQL:
+      - 基础: data_query/mysql/mysql.md
   
   - 数据系统:
     - 缓存系统:
@@ -338,8 +340,11 @@ nav:
         - 服务发现: web/backend/springcloud/discovery.md
       - 分布式追踪:
         - 概览: web/backend/trace/tracing.md
-      - 模板引擎: web/template_engine.md
+      - 模板引擎: web/backend/template_engine.md
+      - 规则引擎: web/backend/rule_engine.md
+      - 状态机框架: web/backend/statemachine.md
       - 指标系统: web/metrics.md  
+      - MQTT: web/backend/mqtt.md
     - 认证: web/authentication.md
     - 授权: web/authroization.md
     - 安全: web/security.md

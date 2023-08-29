@@ -1,10 +1,8 @@
-[toc]
-
 # Spark重试
 
 ## ApplicationMaster 重试
 
-
+Yarn 上会配置作业重试次数。
 
 ## Executor 重试
 

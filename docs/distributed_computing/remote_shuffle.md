@@ -35,3 +35,10 @@
 > Apache Uniffle is a unified remote shuffle service for compute engines.
 
 ### TODO(https://uniffle.apache.org/zh-CN/)
+
+
+
+## Apache Celeborn（incubating）
+
+> Apache Celeborn is an elastic and high-performance service for shuffle and spilled data.
+

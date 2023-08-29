@@ -1,6 +1,6 @@
-[toc]
-
 # Spark 作业调度
+
+> https://spark.apache.org/docs/latest/job-scheduling.html#
 
 ## 配置参数
 
@@ -12,9 +12,11 @@
 
 - 具体的算法参数由各种配置决定；
 
+
+
 ## 应用间调度
 
-在多个应用之间调度，但不支持跨应用的内存共享
+在多个应用之间调度，但**不支持跨应用的内存共享**
 
 - Standalone：默认**FIFO**，控制 `spark.cores.max`和 `spark.executor.memory` 控制应用使用的资源；
 
@@ -35,6 +37,20 @@ Spark提供了一种基于工作负载动态调整应用程序占用的资源的
   - 每个worker节点，会启动`external shuffle service`；
 
 
+
+**资源分配和回收**
+
+- 当有pending的task时，每  `spark.dynamicAllocation.sustainedSchedulerBacklogTimeout` （默认1s）触发
+  - 请求executor分配：当存在pending task持续时间超过  `spark.dynamicAllocation.schedulerBacklogTimeout` (默认 1s)
+  - 指数级分配，第一次满足分配1，第二次满足分配 2 ... 
+
+- 当 executor 空闲超过 `spark.dynamicAllocation.executorIdleTimeout`（默认60s） 时，会被回收；
+
+
+
+Cache数据的Executor：
+
+- 默认不会被回收，配置 `spark.dynamicAllocation.cachedExecutorIdleTimeout`；
 
 
 

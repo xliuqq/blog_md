@@ -2,9 +2,49 @@
 
 > Fluid是一个开源的Kubernetes原生的分布式数据集编排和加速引擎，主要服务于云原生场景下的数据密集型应用，例如大数据应用、AI应用等。
 
+## 场景
+
+主要关注**数据集编排**和**应用编排**这两个重要场景
+
+- 数据集编排可以将**指定数据集的数据缓存到指定特性的Kubernetes节点**；
+- 而应用编排将指定该**应用调度到可以或已经存储了指定数据集的节点**上；
 
 
-Dataset 支持 Spec字段的 update 么？（不支持）
+
+## 架构
+
+<img src="pics/architecture.png" alt="img" style="zoom: 60%;" />
+
+### 控制器(Fluid-controller-manager)
+
+逻辑上相关的一组数据的集合
+
+### 调度器(Fluid-scheduler)
+
+支持数据集的管理和加速
+
+## 原理
+
+**原理和流程：**
+
+- DataSet声明数据集的来源，**Runtime选择node打标签由K8s进行worker调度**；
+- CSI-Plugin作为Deamonset挂载宿主机的`/runtime-mnt`，当Pod挂载PVC时，将对应的`/runtime-mnt`的子目录bind挂载到容器；
+- APP Pod 获取数据是，会触发宿主机`/runtime-mnt`的文件操作，触发FUSE容器通过Alluxio Worker中获取数据；
+  - PVC的数据读取通过CSI-Plugin和FUSE实现，**CSI-Plugin 和 FUSE DaemonSet都挂载宿主机的相同目录（/runtime-mnt）**；
+  - FUSE DaemonSet的本地挂载目录为`/runtime-mnt/alluxio/default/demo`，后两个为*dataset  namespace*和*name*；
+  - Alluxio Worker 根据 DataSet 中声明的远程路径，进行数据操作；
+- Pod选定Runtime的节点，通过webhook通过节点亲和性进行处理；
+
+Alluxio Runtime会创建`**-config`存储Alluxio集群的相关配置信息，供FUSE使用；
+
+App Pod 指定 PVC，PV 和 PVC 由对应的 Cache Runtime 创建（通过指定Label（跟DataSet的name/namespace）进行绑定，Annotation判断是否创建）；
+
+- pv的名字由dataset的namespace-name构成；
+- pvc的name/namespace 跟 dataset一致；
+
+
+
+Dataset 支持 Spec字段的 update 么？（部分支持）
 
 dataloader中executing阶段，**定时20s**（很多处）进行更新？
 
@@ -24,39 +64,6 @@ AssignNodesToCache 没有调用方？
 DataSet的亲和性和Pod的亲和性冲突了怎么处理？
 
 - DataSet的亲和性应该保证和Pod一致，即将Pod的节点亲和性配置应用到DataSet中；
-
-## 场景
-
-1. 作为新的PVC：实现远程文件的访问；（Alluxio + FUSE，作为 SI ）
-2. 加速已有的PVC：NFS的带宽成为了瓶颈；而Fluid基于Alluxio提供了分布式缓存的P2P数据读取能力；
-3. 数据预加载；
-4. HDFS访问加速：通过hdfs client 访问 PVC（hdfs访问Alluxio FS）；
-5. Restful访问Dataset；
-6. 数据缓存亲和性和容忍（DataSet支持NodeSelector）；
-7. 手动扩缩容（通过修改Runtime的Worker的replica数量）；
-8. Fuse客户端全局部署：不要求数据和Fuse客户端之间的强制亲和性（即FUSE和Worker部署在一个节点）；
-9. 指定特定用户进行访问数据；
-
-## 架构
-
-<img src="pics/architecture.png" alt="img" style="zoom: 50%;" />
-
-**原理和流程：**
-
-- DataSet声明数据集的来源，**Runtime选择node打标签由K8s进行worker调度**；
-- CSI-Plugin作为Deamonset挂载宿主机的`/runtime-mnt`，当Pod挂载PVC时，将对应的`/runtime-mnt`的子目录bind挂载到容器；
-- APP Pod 获取数据是，会触发宿主机`/runtime-mnt`的文件操作，触发FUSE容器通过Alluxio Worker中获取数据；
-  - PVC的数据读取通过CSI-Plugin和FUSE实现，**CSI-Plugin 和 FUSE DaemonSet都挂载宿主机的相同目录（/runtime-mnt）**；
-  - FUSE DaemonSet的本地挂载目录为`/runtime-mnt/alluxio/default/demo`，后两个为*dataset  namespace*和*name*；
-  - Alluxio Worker 根据 DataSet 中声明的远程路径，进行数据操作；
-- Pod选定Runtime的节点，通过webhook通过节点亲和性进行处理；
-
-Alluxio Runtime会创建`**-config`存储Alluxio集群的相关配置信息，供FUSE使用；
-
-App Pod 指定 PVC，PV 和 PVC 由对应的 Cache Runtime 创建（通过指定Label（跟DataSet的name/namespace）进行绑定，Annotation判断是否创建）；
-
-- pv的名字由dataset的namespace-name构成；
-- pvc的name/namespace 跟 dataset一致；
 
 
 
@@ -85,9 +92,10 @@ Dataset的生命周期流程如图所示：
 
 #### Spec
 
-- `mounts`：定义来源，**支持 https://, http://, local:// 和 pvc://；**
+- `mounts`：定义来源，**支持 https://, http://, local:// 和 pvc:// 等（依据底层的存储）；**
+  
   - 支持多个Mount，会根据名字，建立不同的文件目录；
-
+  
 - `owner`：定义用户，设置权限，uid/gid；
 
 - **`nodeAffinity`：缓存的节点亲和性（限制runtime的worker的节点选择）；**

@@ -1,5 +1,9 @@
 # 基础
 
+> 版本支持时间：https://spring.io/projects/spring-boot#support
+>
+> - springboot 3.x 要求 JDK 17
+
 ## 配置
 
 ### 文件加载顺序
