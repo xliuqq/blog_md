@@ -108,12 +108,73 @@ SSE是websocket的一种轻型替代方案。
 | 文本传输                 | 二进制传输            |
 | 支持自定义发送的消息类型 | -                     |
 
+### Range
 
+如果请求一个资源时， HTTP响应中出现如下所示的 'Accept-Ranges'， 且其值不是none， 那么服务器支持范围请求。
+
+```bash
+# Response 的响应
+curl -I http://i.imgur.com/z4d4kWk.jpg
+
+HTTP/1.1 200 OK
+...
+Accept-Ranges: bytes
+Content-Length: 577454964
+Content-Range: bytes 0-577454963/577454964
+```
+
+在如上响应中，Accept-Ranges: bytes 代表可以使用字节作为单位来定义请求范围。这里的 Response Headers中的 Content-Length: 577454964则代表该资源的大小。
+
+在处理HTTP Range 请求时，有三个相关的状态：
+
+- 206 Partial Content——> HTTP Range 请求成功
+- 416 Requested Range Not Satisfiable status.——> HTTP Range 请求超出界限
+- 200 OK——> 不支持范围请求
+
+#### 单个范围请求
+
+```bash
+curl http://i.imgur.com/z4d4kWk.jpg -i -H "Range: bytes=0-1023"
+
+# HTTP/1.1 206 Partial Content Content-Range: bytes 0-1023/577454964 Content-Length: 1024 ... (binary content)
+```
+
+正常情况下 server 返回 206 部分内容响应，Content-Length表示的是现在请求的范围大小，而Content-Range则表示的是这部分消息在完整资源中的位置。
+
+#### 多范围请求
+
+```bash
+curl http://www.example.com -i -H "Range: bytes=0-50, 100-150"
+# HTTP/1.1 206 Partial Content 
+# Content-Type: multipart/byteranges; boundary=3d6b6a416f9b5 
+# Content-Length: 282 
+# --3d6b6a416f9b5 
+# Content-Type: video/mp4
+# Content-Range: bytes 0-50/577454964
+# ... binary data...
+# --3d6b6a416f9b5 
+# Content-Type: video/mp4
+# Content-Range: bytes 100-150/577454964
+
+# 多部分 byterange，每个部分包含自己的Content-Type 和 Content-Range
+```
+
+#### 条件范围请求
+
+当继续请求更多资源时，你需要确保被存储的资源在上一帧收到后没有被改变。
+
+- 如果条件得到满足，range请求将会被发出，server 发回带有适当正文的206 partial content 应答；
+- 如果条件不满足则返回完整资源，并显示200 OK状态。
+
+If-Range 头可以与Last-Modified 验证程序，或者与 ETag 一起使用。
+
+> If-Range: Wed, 21 Oct 2015 07:28:00 GMT
 
 ## 错误码
 
-|                      |                                                  |
+| 错误码               | 信息                                             |
 | -------------------- | ------------------------------------------------ |
+| 206(Partial Content) | 部分资源                                         |
 | 400(Bad  Request)    | 语法错误无法解读请求                             |
 | 401(Unauthorized)    | 无权限访问资源，但身份认证后可以访问权限时       |
 | 403(Forbidden)       | 不允许客户端获得资源的访问权限，即使通过身份认证 |

@@ -325,6 +325,8 @@ nav:
     - 实战:
       - 数据权限: web/action/data_permission.md
       - 实时消息推送: web/action/msg_notify.md
+      - 弹幕设计: web/action/barrage.md
+      - 视频播放: web/action/video_play.md
     - 后端:
       - servlet及容器(done): web/backend/servlet_container.md
       - 全局ID生成器(done): web/backend/id_generator.md

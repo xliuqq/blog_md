@@ -4,7 +4,7 @@
 
 ## 抽取成图片
 
-使用ffmpeg将图片抽取为多个图片
+使用ffmpeg将视频抽取为多个图片
 
 `ffmpeg -i /path/to/my/video.mp4 /path/to/output/video-frame-%d.png`
 

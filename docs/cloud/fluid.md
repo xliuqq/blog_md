@@ -249,12 +249,10 @@ Executing阶段
 
 > node 的 labels的创建时机：Sync()函数会定期的进行设置，即使不创建App Pod；
 
-
-
 Setup时，创建Worker：
 
 - `alluxio.node.go`中`AssignNodesToCache`函数（废弃不用），寻找 node 进行 worker的放置（考虑数据集的亲和性）；
-- `LabelCacheNode和UnlabelCacheNode`：在Sync的时候，对Node设置和取消设置标签；
+- `LabelCacheNode和UnlabelCacheNode`：**在Sync的时候，对Node设置和取消设置标签**；
 
 ```yaml
 # 设置数据集个数
@@ -365,9 +363,8 @@ engine#setup：创建 Master/Worker的StatefulSet，**FUSE**的DaemonSet，检�
 
 - **FUSE Pod**如何创建的：
 
-  DaemonSet申请：`value.Fuse.NodeSelector[e.getFuseLabelname()] = "true"`
-
-  CSI NodeStageVolume里设置该值；
+  - DaemonSet申请：NodeSelector 满足`fluid.io/f-{ns}-{ds_name}= "true"`
+- CSI NodeStageVolume里设置该值；
 
 
 
@@ -391,9 +388,9 @@ engine#setup：创建 Master/Worker的StatefulSet，**FUSE**的DaemonSet，检�
 
 ## FluidApp
 
-[Knative 下FUSE使用](https://github.com/fluid-cloudnative/fluid/blob/master/docs/zh/samples/knative.md)
-
-`namespace` 需要添加标签`fluid.io/enable-injection`，开启此namespace下Pod的调度优化功能。（用作关闭FUSE sidecar）
+> 用作关闭 FUSE sidecar（针对 serverless 场景），当 主 Pod完成后，sidecar 的Pod 应该同样结束
+>
+> - Pod 需要有标签，`fuse.serverful.fluid.io/inject=true`
 
 **作为 Serverless 集群的Controller，Pod Fuse Sidecar的状态判断。**
 
@@ -420,8 +417,8 @@ Fluid 默认安装webhook的Deployment，对Pods的create/update进行回调，�
 
   - 将 PVC 的 volume 替换成Fuse容器的路径；
 
-- 如果不是 serverless 模式，则进行`RequireNodeWithFuse`，`PreferNodesWithCache`，`MountPropagationInjector`；
-  - `RequireNodeWithFuse`：fuse的global 和 selector的注入Pod；
+- 如果不是 serverless 模式，则进行`NodeAffinityWithCache`，`PreferNodesWithCache`，`MountPropagationInjector`；
+  - `NodeAffinityWithCache`：fuse的global 和 selector的注入Pod；
   - `PreferNodesWithCache`：pod的节点亲和性调度设置，调度到具备`commonLabel（fluid.io/s-default-demo=true）`的节点；
   - `MountPropagationInjector`：pod进行`MountPropagation`配置为`HostToContainer`
 
@@ -431,9 +428,11 @@ Fluid 默认安装webhook的Deployment，对Pods的create/update进行回调，�
 
 > Serverless 模式下，不触发 CSI::NodeStageVolume，因为会将 PVC 的 volume 重写为 hostPath；
 
-配置 FuseRecovery，FUSE的自动恢复；
+配置 FuseRecovery，FUSE 的自动恢复；
 
-选择`fluid.io/s-default-fusedemo: "true"`的Volume绑定；（fuse pod 什么时候创建？）
+选择`fluid.io/s-default-fusedemo: "true"`的Volume绑定；
+
+- fuse pod 创建见 `NodeStageVolume`阶段；
 
 配置 Fluid Driver，进行自定义存储驱动；
 
@@ -442,17 +441,19 @@ Fluid 默认安装webhook的Deployment，对Pods的create/update进行回调，�
 - CSI Driver DaemonSet 挂载宿主机的`/runtime`目录；
 
 ```shell
-# 将alluxio的目录，挂载到pod中
+# 将alluxio的目录，挂载到pod中，对 pod 该路径的读写，触发 fuse 操作，进而跟 Alluxio 通信
+# fuse daemonset 将 hostpah 的 /runtime-mnt/alluxio/default/demo/ 挂载到容器
 /bin/mount --bind -o ro /runtime-mnt/alluxio/default/demo/alluxio-fuse /var/lib/kubelet/pods/9b5bdfd5-7510-4d50-9246-8f7ebce12a80/volumes/kubernetes.io~csi/default-demo/mount
 ```
 
 `NodeStageVolume`阶段：
 
-- 设置`fluid.io/f-default-demo=true` 标签，即节点上具备该CSI插件，供FUSE使用（此时Fuse daemonset满足调度条件，才会进行调度）；
+- Pod 使用 Dataset Volume 时，CSI 插件执行到该阶段，表明 Pod 调度在该节点；
+- 设置`fluid.io/f-default-demo=true` 标签，即节点上具备该CSI插件，**供FUSE使用**（此时Fuse daemonset满足调度条件，才会进行调度）；
 
 `NodePublishVolume`阶段：
 
-- 将 fluid-path 挂载到 pod 的目录中；
+- 将 fluid fuse path 挂载到 pod 的目录中；
 
 ```txt
 NodePublishVolumeRequest is volume_id:"default-phy" 
