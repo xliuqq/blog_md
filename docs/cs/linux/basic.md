@@ -598,77 +598,9 @@ proxy_password=代理服务器密码
 
 
 
-## 调试相关命令
+## [调试相关命令](./binutils.md)
 
 > 工具命令
 >
 > [Coreutils - GNU core utilitieshttps://www.gnu.org/software/binutils/)
-
-### ldd
-
-打印共享对象依赖关系，可以显示依赖的库的路径（静态依赖），not found的依赖由运行时决定（如配置LD_LIBRARY_PATH）。
-
-```shell
-$ ldd /bin/ls
-        linux-vdso.so.1 =>  (0x00007ffef5ba1000)
-        libselinux.so.1 => /lib64/libselinux.so.1 (0x00007fea9f854000)
-        libcap.so.2 => /lib64/libcap.so.2 (0x00007fea9f64f000)
-        libacl.so.1 => /lib64/libacl.so.1 (0x00007fea9f446000)
-        libc.so.6 => /lib64/libc.so.6 (0x00007fea9f079000)
-        libpcre.so.1 => /lib64/libpcre.so.1 (0x00007fea9ee17000)
-        libdl.so.2 => /lib64/libdl.so.2 (0x00007fea9ec13000)
-        /lib64/ld-linux-x86-64.so.2 (0x00007fea9fa7b000)
-        libattr.so.1 => /lib64/libattr.so.1 (0x00007fea9ea0e000)
-        libpthread.so.0 => /lib64/libpthread.so.0 (0x00007fea9e7f2000)
-```
-
-### ltrace
-
-`ltrace` 命令可以显示运行时从库中调用的所有函数。
-
-看到被调用的函数名称，传递给该函数的参数，函数返回的内容。
-
-```shell
-$ ltrace ls
-__libc_start_main(0x4028c0, 1, 0x7ffd94023b88, 0x412950 <unfinished ...>
-strrchr("ls", '/')                                                 = nil
-setlocale(LC_ALL, "")                                              = "en_US.UTF-8"
-bindtextdomain("coreutils", "/usr/share/locale")                   = "/usr/share/locale"
-textdomain("coreutils")                                            = "coreutils"
-__cxa_atexit(0x40a930, 0, 0, 0x736c6974756572)                     = 0
-isatty(1)                                                          = 1
-getenv("QUOTING_STYLE")                                            = nil
-getenv("COLUMNS")                                                  = nil
-ioctl(1, 21523, 0x7ffd94023a50)                                    = 0
-<< snip >>
-fflush(0x7ff7baae61c0)                                             = 0
-fclose(0x7ff7baae61c0)                                             = 0
-+++ exited (status 0) +++
-```
-
-### strace
-
-跟踪系统调用和信号，见[使用案例](./tuning.md#strace)
-
-```shell
-$ strace -f /bin/ls
-execve("/bin/ls", ["/bin/ls"], [/* 17 vars */]) = 0
-brk(NULL)                               = 0x686000
-mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f967956a000
-access("/etc/ld.so.preload", R_OK)      = -1 ENOENT (No such file or directory)
-open("/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
-fstat(3, {st_mode=S_IFREG|0644, st_size=40661, ...}) = 0
-mmap(NULL, 40661, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7f9679560000
-close(3)                                = 0
-<< snip >>
-fstat(1, {st_mode=S_IFCHR|0620, st_rdev=makedev(136, 1), ...}) = 0
-mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f9679569000
-write(1, "R2  RH\n", 7R2  RH
-)                 = 7
-close(1)                                = 0
-munmap(0x7f9679569000, 4096)            = 0
-close(2)                                = 0
-exit_group(0)                           = ?
-+++ exited with 0 +++
-```
 

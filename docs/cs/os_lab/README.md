@@ -26,6 +26,11 @@
 
 
 
+20. [C标准库和实现](./20-c_standard_lib.md)
+21. [可执行文件与加载](./21-22-executable_files_loading.md)
+
+
+
 ### [AbstractMachine: 抽象计算机](https://jyywiki.cn/OS/AbstractMachine/)
 
 > https://git.nju.edu.cn/jyy/os-workbench
