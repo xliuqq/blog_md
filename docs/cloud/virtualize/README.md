@@ -106,7 +106,7 @@ Kubernetes 只需支持 containerd 等high-level container runtime即可。
 >
 > gVisor includes an [Open Container Initiative (OCI)](https://www.opencontainers.org/) runtime called `runsc` that makes it easy to work with existing container tooling. The `runsc` runtime integrates with Docker and Kubernetes, making it simple to run sandboxed containers.
 
-#### [Containerd](./containerd/README.md)
+#### [Containerd](./containerd/containerd.md)
 
 > [An open and reliable container runtime. ](https://github.com/containerd/containerd)CNCF gradulated project.
 

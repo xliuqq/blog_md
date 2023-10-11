@@ -71,7 +71,7 @@ HTTP/2的通过**stream支持连接的多路复用**，提高连接利用率。S
 - Stream可以被client和server单方面或者共享使用；
 - Stream可以被任意一端关闭；
 - Stream会确定好发送frame的顺序，另一端会按照接受到的顺序来处理；
-- Stream用一个唯一ID来标识，client创建的是奇数，server创建的是偶数。
+- **Stream用一个唯一ID来标识**，client创建的是奇数，server创建的是偶数。
 
 提高一个stream的并发，可以调大MAX_CONCURRENT_STREAMS。
 
@@ -94,19 +94,67 @@ HTTP/2 默认的 window size 是 64 KB。
 
 ## Content-Type
 
+> content-type 是  Http Header 中的一个字段，在此单独列出。
+
+
+
+### application/octet-stream
+
+> 二进制文件没有特定或已知的 subtype，即使用 `application/octet-stream`
+>
+> - 浏览器针对此类型的响应，会将其保存下载下来（配合 Content-Disposition）；
+> - 如果是其它的客户端（比如 curl，Java），可以自行处理；
+
+
+
 ### text/event-stream
+
+> 不应该设置 WriteTimeOut
 
 webpack热更新需要向浏览器推送信息，一般都会想到websocket，但是还有一种方式，叫做**Server-Sent Events**（简称SSE）。
 
-SSE是websocket的一种轻型替代方案。
+- SSE是 websocket 的一种轻型替代方案，其响应 Type 类型为 `text/event-stream`。
 
-| sse                      | websocket             |
-| ------------------------ | --------------------- |
-| http 协议                | 独立的 websocket 协议 |
-| 轻量，使用简单           | 相对复杂              |
-| 默认支持断线重连         | 需要自己实现断线重连  |
-| 文本传输                 | 二进制传输            |
-| 支持自定义发送的消息类型 | -                     |
+| sse                                     | websocket             |
+| --------------------------------------- | --------------------- |
+| http 协议                               | 独立的 websocket 协议 |
+| 轻量，使用简单                          | 相对复杂              |
+| 默认支持断线重连（JS 自带 EventSource） | 需要自己实现断线重连  |
+| 文本传输                                | 二进制传输            |
+| 支持自定义发送的消息类型                | -                     |
+
+
+
+## Other Headers
+
+### Transfer-Encoding
+
+> 当包体长度未知或者我们想把包体拆成几个小块传输时（比如推送场景），即 Content-Length 长度未知时。
+
+当服务器返回 `Transfer-Encoding: chunked` 时，表明此时服务器会对返回的包体进行 `chunked` 编码，每个 chunk 的格式如下所示：
+
+```shell
+${chunk-length}\r\n${chunk-data}\r\n
+```
+
+其中，`${chunk-length}` 表示 chunk 的字节长度，使用 16 进制表示，`${chunk-data}` 为 chunk 的内容。
+
+当 chunk 都传输完，需要额外传输 `0\r\n\r\n` 表示结束。
+
+- HTTP 的包已经对该格式进行解析和处理，应用端直接读取 Body，如下（假设每个chunk-data按 `\n`划分）
+
+  ```go
+  rep, _ := client.Get(url)
+  reader := bufio.NewReader(rep.Body)
+  defer rep.Body.Close()
+  for {
+      // handle chunked data
+      data, _ := reader.ReadString('\n')
+      log.Printf("receive: [%s]", data)
+  }
+  ```
+
+  
 
 ### Range
 
@@ -170,6 +218,10 @@ If-Range 头可以与Last-Modified 验证程序，或者与 ETag 一起使用。
 
 > If-Range: Wed, 21 Oct 2015 07:28:00 GMT
 
+
+
+
+
 ## 错误码
 
 | 错误码               | 信息                                             |
@@ -187,6 +239,10 @@ If-Range 头可以与Last-Modified 验证程序，或者与 ETag 一起使用。
 
 
 ## WebSocket
+
+> 服务端可以通过检查请求的协议来区分是HTTP还是WebSocket的请求
+>
+> - Upgrade头部字段值为websocket，则表示客户端希望升级到WebSocket协议；
 
 **单个TCP连接上进行全双工通信**的协议。
 

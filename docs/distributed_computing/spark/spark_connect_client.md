@@ -1,4 +1,4 @@
-# Spark Connect
+# [Spark Connect](https://spark.apache.org/docs/latest/spark-connect-overview.html)
 
 > In Apache Spark 3.4, Spark Connect introduced a decoupled client-server architecture that allows remote connectivity to Spark clusters using the **DataFrame** API and **unresolved logical plans** as the protocol. 
 

@@ -93,10 +93,12 @@ nav:
       - docker:
         - 概念: cloud/virtualize/docker/docker.md
         - 使用: cloud/virtualize/docker/usage.md
-        - 镜像搬运工具: cloud/virtualize/docker/skopeo.md
         - FAQ: cloud/virtualize/docker/faqs.md
       - containerd: cloud/virtualize/containerd/containerd.md
       - gpu虚拟化: cloud/virtualize/gpu.md
+    - Habor镜像仓库: cloud/habor.md
+    - Fluid 数据缓存: cloud/fluid.md
+    - 镜像搬运工具: cloud/virtualize/docker/skopeo.md
   - 调度系统:
     - 概念: scheduler_system/README.md
     - Yarn:

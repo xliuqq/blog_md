@@ -13,3 +13,7 @@ containerd 是一个工业级标准的容器运行时，它强调**简单性**�
 ## 架构
 
 ![img](pics/containerd_arch.webp)
+
+## 配置
+
+containerd 可以修改 http://docker.io 对应的 endpoint（默认为https://registry-1.docker.io），而 docker 无法修改。

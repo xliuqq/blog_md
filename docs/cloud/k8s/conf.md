@@ -47,13 +47,17 @@ $ kubectl taint nodes --all node-role.kubernetes.io/master -
 
 ### ResourceVersion
 
-全局唯一的版本号（`metadata.resourceVersion`）。
+> 同一个版本的并发修改，只能有一个成功，两一个再更改时会发现版本号不一致。
+>
+> - 其 CAS 原子性操作是 etcd 的特性？
+
+全局唯一的版本号（`metadata.resourceVersion`），防止基于同一个版本的并发修改的覆盖问题。
 
 **每个资源对象从创建开始就会有一个版本号，而后每次被修改（不管是 update 还是 patch 修改），版本号都会发生变化。**
 
-[官方文档](https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions)告诉我们，这个版本号是一个 K8s 的内部机制，用户不应该假设它是一个数字或者通过比较两个版本号大小来确定资源对象的新旧，唯一能做的就是**通过比较版本号相等来确定对象是否是同一个版本**（即是否发生了变化）。
+[官方文档](https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions)告诉我们，这个版本号是一个 K8s 的内部机制，用户**不应该假设它是一个数字或者通过比较两个版本号大小**来确定资源对象的新旧，唯一能做的就是**通过比较版本号相等来确定对象是否是同一个版本**（即是否发生了变化）。
 
-- 如果两个用户同时对一个资源对象做 update，不管操作的是对象中同一个字段还是不同字段，都**存在版本控制的机制**确保两个用户的 update 请求不会发生覆盖。
+- 如果两个用户同时对一个资源对象做 update，不管操作的是对象中同一个字段还是不同字段，都**存在版本控制的机制**确保两个用户的 **update 请求不会发生覆盖**。
 
 ### Generation
 

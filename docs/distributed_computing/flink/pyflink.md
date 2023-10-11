@@ -57,34 +57,28 @@ exec "$FLINK_BIN_DIR"/flink run ${ARGS[@]} -c ${DRIVER}
 
 ## Yarn
 
-pyflink 当前只支持 **yarn cluster模式，即 session 模式**。
+> per job 模式废弃
 
-通过上面 SUBMIT_ARGS 的方法，可以指定 " -sae " 注册 Hook，源码见：
+Application Mode
 
-```java
-// directly deploy the job if the cluster is started in job mode and detached
-if (clusterId == null && runOptions.getDetachedMode()) {
-    ... 
-} else {
-    final Thread shutdownHook;
-    if (clusterId != null) {
-        shutdownHook = null;
-    } else {
-        ...
-        // 非detach模式，需要开启attachedexit即"-sae"
-        if (!runOptions.getDetachedMode() && runOptions.isShutdownOnAttachedExit()) {
-            shutdownHook = ShutdownHookUtil.addShutdownHook(client::shutDownCluster, client.getClass().getSimpleName(), LOG);
-        } else {
-            shutdownHook = null;
-        }
-    }
-    try {
-        // Python模式会永远卡在这里，无法执行到finally
-        executeProgram(program, client, userParallelism); 
-    } finally {
-        if (clusterId == null && !client.isDetached()) {
-            client.shutDownCluster();
-        }
-    }
+```shell
+./bin/flink run-application -t yarn-application \
+      -Djobmanager.memory.process.size=1024m \
+      -Dtaskmanager.memory.process.size=1024m \
+      -Dyarn.application.name=<ApplicationName> \
+      -Dyarn.ship-files=/path/to/shipfiles \
+      -pyarch shipfiles/venv.zip \
+      -pyclientexec venv.zip/venv/bin/python3 \
+      -pyexec venv.zip/venv/bin/python3 \
+      -pyfs shipfiles \
+      -pym word_count
+```
+
+Session 模式
+
+```shell
+$ ./bin/flink run \
+      --target yarn-session
+      --python examples/python/table/word_count.py
 ```
 

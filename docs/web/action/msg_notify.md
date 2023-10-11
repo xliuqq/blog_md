@@ -47,7 +47,7 @@
 
 ## SSE
 
-> 示例代码见：[SSE 代码](https://gitee.com/oscsc/web-tech/sse)
+> 不应该设置 WriteTimeOut，示例代码见：[SSE 代码](https://gitee.com/oscsc/web-tech/sse)
 
 服务器发送事件(`Server-sent events`)，简称`SSE`。
 

@@ -1,5 +1,15 @@
 # Go基础语法
 
+## 使用
+
+go包下载的代理 https://goproxy.io/zh/
+
+```shell
+export GOPROXY=https://proxy.golang.com.cn,direct
+```
+
+
+
 ## 变量
 
 变量定义只有var，函数外不能用 := 赋值，变量未初始化有零值；

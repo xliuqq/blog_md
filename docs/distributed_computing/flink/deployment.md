@@ -4,14 +4,14 @@
 
 三种部署模式：
 
-- **Application Mode**：资源隔离，多个job组成一个application运行在同一个集群上，比如如果main()方法有多个execute()，这些作业将视为同一个应用，运行在同一集群中。
-  - main()方法在集群上（JobManager）执行而不是客户端
+- **Application Mode**：资源隔离，多个job组成一个application运行在同一个集群上，比如如果main()方法有**多个execute()，这些作业将视为同一个应用**，运行在同一集群中。
+  - **main()方法在集群上（JobManager）执行**而不是客户端
 
-- **A Per-Job Mode**：为每个提交的作业启动一个集群，该集群仅可用于该作业，一旦作业完成集群将会释放。作业之间互不影响。
+- **A Per-Job Mode（deprecated）**：为每个提交的作业启动一个集群，该集群仅可用于该作业，一旦作业完成集群将会释放。作业之间互不影响。
   - main()方法在client侧执行
   - `bin/flink run -t yarn-per-job -c main方法的类路径 jar包地址`
   
-- **Session Mode**：启动一个长期运行的集群，该集群可以接收多个作业的提交，即使所有作业完成后，集群仍然继续运行直到手动停止。
+- **Session Mode**：启动一个长期运行的集群，该集群可以**接收多个作业的提交**，即使所有作业完成后，集群仍然继续运行直到手动停止。
   - main()方法在client执行；
   - **同一个 TaskManager 上可能运行很多作业**，如果其中一个发生故障导致 TaskManager 宕机，在这个上的所有作业都会受到影响；
   - 适合于单个规模小、执行时间短的大量作业。
@@ -21,12 +21,21 @@
 
 对比Spark：
 
-- Applicatoin Mode和Per-Job Mode 对应 Spark的 client 模式 和 cluster 模式；
-- Session Mode 为 Spark 的Standalone模式，但是在Yarn上Spark没有Session模式；
+- Applicatoin Mode 类似 Spark的 cluster 模式；
+- Per-Job Mode 是每个 job 一个集群运行（一个APP中包含多个 job，即多个 execute 函数）；
+- Session Mode 在 Yarn上使用Spark 的Standalone模式，但是在Yarn上Spark没有Session模式；
 
 
 
-## Yarn
+## [Yarn](https://nightlies.apache.org/flink/flink-docs-master/zh/docs/deployment/resource-providers/yarn/)
+
+> For production use, we recommend deploying Flink Applications in the Per-job or Application Mode.
+
+### Application Mode
+
+```bash
+./bin/flink run-application -t yarn-application ./examples/streaming/TopSpeedWindowing.jar
+```
 
 ### Flink Session
 
@@ -41,7 +50,7 @@ bin/yarn-session.sh -jm 1024 -tm 1024 -s 1 -nm flink-session -d
 提交作业到 Flink 集群运行：
 
 ```
-./bin/flink run -m yarn-cluster ./examples/batch/WordCount.jar
+./bin/flink run -d -m yarn-cluster ./examples/batch/WordCount.jar
 ```
 
 Session 模式具体的工作流程：

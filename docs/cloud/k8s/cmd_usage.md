@@ -117,3 +117,8 @@ Pod伸缩
 
 - `kubectl rollout resume deployment/nginx-deployment`
 
+
+
+## Rest API
+
+https://kubernetes.io/docs/tasks/administer-cluster/access-cluster-api/

@@ -328,6 +328,16 @@ spec:
 
 
 
+## Pod 开销
+
+> [Pod 开销 | Kubernetes](https://kubernetes.io/zh-cn/docs/concepts/scheduling-eviction/pod-overhead/)
+
+Pod 本身占用大量系统资源。这些是运行 Pod 内容器所需资源之外的资源。
+
+Pod 的开销是根据与 Pod 的 [RuntimeClass](https://kubernetes.io/zh-cn/docs/concepts/containers/runtime-class/) 相关联的开销在[准入](https://kubernetes.io/zh-cn/docs/reference/access-authn-authz/extensible-admission-controllers/#what-are-admission-webhooks)时设置的
+
+
+
 ## 默认调度器
 
 职责：为新创建出来的Pod寻找一个合适的节点。
@@ -343,11 +353,11 @@ Kubernetes 调度器的核心，**实际上就是两个相互独立的控制循�
   - **Priority** ：从第一步结果中，再根据调度算法挑选一个最符合条件的节点作为最终结果；
   - **Bind**：将pod的`spec.nodeNmae`字段填上调度结果的节点名称。
 
-乐观绑定（Assume）：**不在这个关键调度步骤中远程访问 API server，在 Bind 阶段，调度器只会更新 Scheduler Cache 里的 Pod 和 Node 信息**
+**乐观绑定**（Assume）：**不在这个关键调度步骤中远程访问 API server，在 Bind 阶段，调度器只会更新 Scheduler Cache 里的 Pod 和 Node 信息**
 
 - 再创建一个 Goroutine 来异步向 API server 发起更新 Pod 的请求，来完成真正的 Bind 操作。
 
-- 对应节点的 kubelet 会进行一个 Admit 的操作，再次确认该 pod 能否运行在该节点上。
+- 对应节点的 kubelet 会进行一个 **Admit** 的操作，再次确认该 pod 能否运行在该节点上。
 
 ### 优先级和抢占
 
@@ -389,7 +399,7 @@ spec:
 
 
 
-### Kubernetes Scheduling Framework
+## 调度器插件扩展框架
 
 > 默认调度器的可扩展机制，在 Kubernetes 里面叫作 Scheduler Framework。
 >
@@ -406,26 +416,49 @@ spec:
 - **scheduling cycle** 是同步执行的，同一个时间只有一个 scheduling cycle，是线程安全的；
 - **binding cycle** 是异步执行的，同一个时间中可能会有多个 binding cycle在运行，是线程不安全的。
 
-## 多Schduler模式
+### 默认的调度配置
 
-`Kubernetes` 允许在一个集群中运行多个调度程序。
+> [默认插件 | Kubernetes](https://kubernetes.io/zh-cn/docs/reference/scheduling/config/#scheduling-plugins)
 
+包括：
 
+- 污点和容忍；
+- 节点选择器和亲和性；
+- Pod 间亲和性与反亲和性；
+- Pod拓朴分布；
+- Pod 请求的所有资源检查；
+- `NodeResourcesBalancedAllocation`：调度 Pod 时，选择资源使用更为均衡的节点
 
-## 官方调度插件
+### 官方调度插件
 
 https://github.com/kubernetes-sigs/scheduler-plugins
 
 支持
 
-- [Capacity Scheduling](https://github.com/kubernetes-sigs/scheduler-plugins/blob/master/pkg/capacityscheduling/README.md)
-- [Coscheduling](https://github.com/kubernetes-sigs/scheduler-plugins/blob/master/pkg/coscheduling/README.md)：Gang Scheduling
+- [Capacity Scheduling](https://github.com/kubernetes-sigs/scheduler-plugins/blob/master/pkg/capacityscheduling/README.md)：容量调度器；
+- [Coscheduling](https://github.com/kubernetes-sigs/scheduler-plugins/blob/master/pkg/coscheduling/README.md)：Gang Scheduling，批量协同调度
+  - 通过Pod的调度状态 Wait 保证至少N个Pod可以被一起调度；
+
 - [Node Resources](https://github.com/kubernetes-sigs/scheduler-plugins/blob/master/pkg/noderesources/README.md)
 - [Node Resource Topology](https://github.com/kubernetes-sigs/scheduler-plugins/blob/master/pkg/noderesourcetopology/README.md)
 - [Preemption Toleration](https://github.com/kubernetes-sigs/scheduler-plugins/blob/master/pkg/preemptiontoleration/README.md)
 - [Trimaran](https://github.com/kubernetes-sigs/scheduler-plugins/blob/master/pkg/trimaran/README.md)
 
-## 三方调度器
+插件编写见 [自定义调度插件](./k8s_scheduler_plugin.md)
+
+
+
+## 多Schduler模式
+
+> [配置多个调度器 | Kubernetes](https://kubernetes.io/zh-cn/docs/tasks/extend-kubernetes/configure-multiple-schedulers/)
+>
+> - 没有 queueSort 的限制 ？
+
+`Kubernetes` 允许在一个集群中运行多个调度程序。
+
+
+
+### 三方调度器
 
 [kube-batch](https://github.com/kubernetes-sigs/kube-batch/blob/master/doc/usage/tutorial.md)
 

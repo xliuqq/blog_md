@@ -10,6 +10,10 @@ RPC：远程过程调用，Remote Procedure Call，实现 IPC。
 
 ## Engine
 
+> Client 端 Socket，阻塞性；
+>
+> Server 端 Connection 使用 NIO；
+
 Hadoop有两个`RPCEngine`实现：
 
 - `WritableRpcEngine`：将请求序列化发送到Server端，通过反射查找匹配的方法，执行并返回结果；
@@ -20,11 +24,6 @@ Hadoop有两个`RPCEngine`实现：
 **如何决定是WritableEngine还是ProtobufEngine**
 
 - 通过`RPC.setProtocolEngine()`注册某个接口的Engine类型，如果没有注册，`RPC.getProtocolEngine`默认逻辑会走`WritableRpcEngine`；
-- 
-
-
-
-
 
 
 
