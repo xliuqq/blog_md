@@ -1,7 +1,5 @@
 # Spark Monitor
 
-
-
 ***RSS/VM 内存***：PID 为 executor进程的**父PID**，搜索其所有的子PID
 
 - java / python / other：根据进程名区分，
@@ -56,10 +54,19 @@ metrics_app_20221118102536_0010_driver_ExecutorMetrics_ProcessTreeJVMVMemory_Val
 metrics_app_20221118102536_0010_driver_ExecutorMetrics_ProcessTreeOtherRSSMemory_Number{type="gauges"} 0
 ```
 
+### 自定义SInk
 
-
-### Prometheus 实时值方案
+#### Prometheus 实时值方案
 
 - [Prometheus gateway push sink](https://github.com/banzaicloud/spark-metrics)：通过自定义Sink实现向Prometheus Gateway 推送；
 
   
+
+### 自定义 Source
+> [Demo 示例](https://gitee.com/oscsc/bigdatatech/blob/master/spark/metrics-source/README.md)
+
+```
+spark.metrics.conf.[component_name].source.jvm.class=[source_name]
+// 例如 spark 自带的
+"spark.metrics.conf.*.source.jvm.class" = "org.apache.spark.metrics.source.JvmSource"
+```

@@ -2,8 +2,6 @@
 
 > 分布式流处理平台
 
-
-
 流处理平台具有三个关键能力：
 
 1. 发布和订阅消息(流)，在这方面，它类似于一个消息队列或企业消息系统。
@@ -23,6 +21,9 @@
 
 Kafka将消息分门别类，**每一类的消息称之为一个主题**（Topic）。
 
+- Topic/Partition 数量过多，导致顺序写退化成随机写；
+  - 每个 Partition 都是一个目录；
+
 #### Producer
 
 **发布消息**的对象称之为主题生产者（Kafka topic producer）。
@@ -30,6 +31,11 @@ Kafka将消息分门别类，**每一类的消息称之为一个主题**（Topic
 #### Consumer
 
 **订阅消息**并处理发布的消息的对象称之为主题消费者（consumers）。
+
+Consumer Group（消费组）的概念，多个 Consumer 组团去消费一个 Topic：
+
+- 同组的 Consumer 有相同的 Group ID；
+- Consumer Group 机制会保障一条消息**只被组内唯一一个 Consumer 消费**，不会重复消费。
 
 #### Broker
 
@@ -44,23 +50,14 @@ produce发送的消息分发到不同的partition中，consumer接受数据的�
 
 
 
+Topic的Partitions分布在不同的Broker上
+
+- 单个 Broker 的 IO能力受限，Partition分散可扩展性强；
+- Consumer 的多个实例连接不同 broker，消费不同分区数据；
+
 ## 架构
 
 ![kafka使用](pics/kafka_flow.png)
-
-### Producer
-
-
-
-### Consumer
-
-
-
-### Streams
-
-
-
-### Connectors
 
 
 
@@ -90,3 +87,28 @@ kafka 写数据：
 ### 分区
 
 ![img](pics/kafka_partition.jpg)
+
+### 写
+
+分区选择的三种方式：
+
+1）写入时，直接指定分区；
+
+2）根据 Partition Key 写入特定 Partition，保证此类消息的有序性
+
+- 由特定 Hash 函数，决定写入哪个 Partition，有相同 Partition Key 的消息，会被放到相同的 Partition；
+- 热点问题，某个 Partition 特别繁忙；
+
+3）不指定 Key，Kafka 采用轮询的方式写入，分散均匀但不保证有序性；
+
+4）自定义规则，Producer 可以使用自己的分区指定规则；
+
+### 读
+
+分区读取的方式：
+
+- Consumer 必须自己从 Topic 的 Partition 根据 Offset 拉取消息；
+- 可以指定消费特定的分区；
+- Offset 的推进和记录都是 Consumer 的责任，定期会提交offset 给kafka内部topic：`__consumer_offsets`；
+  - 根据 comsumer group 进行区分不同客户端；
+

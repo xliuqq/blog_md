@@ -73,7 +73,7 @@ public void handleRequest(Request request, Response response) {
 
 #### Gauges
 
-guage: 量表是对**一个值的瞬时测量**。（比如 CPU 的使用率等）
+gauge: 量表是对**一个值的瞬时测量**。（比如 CPU 的使用率等）
 
 ```java
 // 只是注册Guage这个metric，Reporter获取的时候才会触发计算（即每次都会进行调用，获取最新的值）
@@ -270,7 +270,7 @@ class YourClass {
 }
 ```
 
-#### Guage
+#### Gauge
 
 > Gauges can go up and down.
 

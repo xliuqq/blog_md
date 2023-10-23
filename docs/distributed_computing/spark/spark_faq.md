@@ -33,7 +33,7 @@ pyspark yarn-client 应用，task的执行时间为1h，结束后发现driver端
 
 解决方案见[StackOverflow](https://stackoverflow.com/questions/40764807/null-entry-in-command-string-exception-in-saveastextfile-on-pyspark)。
 
-将https://github.com/steveloughran/winutils中对应hadoop版本中的bin下的winutils下载到本地，并配置HADOOP_HOME；
+将https://github.com/cdarlint/winutils中对应hadoop版本中的bin下的winutils下载到本地，并配置HADOOP_HOME，并将 `bin/`目录加入 `path`环境变量中；
 
 ### SparkSQL启动时，报The  root scratch dir: /tmp/hive on HDFS should be writable
 

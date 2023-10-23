@@ -1,12 +1,12 @@
-# 并发
+# Channel
 
- Go 语言提供了一种不同的并发模型，即通信顺序进程（**Communicating sequential processes**，**CSP**）。
+ Go 语言提供了一种不同的**并发模型**，即通信顺序进程（**Communicating sequential processes**，**CSP**）。
 
 Goroutine 和 Channel 分别对应 CSP 中的实体和传递信息的媒介，Goroutine 之间会通过 Channel 传递数据。
 
-## Channel
+## 基本使用
 
-目前的 Channel 收发操作均遵循了先进先出的设计，具体规则如下：
+目前的 Channel 收发操作均遵循了**先进先出**的设计，具体规则如下：
 
 - 先从 Channel 读取数据的 Goroutine 会先接收到数据；
 - 先向 Channel 发送数据的 Goroutine 会得到先发送数据的权利；
@@ -26,13 +26,13 @@ close(ch)
 ```
 
 - 如果channel c 已经被关闭,继续往它发送数据会导致`panic: send on closed channel`;
-- 但是从这个关闭的channel中不但可以读取出已发送的数据，还可以不断的读取零值；
-- 如果通过`range`读取，channel关闭后for循环会跳出；
-- `i, ok := <-c`可以查看Channel的状态（`i`为 0， `ok`为 false）；
+- 但是从这个关闭的channel中不但可以读取出已发送的数据，还可以**不断的读取零值**；
+- 如果通过`range`读取，**channel关闭后for循环会跳出**；
+- `i, ok := <-c`可以查看 Channel的状态（`i`为 0， `ok`为 false）；
 
-## 同步
+### 同步
 
-channel 用在goroutine之间的同步。
+channel 用在 **goroutine 之间的同步**。
 下面的例子中main goroutine通过done channel等待worker完成任务。 worker做完任务后只需往channel发送一个数据就可以通知main goroutine任务完成。
 
 ```go
@@ -52,14 +52,6 @@ func main() {
     <-done
 }
 ```
-
-### 基本原语
-
- `sync` 包中提供了用于同步的一些基本原语，包括常见的 `sync.Mutex`、`sync.RWMutex`、`sync.WaitGroup`、`sync.Once` 和 `sync.Cond`；
-
-
-
-
 
 ## select
 
@@ -84,9 +76,7 @@ func fibonacci(c, quit chan int) {
 
 无论哪一个表达式返回都会立刻执行 `case` 中的代码，当 `select` 中的两个 `case` 同时被触发时，会**随机**执行其中的一个。
 
-
-
-#### 超时
+### 超时
 
 select 如果没有case需要处理，select语句就会一直阻塞着。这时候我们可能就需要一个超时操作，用来**处理超时**的情况。
 

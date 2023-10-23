@@ -1,136 +1,130 @@
 # Spark Hudi 使用
 
-> 参考官方文档：
+> 参考[官方文档](https://hudi.apache.org/docs/quick-start-guide)
 >
-> - https://hudi.apache.org/docs/quick-start-guide
-> - 
 
-- 支持Streaming write；
 
-- `spark.sql.catalog.spark_catalog`：Spark 3.2，`org.apache.spark.sql.hudi.catalog.HoodieCatalog`
 
 ## 快速上手
 
-### 准备（生成数据）
+### 准备
 
-spark-shell
+=== "spark-shell"
 
-```shell
-# Spark 3.2
-spark-shell \
-  --packages org.apache.hudi:hudi-spark3.2-bundle_2.12:0.11.0 \
-  --conf 'spark.serializer=org.apache.spark.serializer.KryoSerializer' \
-  --conf 'spark.sql.catalog.spark_catalog=org.apache.spark.sql.hudi.catalog.HoodieCatalog'
-```
+    ```shell
+    # For Spark versions: 3.2 - 3.4
+    export SPARK_VERSION=3.4
+    spark-shell --packages org.apache.hudi:hudi-spark$SPARK_VERSION-bundle_2.12:0.14.0 --conf 'spark.serializer=org.apache.spark.serializer.KryoSerializer' --conf 'spark.sql.catalog.spark_catalog=org.apache.spark.sql.hudi.catalog.HoodieCatalog' --conf 'spark.sql.extensions=org.apache.spark.sql.hudi.HoodieSparkSessionExtension' --conf 'spark.kryo.registrator=org.apache.spark.HoodieSparkKryoRegistrar'
+    ```
 
-设置信息，DataGenerator是Hudi的工具类，用于生成测试数据
+=== "Spark SQL"
 
-```scala
-// spark-shell
-import org.apache.hudi.QuickstartUtils._
-import scala.collection.JavaConversions._
-import org.apache.spark.sql.SaveMode._
-import org.apache.hudi.DataSourceReadOptions._
-import org.apache.hudi.DataSourceWriteOptions._
-import org.apache.hudi.config.HoodieWriteConfig._
-
-val tableName = "hudi_trips_cow"
-val basePath = "file:///tmp/hudi_trips_cow"
-val dataGen = new DataGenerator
-```
+    ```shell
+    export SPARK_VERSION=3.4
+    spark-sql --packages org.apache.hudi:hudi-spark$SPARK_VERSION-bundle_2.12:0.14.0 --conf 'spark.serializer=org.apache.spark.serializer.KryoSerializer' --conf 'spark.sql.extensions=org.apache.spark.sql.hudi.HoodieSparkSessionExtension' --conf 'spark.sql.catalog.spark_catalog=org.apache.spark.sql.hudi.catalog.HoodieCatalog' --conf 'spark.kryo.registrator=org.apache.spark.HoodieSparkKryoRegistrar'
+    ```
 
 ### 建表
 
-#### Spark SQL
+=== "spark-shell"
 
-**新建表**
+    ```scala
+    // do nothing
+    ```
 
-```sql
--- 创建分区表，设置hudi表的属性
-create table hudi_cow_pt_tbl (
-  id bigint,
-  name string,
-  ts bigint,
-  dt string,
-  hh string
-) using hudi
-tblproperties (
-  type = 'cow',
-  primaryKey = 'id',
-  preCombineField = 'ts'
- )
-partitioned by (dt, hh) location '/tmp/hudi/hudi_cow_pt_tbl';
-```
+=== "Spark SQL"
 
-**加载已存在的Hudi表**
+    ```sql
+    -- 创建分区表，设置hudi表的属性
+    create table hudi_cow_pt_tbl (
+      id bigint,
+      name string,
+      ts bigint,
+      dt string,
+      hh string
+    ) using hudi
+    tblproperties (
+      type = 'cow',
+      primaryKey = 'id',
+      preCombineField = 'ts'
+     )
+    partitioned by (dt, hh) location '/tmp/hudi/hudi_cow_pt_tbl';
+    
+    -- 加载已经存在的分区表，schema和属性，Hudi会自动解析
+    create table hudi_existing_tbl1 using hudi
+    partitioned by (dt, hh) location 'file:///tmp/hudi/dataframe_hudi_pt_table';
+    ```
 
-```sql
--- 加载分区表，schema和属性，Hudi会自动解析
-create table hudi_existing_tbl1 using hudi
-partitioned by (dt, hh) location 'file:///tmp/hudi/dataframe_hudi_pt_table';
-```
 
 ### 插入数据
 
-#### DataFrame
+=== "spark-shell"
 
-```scala
-df.write.format("hudi").
-  options(getQuickstartWriteConfigs).
-  option(PRECOMBINE_FIELD_OPT_KEY, "ts").
-  option(RECORDKEY_FIELD_OPT_KEY, "uuid").
-  option(PARTITIONPATH_FIELD_OPT_KEY, "partitionpath").
-  option(TABLE_NAME, "hudi_test").
-  mode(Overwrite).
-  save(basePath)  // file:///tmp/hudi_trips_cow
-```
+    ``` scala
+    // spark-shell
+    val columns = Seq("ts","uuid","rider","driver","fare","city")
+    val data = Seq((1695159649087L,"334e26e9-8355-45cc-97c6-c31daf0df330","rider-A","driver-K",19.10,"san_francisco"),
+    		(1695091554788L,"e96c4396-3fad-413a-a942-4cb36106d721","rider-C","driver-M",27.70 ,"san_francisco"),
+    		(1695046462179L,"9909a8b1-2d15-4d3d-8ec9-efc48c536a00","rider-D","driver-L",33.90 ,"san_francisco"),
+    		(1695516137016L,"e3cf430c-889d-4015-bc98-59bdce1e530c","rider-F","driver-P",34.15,"sao_paulo"    ),
+    		(1695115999911L,"c8abbe79-8d89-47ea-b4ce-4d224bae5bfa","rider-J","driver-T",17.85,"chennai"));
+    var inserts = spark.createDataFrame(data).toDF(columns:_*)
+    
+    inserts.write.format("hudi").
+      option(PARTITIONPATH_FIELD_NAME.key(), "city").
+      // default operation type is upsert
+      option(TABLE_NAME, tableName).
+      mode(Overwrite).
+      save(basePath)
+    ```
 
-#### SQL
+=== "Spark SQL"
 
-```sql
--- insert into non-partitioned table
-insert into hudi_cow_nonpcf_tbl select 1, 'a1', 20;
-insert into hudi_mor_tbl select 1, 'a1', 20, 1000;
-
--- insert dynamic partition
-insert into hudi_cow_pt_tbl partition (dt, hh)
-select 1 as id, 'a1' as name, 1000 as ts, '2021-12-09' as dt, '10' as hh;
-
--- insert static partition
-insert into hudi_cow_pt_tbl partition(dt = '2021-12-09', hh='11') select 2, 'a2', 1000;
-```
+    ``` sql
+    -- insert into non-partitioned table
+    insert into hudi_cow_nonpcf_tbl select 1, 'a1', 20;
+    insert into hudi_mor_tbl select 1, 'a1', 20, 1000;
+    
+    -- insert dynamic partition
+    insert into hudi_cow_pt_tbl partition (dt, hh)
+    select 1 as id, 'a1' as name, 1000 as ts, '2021-12-09' as dt, '10' as hh;
+    
+    -- insert static partition
+    insert into hudi_cow_pt_tbl partition(dt = '2021-12-09', hh='11') select 2, 'a2', 1000;
+    ```
 
 ### 覆盖写
 
-#### Dataframe
+> `insert_overwrite_table`: This can be faster than deleting the older table and recreating in `Overwrite` mode.
 
-```scala
-df.write.format("hudi").
-  options(getQuickstartWriteConfigs).
-  // 覆盖写
-  option(OPERATION.key(),"insert_overwrite").
-  option(PRECOMBINE_FIELD.key(), "ts").
-  option(RECORDKEY_FIELD.key(), "uuid").
-  option(PARTITIONPATH_FIELD.key(), "partitionpath").
-  option(TBL_NAME.key(), tableName).
-  mode(Append).
-  save(basePath)
-```
+=== "spark-shell"
 
-#### SQL
+    ```scala
+    df.write.format("hudi").
+      options(getQuickstartWriteConfigs).
+      // 覆盖写
+      option(OPERATION.key(),"insert_overwrite").
+      option(PRECOMBINE_FIELD.key(), "ts").
+      option(RECORDKEY_FIELD.key(), "uuid").
+      option(PARTITIONPATH_FIELD.key(), "partitionpath").
+      option(TBL_NAME.key(), tableName).
+      mode(Append).
+      save(basePath)
+    ```
 
-```sql
--- insert overwrite non-partitioned table
-insert overwrite hudi_mor_tbl select 99, 'a99', 20.0, 900;
-insert overwrite hudi_cow_nonpcf_tbl select 99, 'a99', 20.0;
+=== "Spark SQL"
 
--- insert overwrite partitioned table with dynamic partition
-insert overwrite table hudi_cow_pt_tbl select 10, 'a10', 1100, '2021-12-09', '10';
-
--- insert overwrite partitioned table with static partition
-insert overwrite hudi_cow_pt_tbl partition(dt = '2021-12-09', hh='12') select 13, 'a13', 1100;
-```
-
+    ```sql
+    -- insert overwrite non-partitioned table
+    insert overwrite hudi_mor_tbl select 99, 'a99', 20.0, 900;
+    insert overwrite hudi_cow_nonpcf_tbl select 99, 'a99', 20.0;
+    
+    -- insert overwrite partitioned table with dynamic partition
+    insert overwrite table hudi_cow_pt_tbl select 10, 'a10', 1100, '2021-12-09', '10';
+    
+    -- insert overwrite partitioned table with static partition
+    insert overwrite hudi_cow_pt_tbl partition(dt = '2021-12-09', hh='12') select 13, 'a13', 1100;
+    ```
 
 
 ### 查询数据

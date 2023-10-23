@@ -230,7 +230,7 @@ nav:
         - 服务:
           - 压缩（Compaction）: data_system/data_lake/apache_hudi/compaction.md
           - 聚簇（clustering）: data_system/data_lake/apache_hudi/clustering.md
-
+        - Spark使用: data_system/data_lake/apache_hudi/spark.md
   - 计算引擎:
     - Spark:
       - 概览: distributed_computing/spark/README.md
