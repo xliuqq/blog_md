@@ -1,5 +1,10 @@
 # Channel
 
+> channel 的零值为 nil：
+>
+> - 在 nil 通道上发送和接收将会永远阻塞；
+> - select语句中，如果通道为nil，将永远不会被选择；
+
  Go 语言提供了一种不同的**并发模型**，即通信顺序进程（**Communicating sequential processes**，**CSP**）。
 
 Goroutine 和 Channel 分别对应 CSP 中的实体和传递信息的媒介，Goroutine 之间会通过 Channel 传递数据。

@@ -1,5 +1,60 @@
 # 操作系统
 
+## CPU 内存/缓存一致性
+
+### cpu cache 
+
+数据以"cache lines"的形式在cpus的cache和内存之间传输，cache line是定长的block，大小通常在16～256bytes。
+
+- cache miss 时会加载数据，一般采用组相联模式；
+- 写需要**保证所有cpu之间的一致性**，在某个cpu写数据之前需要将其它cpu cache中的相应数据移除或者"invalidated"；
+
+![cache_cpu](pics/cpu_cache_arch.jpg)
+
+### MESI
+
+**cache一致性协议**通过管理cache-line的状态来防止不一致或者数据丢失，以下介绍只**关注四种状态的MESI**缓存一致性协议。
+
+MESI协议，每个cache line上用2位来维护状态值"tag"，四种状态分别为：
+
+- **Modified**：处于modified状态的cache line可以认为是被这个cpu所拥有，相应的内存确保不会出现在其它cpu的cache中。这个cache拥有这份数据的**最新副本**，因此也负责将它写回内存或者移交给其它cache。
+- **Exclusive**：与modified相似，区别是这种状态下相应cpu还**未修改cache line的这份数据**，内存中的这份数据是最新的，在cache丢弃该数据前，缓存不用负责将数据写回或者移交给其它cache。
+- **Shared**：处于shared状态的cache line可能被**复制到至少一个其它的cpu cache**中，因此在该cpu存储该line时，需要先询问其它cpu，与exclusive一样，相应的**内存中的值是最新**的，在cache丢弃该数据前，不用负责将数据写回或者移交给其它cache。
+- **Invalid**：处于invalid状态的line是空的，**没有数据**，当新的数据进入cache时，将会优先被放入invalid状态的cache line中，替代其它状态的line可能引起将来的cache miss。
+
+`内存重排`（由Store Buffer、CPU乱序、编译器重排等造成）带来的内存一致性memory consistency问题，MESI协议也是处理不了的。
+
+- X86 上的LOCK前缀指令：原子性 + 禁止前后指令的重排序
+
+### 内存重排
+
+内存重排是指内存读写指令的重排，分为软件层面的`编译器重排` 和硬件层面的`CPU重排` 。
+
+CPU重排：
+
+- CPU指令重排：并行执行、延迟执行等；
+- 缓存读写重排：先进行缓存读写操作，而不是直接对内存进行读写；
+
+### 内存屏障类型
+
+从上面来看，barrier 有四种:
+
+- **LoadLoad** 阻止不相关的 Load 操作发生重排
+- **LoadStore** 阻止 Store 被重排到 Load 之前
+- **StoreLoad** 阻止 Load 被重排到 Store 之前
+- **StoreStore** 阻止 Store 被重排到 Store 之前
+
+### CPU 内存一致性模型
+
+目前有多种内存一致性模型：
+
+- 顺序存储模型（sequential consistency model）
+- 完全存储定序（total store order）
+- 部分存储定序（part store order）
+- 宽松存储模型（relax memory order）
+
+
+
 ## 进程
 
 三态模型：**运行态、就绪态、阻塞态**
@@ -75,30 +130,6 @@ PCB的组织方式：
 系统有两个任务，因对方的行为而改变自己的状态，则出现了活锁。最终是它们陷入状态变更的循环而无法继续向下执行。
 
 通过对**多个资源的同顺序申请**，可以预防活锁。
-
-
-
-### 内存障(Memory Barrier)
-
-#### cpu cache 
-
-数据以"cache lines"的形式在cpus的cache和内存之间传输，cache line是定长的block，大小通常在16～256bytes。
-
-- cache miss 时会加载数据，一般采用组相联模式；
-- 写需要**保证所有cpu之间的一致性**，在某个cpu写数据之前需要将其它cpu cache中的相应数据移除或者"invalidated"；
-
-![cache_cpu](pics/cpu_cache_arch.jpg)
-
-#### MESI
-
-cache一致性协议通过管理cache-line的状态来防止不一致或者数据丢失，以下介绍只**关注四种状态的MESI**缓存一致性协议。
-
-MESI协议，每个cache line上用2位来维护状态值"tag"，四种状态分别为：
-
-- **Modified**：处于modified状态的cache line可以认为是被这个cpu所拥有，相应的内存确保不会出现在其它cpu的cache中。这个cache拥有这份数据的**最新副本**，因此也负责将它写回内存或者移交给其它cache。
-- **Exclusive**：与modified相似，区别是这种状态下相应cpu还**未修改cache line的这份数据**，内存中的这份数据是最新的，在cache丢弃该数据前，缓存不用负责将数据写回或者移交给其它cache。
-- **Shared**：处于shared状态的cache line可能被**复制到至少一个其它的cpu cache**中，因此在该cpu存储该line时，需要先询问其它cpu，与exclusive一样，相应的**内存中的值是最新**的，在cache丢弃该数据前，不用负责将数据写回或者移交给其它cache。
-- **Invalid**：处于invalid状态的line是空的，**没有数据**，当新的数据进入cache时，将会优先被放入invalid状态的cache line中，替代其它状态的line可能引起将来的cache miss。
 
 
 
