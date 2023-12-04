@@ -195,9 +195,9 @@ Phaser是在线程动态数需要继续执行之前等待的屏障。在CountDow
 
 ### 父进程退出时Kill子进程
 
-- 通过ProcessBuilder启动JVM，并注册kill父进程时执行的线程(kill子线程)；
+> 通过ProcessBuilder启动JVM，并注册kill父进程时执行的线程(kill子线程)；
 
-  通过ProcessBuilder执行shell命令(如再启动java进程），此时通过jps查看会看到两个java进程；**如果kill掉父进程，子进程不会随之消亡**，若需要，需注册（见左面代码）；
+通过ProcessBuilder执行shell命令(如再启动java进程），此时通过jps查看会看到两个java进程；**如果kill掉父进程，子进程不会随之消亡**，若需要，需注册（见下面代码）；
 
 ```java
 public class TestRunJVM {
@@ -205,6 +205,7 @@ public class TestRunJVM {
         ProcessBuilder pb = new ProcessBuilder("jvisualvm");
         try {
             final Process process = pb.start();
+            // destroy child process，对于 kill -9 不生效
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 public void run() {
                     if (process != null) {

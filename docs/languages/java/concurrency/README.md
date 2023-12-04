@@ -65,6 +65,8 @@ public class LoggingWidget extends Widget {
 
 # 对象的共享
 
+> [JSR-133/Java内存模型(JMM)规范](https://gee.cs.oswego.edu/dl/jmm/cookbook.html)
+
 ## 可见性
 
 ### 指令重排序
@@ -118,6 +120,8 @@ public class SynchronizedInteger {
 }
 ```
 
+
+
 ### volatile
 
 **只保证可见性，不保证原子性**
@@ -130,6 +134,15 @@ public class SynchronizedInteger {
 ### 非原子的64位操作
 
 - Java内存模型要求，**变量的读取操作和写入操作都必须是原子操作**，但对于**非volatile类型的long和double类型，JVM允许将64位的读或写操作分解为32位的操作**。
+
+
+
+## 锁的内存语义
+
+> ？TODO JVM How to do that ?（MonitorEnter/MonitorExit）
+
+- 当线程获取锁时, JMM会把**线程对应的本地内存置为无效**. 从而使得被监视器保护的临界区的变量必须从主内存中读取.
+- 当线程释放锁时, JMM会把该线程对应的**本地内存中的共享变量刷新到主内存中**(并不是不释放锁就不刷新到主内存, 只是释放锁时把未刷新到主内存中的数据刷新到主内存).
 
 
 

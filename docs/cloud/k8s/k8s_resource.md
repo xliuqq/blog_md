@@ -883,7 +883,18 @@ spec:
 
 ### ConfigMap
 
-与Secret的区别是，**ConfigMap存储无需加密、应用所需的配置信息**。
+> 作为**卷整体挂载**时，每个 key 是以软链接的形式。
+>
+> ```shell
+> Oct 31 10:25 ..2023_10_31_10_25_13.340959843
+> Oct 31 10:25 ..data -> ..2023_10_31_10_25_13.340959843
+> Oct 31 10:25 aa -> ..data/aa
+> ```
+
+与Secret的区别是，**ConfigMap存储无需加密、应用所需的配置信息**：
+
+- `data` 下的每个键的名称都必须由字母数字字符或者 `-`、`_` 或 `.` 组成；
+- `immutable` 字段到 ConfigMap 定义中， 创建[不可变更的 ConfigMap](https://kubernetes.io/zh-cn/docs/concepts/configuration/configmap/#configmap-immutable) (只能删除并重建 ConfigMap)
 
 ```yaml
 apiVersion: v1
@@ -892,8 +903,11 @@ metadata:
   # 配置名称为cc-go-config 
   name: cc-go-config
   namespace: test
-data:
+# 保存 UTF-8 字符串
+data
   application-name: Test
+# 不可变，v1.21 stable
+immutable: true
 ```
 
 #### 使用
@@ -902,7 +916,9 @@ Pod的使用方式：
 
 - 将ConfigMap中的数据设置为**容器的环境变量**
 - 将ConfigMap中的数据设置为**命令行参数**
-- 使用Volume将ConfigMap**作为文件或目录挂载**（可自动更新）
+- 使用Volume将ConfigMap**作为文件或目录挂载**（可[自动更新]((https://kubernetes.io/zh-cn/docs/tasks/configure-pod-container/configure-pod-configmap/#mounted-configMaps-are-updated-automatically))，使用subpath则不行）
+  - configmap 的更新延迟，可以通过对Pod 添加注解立即触发configmap更新；
+
 - 编写代码在 Pod 中运行，使用 **Kubernetes API** 来读取 ConfigMap
 
 
@@ -1080,6 +1096,8 @@ spec:
 - 主要用于某些应用程序无需永久保存的临时目录，多个容器的共享目录等
 
 ## PVC
+
+> **PV和PVC是一一对应的**。
 
 pvc － 对 pv 资源的请求
 

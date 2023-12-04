@@ -25,7 +25,7 @@
 
 ## 原理
 
-**原理和流程：**
+### 原理和流程
 
 - DataSet声明数据集的来源，**Runtime选择node打标签由K8s进行worker调度**；
 - CSI-Plugin作为Deamonset挂载宿主机的`/runtime-mnt`，当Pod挂载PVC时，将对应的`/runtime-mnt`的子目录bind挂载到容器；
@@ -44,29 +44,6 @@ App Pod 指定 PVC，PV 和 PVC 由对应的 Cache Runtime 创建（通过指定
 
 
 
-Dataset 支持 Spec字段的 update 么？（部分支持）
-
-dataloader中executing阶段，**定时20s**（很多处）进行更新？
-
-Runtime中worker 跟 pod 在一个节点么？ pod中的卷哪里来的？
-
-AlluxioRuntime申请的pod（master，worker，fuse）的网络是HostNetWork，意义是啥？（使用宿主机网络）
-
-Runtime创建的PV的大小，常量100Gi？
-
-ObjectMeta的Generation为什么被用来做DataSetController的AddFinalizer的判断？
-
-AssignNodesToCache 没有调用方？
-
-- 搜索节点放值worker，现在alluxio的worker通过helm安装的，调度信息在哪里？
-- 节点打标签，通过Engine::SyncScheduleInfoToCacheNodes函数设置；
-
-DataSet的亲和性和Pod的亲和性冲突了怎么处理？
-
-- DataSet的亲和性应该保证和Pod一致，即将Pod的节点亲和性配置应用到DataSet中；
-
-
-
 **细节**
 
 - Cache Runtime的master/worker的节点选择；
@@ -77,6 +54,31 @@ DataSet的亲和性和Pod的亲和性冲突了怎么处理？
 - FUSE 和 Worker 不需要在一个节点上，根据Runtime的Global字段进行设置？；
 
 **Runtime和DataSet是一对一的关系，通过name进行关联！**
+
+- Alluxio Runtime worker 挂掉时，其宿主机的缓存(`/dev/shm`)不会被清理（？如果Pod飘逸，数据无法删除）
+
+### FAQ
+
+Dataset 支持 Spec字段的 update 么？（部分支持，如 AlluxioRuntime 可以在运行时新增 WebUFS）
+
+dataloader中executing阶段，**定时20s**（很多处）进行更新？
+
+AlluxioRuntime申请的pod（master，worker，fuse）的网络是HostNetWork，意义是啥？（使用宿主机网络，性能）
+
+Runtime创建的PV的大小，常量100Gi？
+
+ObjectMeta的Generation为什么被用来做DataSetController的AddFinalizer的判断？
+
+AssignNodesToCache 没有调用方？（worker 的放置由 k8s的亲和性配置）
+
+- 搜索节点放值worker，现在alluxio的worker通过helm安装的，调度信息在哪里？
+- 节点打标签，通过Engine::SyncScheduleInfoToCacheNodes函数设置；
+
+DataSet的亲和性和Pod的亲和性冲突了怎么处理？
+
+- DataSet的亲和性应该保证和Pod一致，即将Pod的节点亲和性配置应用到DataSet中；
+
+
 
 
 
@@ -275,7 +277,7 @@ fluid.io/dataset-placement: {{ .Values.placement }}
 
 ### AlluxioRuntime
 
-默认`20000~25000`的端口范围，Master/Worker/Fuse使用的是HostNetWork。
+默认`20000~25000`的端口范围，**Master/Worker/Fuse** 使用的是 **HostNetWork**。
 
 #### Spec
 
@@ -292,7 +294,7 @@ fluid.io/dataset-placement: {{ .Values.placement }}
 - `WorkerPhase`：Worker的阶段，如Ready；
 - `CacheStates`：缓存的状态信息
 
-#### Controller
+#### ReconcilerController
 
 - 创建和删除Runtime的Finalizer字段；
 - 创建/删除Engine；
@@ -353,9 +355,7 @@ Runtime包含Delete时间戳：
 
 - 删除：DeleteVolume -> Shutdown
 
-engine#setup：创建 Master/Worker的StatefulSet，**FUSE**的DaemonSet，检查UFS（同步元数据），检查Runtime Ready，绑定到DataSet
-
-- **Worker的亲和性调度（TODO）？**
+engine#setup：创建 Master/Worker的StatefulSet，**FUSE**的 DaemonSet，检查UFS（同步元数据），检查Runtime Ready，绑定到DataSet
 
 - 元数据（通过alluxio master的alluxio fs命令）：文件总数，文件总大小
 
@@ -363,7 +363,7 @@ engine#setup：创建 Master/Worker的StatefulSet，**FUSE**的DaemonSet，检�
 
 - **FUSE Pod**如何创建的：
 
-  - DaemonSet申请：NodeSelector 满足`fluid.io/f-{ns}-{ds_name}= "true"`
+  - `DaemonSet`申请：NodeSelector 满足`fluid.io/f-{ns}-{ds_name}= "true"`
 - CSI NodeStageVolume里设置该值；
 
 

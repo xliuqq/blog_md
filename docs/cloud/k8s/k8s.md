@@ -22,6 +22,8 @@
 
 #### [kube-apiserver](https://kubernetes.io/zh/docs/reference/command-line-tools-reference/kube-apiserver/)
 
+> 从 etcd 读取（`ListWatch`）全量数据，并缓存在内存中；**无状态服务**，可水平扩展；
+
 该组件公开了 Kubernetes API，支持水平伸缩。
 
 
@@ -63,11 +65,19 @@ kubelet 不会管理不是由 Kubernetes 创建的容器。
 
 每个节点（node）上运行的代理。 它保证容器（containers）都 运行在 Pod 中。
 
+- 宿主机进程：注册到`/etc/systemd/system/kubelet.service`
+
+- `syncFrequency`：默认`1min`，表示在运行中的容器与其配置之间执行同步操作的最长时间间隔；
+
+  
+
 #### kube proxy 
 
 每个节点上运行的网络代理， **实现 Kubernetes 服务（Service） 概念**的一部分。
 
 **维护节点上的网络规则**，允许从集群内部或外部的网络会话与 Pod 进行网络通信。
+
+
 
 #### ContainerRuntime
 
@@ -213,6 +223,8 @@ Flannel
 Canal
 
 Romana
+
+
 
 
 
