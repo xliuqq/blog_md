@@ -1,3 +1,12 @@
+---
+hide:
+  - tags
+tags:
+  - mkdocs
+---
+
+
+
 # mkdocs
 
 > 一般使用 [material](https://squidfunk.github.io/mkdocs-material/) 样式。

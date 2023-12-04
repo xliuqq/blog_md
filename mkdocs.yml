@@ -45,10 +45,19 @@ extra_javascript:
   - .mkdocs/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
-  
+ 
 
+plugins:
+  - search
+  - tags:
+      enabled: true
+  - tags:
+      tags_file: tags.md
+  
 nav:
-  - 主页: README.md
+  - 主页: 
+    - README.md
+    - 标签: tags.md
   - 云原生:
     - 概念: cloud/cloud_native.md
     - Fluid: cloud/fluid.md
