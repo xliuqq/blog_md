@@ -4,24 +4,12 @@
 
 ![Filnk_Flow](./pics/flink-flow.png)
 
+基于操作符**（Operator）**的连续流模型，可以做到**微秒级别的延迟**。
+
 - 批流一体化；
 - 精密的状态管理；
 - 事件时间支持；
 - 精确一次的状态一致性保障；
-
-
-
-### 事件驱动型应用
-
-
-
-### 数据分析应用
-
-
-
-### 数据管道应用
-
-
 
 ## 架构
 
@@ -47,7 +35,7 @@ JobManager可以进行高可用配置。
 
 TaskManagers(也称为workers)执行数据流的任务，并缓冲和交换数据流。
 
-必须始终至少有一个TaskManager。TaskManager中最小的资源调度单位是任务槽位。**TaskManager的任务槽位数表示并发处理的任务数**。
+必须始终至少有一个TaskManager。TaskManager中**最小的资源调度单位是任务槽位**。**TaskManager的任务槽位数表示并发处理的任务数**。
 
 **注意，多个操作符可以在一个任务槽中执行**。
 
@@ -55,32 +43,65 @@ TaskManagers(也称为workers)执行数据流的任务，并缓冲和交换数�
 
 ## 并行策略
 
-### 任务和操作链
+### 并行度
 
-对于分布式执行，Flink将操作子任务链成任务（ *chains* operator subtasks together into *tasks*）。
+一个**特定 operator 的 subtask 的个数被称之为其 parallelism**(并行度)：
 
-每个Task由一个线程执行，将操作符链接到任务中是一种有用的优化：它减少了线程到线程切换和缓冲的开销，并在降低延迟的同时增加了总体吞吐量。
+- 一个stream的并行度总是等同于其producing operator的并行度；
+- 一个程序中，**不同的operator可能具有不同的并行度**。
 
-下图中的样例数据流使用五个子任务执行，因此使用五个并行线程。
+### 任务和操作
+
+对于分布式执行，Flink将操作**子任务链成任务**（ *chains* operator subtasks together into *tasks*）。
+
+每个Task由一个线程执行，将操作符链接到任务中是一种有用的优化：
+
+- 将一个thread对应一个subtask优化为一个thread对应一个subtask-chain中的多个subtask；
+- 它减少了线程到线程切换和缓冲的开销，并在降低延迟的同时增加了总体吞吐量。
+
+下图中的样例数据流使用五个子任务执行，因此**使用五个并行线程**。
+
+- Source/map 并行度2（被合并）， KeyBy 并行度2， Sink 并行度1；
 
 ![Operator chaining into Tasks](pics/tasks_chains.svg)
 
-### 任务槽和资源（？？）
+### 任务槽和槽共享
+
+> 默认所有 task 都在同一个槽中（default）
 
 每个worker (TaskManager)是一个JVM进程，可以在不同的线程中执行一个或多个子任务，能接受的任务数量由`task slots`决定。
 
 **每个任务槽代表TaskManager资源的一个固定子集**。例如，一个有三个槽的TaskManager会将其托管内存的1/3分配给每个槽。对资源进行插槽意味着子任务不会与其他作业的子任务竞争托管内存，而是拥有一定数量的预留托管内存。注意这里没有CPU隔离；目前，槽只分离任务的托管内存。
 
-通过调整任务槽位数，用户可以定义子任务之间的隔离方式。每个TaskManager有一个槽意味着每个任务组在单独的JVM中运行(例如，可以在单独的容器中启动)。拥有多个插槽意味着更多的子任务共享同一个JVM。同一个JVM中的任务共享TCP连接(通过多路复用)和心跳消息。它们还可以共享数据集和数据结构，从而减少每个任务的开销。
+通过调整任务槽位数，用户可以定义子任务之间的隔离方式。每个TaskManager有一个槽意味着**每个任务组在单独的JVM中运行**(例如，可以在单独的容器中启动)。拥有多个插槽意味着更多的子任务共享同一个JVM。**同一个JVM中的任务共享TCP连接(通过多路复用)和心跳消息**。它们还可以共享数据集和数据结构，从而减少每个任务的开销。
 
 <img src="pics/tasks_slots.svg" alt="A TaskManager with Task Slots and Tasks" style="zoom:80%;" />
 
-默认情况下，Flink允许子任务共享槽位，即使它们是不同任务的子任务，只要它们来自同一作业。结果是一个槽可能容纳整个作业管道。允许这种插槽共享有两个主要好处：
+默认情况下，Flink允许**子任务共享槽位，即使它们是不同任务的子任务，只要它们来自同一作业**。结果是**一个槽可能容纳整个作业管道**。允许这种插槽共享有两个主要好处：
 
-- Flink集群需要的任务槽数量与作业中使用的最高并行度完全相同。不需要计算一个程序总共包含多少任务(并行度不同)。
-- 更好的资源利用。如果没有插槽共享，非密集型source/map()子任务将阻塞与资源密集型window子任务一样多的资源。使用槽共享，将示例中的基本并行度从2增加到6，可以充分利用槽资源，同时确保繁重的子任务公平地分布在taskmanager中。
+- Flink集群**需要的任务槽数量与作业中使用的最高并行度完全相同**。不需要计算一个程序总共包含多少任务(并行度不同)。
+- 同一个slot 可以运行整个 job 的流水线，更好的资源利用。
+- 如果没有插槽共享，非密集型source/map()子任务将阻塞与资源密集型window子任务一样多的资源。使用槽共享，将示例中的基本并行度从2增加到6，可以充分利用槽资源，同时确保繁重的子任务公平地分布在taskmanager中。
 
 ![TaskManagers with shared Task Slots](pics/slot_sharing.svg)
+
+<font color=red>不同operator 的 subtask 是启动多线程并等待？</font>
+
+## 数据传输
+
+### 同一个SubTask
+
+当处于上下游的两个算子处于同一个算子链中(OperatorChain)，在执行的时候就会被调度至同一个SubTask中。
+
+- 数据传输是直接通过Java的方法调用实现，不需要数据序列化，节省了线程切换的开销
+
+### 同一个TaskManager的不同SubTask
+
+同一个TaskManager（JVM进程）内部的不同SubTask（线程）之间的流数据传输。两个SubTask之间共享同一个Buffer Pool，通过`wait/notifyAll`来同步，InputGate负责读取Buffer。
+
+### 不同TaskManager之间的SubTask 
+
+采用Netty框架，通过Socket传递，也存在数据序列化和反序列过程。
 
 ## 应用执行
 

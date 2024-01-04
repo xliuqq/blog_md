@@ -109,7 +109,7 @@ HashMapStateBackend将数据作为Java堆上的对象在内部保存。键/值�
 
 ### Legacy
 
-Flink 1.13开始，从概念上本地state storage和checkpoint storage分开，但实现上没有区别。
+Flink 1.13开始，从概念上本地`state storage`和`checkpoint storage`分开，但实现上没有区别。
 
 MemoryStateBackend 等价于 HashMapBackend 和  JobManagerCheckpointStorage；
 
