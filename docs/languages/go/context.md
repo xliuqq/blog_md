@@ -45,9 +45,13 @@ ctx := context.withValue(context.Background(), "a", 1)
 
 ### context.WithCancel
 
-> a copy of parent with a new Done channel.
+> a copy of parent with a **new Done channel**.
+>
+> The returned context's **Done channel is closed when the returned cancel function is called or when the parent context's Done channel is closed**, whichever happens first.
 
-取消某个parent的goroutine, 实际上上会递归层层cancel掉自己的child context的done chan从而让整个调用链中所有监听cancel的goroutine退出
+取消某个parent的goroutine, 实际上会**递归层层cancel掉自己的child context的done chan**从而**让整个调用链中所有监听cancel的goroutine退出**
+
+- 当代码执行完成后，应当立即执行 `cancel` 函数（这里的cancel 有 complete的含义）；
 
 ```go
 type cancelCtx struct {
@@ -55,6 +59,7 @@ type cancelCtx struct {
 
     mu       sync.Mutex            // protects following fields 保护属性
     done     chan struct{}         // created lazily, closed by first cancel call
+    // 记录子 context 的cancel
     children map[canceler]struct{} // set to nil by the first cancel call
     err      error                 // set to non-nil by the first cancel call
 }
@@ -64,7 +69,7 @@ type cancelCtx struct {
 
 ### context.WithTimeout
 
-实现原理：启动一个定时器，然后在超时的时候，直接将当前的context给cancel掉，就可以实现监听在当前和下层的context.Done()的goroutine的退出
+实现原理：**启动一个定时器，然后在超时的时候，直接将当前的context给cancel掉**，就可以实现监听在当前和下层的`context.Done()`的`goroutine`的退出
 
 ```go
 type timerCtx struct {
@@ -77,9 +82,12 @@ type timerCtx struct {
 
 示例：
 
+- 即时超时返回了，但是子协程仍在继续运行，直到自己退出
+
 ```go
 func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+    // cancel 一定要执行
 	defer cancel()
 
 	go handle(ctx, 500*time.Millisecond)

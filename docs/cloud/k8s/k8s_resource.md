@@ -543,6 +543,7 @@ spec:
 **不需要定义`spec.selector`描述需要控制哪些Pods**。
 
 - Job Controller会自动为Pod模板加上`controller-uid=<随机字符串>`的标签，并在Job对象本身添加该标签对应的selector。
+- pod 和 job 的metadata 都会自动添加 `jobname`的标签；
 
 重启策略： [`RestartPolicy`](https://kubernetes.io/zh/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy) 只能设置为 `Never` 或 `OnFailure` 
 
@@ -710,7 +711,7 @@ subsets:
 - Services的**VIP**（Virtual IP）方式：vip将请求转发到某一个Pod上；
 - Service的**DNS**方式：通过域名解析成对应ip
   - **Normal Service**：解析后的ip就是Service的**vip**；
-  - **Headless Service**：没有ClusterIP（None），解析出的是所有的Pod的ip:port地址列表；
+  - **Headless Service**：没有ClusterIP（None），解析出的是所有的Pod的 ip:port 地址列表；
   - dns记录域名为：`<pod-name>.<svc-name>.<namespace>.svc.cluster.local`
 
 #### NodePort模式
@@ -916,7 +917,7 @@ Pod的使用方式：
 
 - 将ConfigMap中的数据设置为**容器的环境变量**
 - 将ConfigMap中的数据设置为**命令行参数**
-- 使用Volume将ConfigMap**作为文件或目录挂载**（可[自动更新]((https://kubernetes.io/zh-cn/docs/tasks/configure-pod-container/configure-pod-configmap/#mounted-configMaps-are-updated-automatically))，使用subpath则不行）
+- 使用Volume将ConfigMap**作为文件或目录挂载**（可[自动更新](https://kubernetes.io/zh-cn/docs/tasks/configure-pod-container/configure-pod-configmap/#mounted-configMaps-are-updated-automatically)，使用subpath则不行）
   - configmap 的更新延迟，可以通过对Pod 添加注解立即触发configmap更新；
 
 - 编写代码在 Pod 中运行，使用 **Kubernetes API** 来读取 ConfigMap

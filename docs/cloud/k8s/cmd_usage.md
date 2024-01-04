@@ -18,6 +18,10 @@ Master组件的YAML文件会被生成在`/etc/kubernetes/manifests`路径下；
 
 ### get
 
+> json 路径匹配：
+>
+> - `-o jsonpath='{.items[?(@.metadata.uid=="43504a29-8b72-4304-873c-3fee910374fa")].metadata.name}'`
+
 `–show-labels `: 查看标签
 
 - 查看pod服务

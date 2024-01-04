@@ -65,7 +65,10 @@ Docker 官方中国区：
 ### exec
 
 ```bash
-$ docker exec [OPTIONS] Container  Commands [Args]  在正在运行的容器中执行命令
+# 在正在运行的容器中执行命令
+$ docker exec [OPTIONS] Container  Commands [Args]
+# 交互式
+$ docker exec -it [OPTIONS] Container  Commands [Args]  
 ```
 
 ### run

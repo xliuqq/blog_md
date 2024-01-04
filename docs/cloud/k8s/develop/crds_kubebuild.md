@@ -7,7 +7,9 @@
 - 提供脚手架工具初始化 CRDs 工程，自动生成 boilerplate 代码和配置；
 - 提供代码库封装底层的 K8s go-client；
 
- kubebuilder、operator-sdk 这些框架其实都是**在 controller-runtime 基础上做了一层封装**，方便开发者快速生成项目的脚手架，从零开始开发 CRDs，Controllers 和 Admission Webhooks 来扩展 K8s。
+方便用户从零开始开发 CRDs，Controllers 和 Admission Webhooks 来扩展 K8s。
+
+kubebuilder、operator-sdk 这些框架其实都是**在 controller-runtime 基础上做了一层封装**，方便开发者快速生成项目的脚手架，从零开始开发 CRDs，Controllers 和 Admission Webhooks 来扩展 K8s。
 
 
 
@@ -33,37 +35,6 @@ API Group 是相关 API 功能的集合，每个 Group 拥有一或多个 Versio
 
 - apiVersion：这个就是 GV 。
 - kind：这个就是 K。
-
-## Controller-Runtime
-
-![](pics/controller_runtime_arch.jpg)
-
--  Controller 会先向 Informer 注册特定资源的 eventHandler；
--  Cache 会启动 Informer，Informer 向 ApiServer 发出请求，建立连接；
--  Informer 检测到有资源变动后，使用 Controller 注册进来的 eventHandler 判断是否推入队列中；
-- 当队列中有元素被推入时，Controller 会将元素取出，并执行用户侧的 Reconciler；
-
-### Cache
-
-负责在 Controller 进程里面根据 Scheme 同步 Api Server 中所有该 Controller 关心 GVKs 的 GVRs，其核心是 GVK -> Informer 的映射，Informer 会负责监听对应 GVK 的 GVRs 的创建/删除/更新操作，以触发 Controller 的 Reconcile 逻辑。
-
-### Controller
-
-脚手架文件，我们只需要实现 Reconcile 方法即可。
-
-### Clients
-
-通过该 Clients 对某些资源类型进行创建/删除/更新，**查询功能实际查询是本地的 Cache，写操作直接访问 Api Server**。
-
-### Index
-
-由于 Controller 经常要对 Cache 进行查询，Kubebuilder 提供 Index utility 给 Cache 加索引提升查询效率。
-
-### OwnerReference
-
-K8s GC 在删除一个对象时，任何 ownerReference 是该对象的对象都会被清除，与此同时，Kubebuidler 支持**所有对象的变更都会触发 Owner 对象 controller** 的 Reconcile 方法。
-
-### 示例
 
 
 
