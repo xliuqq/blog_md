@@ -6,6 +6,75 @@
 
 http://maven.apache.org/plugins/index.html
 
+
+
+## flatten-maven-plugin（多模块版本号）
+
+> [Releases · mojohaus/flatten-maven-plugin (github.com)](https://github.com/mojohaus/flatten-maven-plugin/releases)
+>
+> 用于大型的多maven模块的项目，用于版本号的管理。
+>
+> - 打包的时候（package、install、deploy）将生成 `.flattened-pom.xml`做为当前项目的 pom 文件
+
+父 pom
+
+```xml
+<!-- 在 父 pom 中定义 ${revision} 变量-->
+<version>${revision}</version>
+<packaging>pom</packaging>
+
+<properties>
+    <revision>1.0.2</revision>
+</properties>
+
+
+
+<plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>flatten-maven-plugin</artifactId>
+    <version>1.5.0</version>
+    <configuration>
+        <!-- 对于 packaging 为 pom 类型的项目也使用生成的 .flattened-pom.xml -->
+        <updatePomFile>true</updatePomFile>
+        <flattenMode>resolveCiFriendliesOnly</flattenMode>
+    </configuration>
+    <executions>
+        <execution>
+            <id>flatten</id>
+            <phase>process-resources</phase>
+            <goals>
+                <goal>flatten</goal>
+            </goals>
+        </execution>
+        <execution>
+            <id>flatten.clean</id>
+            <phase>clean</phase>
+            <goals>
+                <goal>clean</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
+
+子 pom
+
+```xml
+<parent>
+  <version>${revision}</version>
+</parent>
+<!-- 子模块的版本应该使用父工程的版本，单独设置版本的话会导致版本混乱，即不设置 version -->
+
+<dependency>
+    <groupId>org.apache.maven.ci</groupId>
+    <artifactId>child2</artifactId>
+	<!-- 以来其它子模块时，使用 ${project.version} 或者 ${revision} 都可以 -->
+    <version>${project.version}</version>
+</dependency>
+```
+
+
+
 ## dependency-plugin
 
 将依赖的包递归下载，并拷贝到指定目录

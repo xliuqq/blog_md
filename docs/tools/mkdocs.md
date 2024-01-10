@@ -53,6 +53,14 @@ https://squidfunk.github.io/mkdocs-material/setup/changing-the-language/#site-la
 
 通过在`docs`建立`img`目录，里面放入图片，在md文件中通过`img/a.png`引入。
 
+通过 `<img>`标签引入时，需要进行如下设置：
+
+- 相关问题和解释可见：[markdown - configuring image filepaths correctly in mkdocs - Stack Overflow](https://stackoverflow.com/questions/71074662/configuring-image-filepaths-correctly-in-mkdocs)
+
+```yaml
+use_directory_urls: false
+```
+
 
 
 ## PyMdown Extensions

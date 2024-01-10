@@ -226,7 +226,11 @@ nodeRegistration:
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
 kubernetesVersion: v1.21.1
-clusterName: "hc_bigdata_c1"
+# kubectl config get-clusters 查看的结果
+# 查看 kubeconfig 可看到 cluster.name 的内容一致
+clusterName: "cluster.local"
+# 定义控制面板的地址
+controlPlaneEndpoint: "node131:6443"
 controllerManager:
   extraArgs:
     horizontal-pod-autoscaler-sync-period: "10s"
@@ -235,7 +239,6 @@ apiServer:
   exitArgs:
     runtime-config: "api/all=true"
 imageRepository: registry.aliyuncs.com/google_containers  
-controlPlaneEndpoint: "node131:6443"
 networking:
   podSubnet: "10.10.0.1/16"
 

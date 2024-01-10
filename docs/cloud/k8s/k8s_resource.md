@@ -956,13 +956,18 @@ spec:
 
 ### ServiceAccountToken
 
+> token 文件中存储的 k8s api server 地址是 https://kubernetes.default.svc（不会变）
+>
+> - kubectl cluster-info 显式的域名跟这个不需要一致，两者之间无关联
+> - apiserver 的 pod 启动参数定义 `- --service-account-issuer=https://kubernetes.default.svc.cluster.local`
+
 Service Account对象的作用是Kubernetes内置的一种“服务账户”，是K8s进行权限分配的对象。
 
-`InClusterConfig`：将K8s客户端以容器方式运行，使用默认的Service Account自动授权
+`InClusterConfig`：将**K8s客户端以容器方式运行，使用默认的Service Account自动授权**
 
 - Pods会自动挂载一个类型为Secret，名为`default-token-***`的Volume。
 
-- Service Account的授权信息和文件，作为特殊的Secret，存在容器里的`/var/run/secrets/kubernetes.io/serviceaccount`目录，包含`ca.crt`, `token`等；
+- Service Account的授权信息和文件作为特殊的Secret，存在容器里的`/var/run/secrets/kubernetes.io/serviceaccount`目录，包含`ca.crt`, `token`等；
 
 
 
