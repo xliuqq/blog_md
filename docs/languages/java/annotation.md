@@ -45,7 +45,7 @@ public @interface Action {
 
 `javax.annotation.processing.Processor`
 
-注解处理器(Annotation Processor)是javac内置的一个用于编译时扫描和处理注解(Annotation)的工具，常用的用法就是在编译期间获取相关注解数据，然后动态生成`.java`源文件，比如lombok。
+注解处理器(Annotation Processor)是 **javac 内置的一个用于编译时**扫描和处理注解(Annotation)的工具，常用的用法就是在编译期间获取相关注解数据，然后动态生成`.java`源文件，比如lombok。
 
 在编译的时候，javac会去找所有jar包及项目（模块）里`resource/META-INF/services/javax.annotation.processing.Processor`这个文件中配置的类信息，记住是**类信息**，它会通过classloader去加载这个类，此时项目（模块）中的文件因为是在编译期，尚未生成class文件，也就找不到对应的类，解决方法：
 
@@ -58,7 +58,9 @@ public @interface Action {
 
 ### 编译期间修改语法树
 
-示例：实现 GettetSetter 注解；
+示例：实现 GettetSetter 注解（依赖 tools.jar）；
+
+- 直接修改语法树，也可以先生成源文件，再进行编译；
 
 ```java
 // 根据字符串获取Name

@@ -1,34 +1,6 @@
-# 代理
+# AOP
 
-## 反射
-
-- 基本类型的Class，如boolean.class；
-
-
-
-## 
-
-## JDK 动态代理
-
->  通过反射类Proxy以及InvocationHandler回调接口实现
->
-> - 进行**动态代理的类必须要实现一个接口**
-
-- 实现InvocationHandle接口，Proxy.newProxyInstance(ClassLoader, Interface, InvocationHandle)
-
-
-
-## Cglib 动态代理(不再维护)
-
-> https://github.com/cglib/cglib
-
-使用 [ASM](./bytecode.md#ASM) 进行底层的字节码处理，动态代理的类不需要接口。
-
-
-
-## AOP
-
-### AOP Alliance
+## AOP Alliance
 
 AOP 联盟是java对于AOP提供的一系列**标准接口**，顶层接口有： 
 
@@ -43,7 +15,7 @@ AOP 联盟是java对于AOP提供的一系列**标准接口**，顶层接口有�
 </dependency>
 ```
 
-### Java 依赖注入标准（JSR-330）
+## Java 依赖注入标准（JSR-330）
 
 该规范主要是面向依赖注入使用者，而对注入器实现、配置并未作详细要求。目前 **Spring、Guice 已经开始兼容该规范**，JSR-299（Contexts and Dependency Injection for Java EE platform，参考实现 Weld）在依赖注入上也使用该规范。
 
@@ -53,6 +25,8 @@ AOP 联盟是java对于AOP提供的一系列**标准接口**，顶层接口有�
 * **@Named** - String-based qualifier
 * **@Singleton** - Identifies a type that the injector only instantiates once
 * **Provider** - Provides instances of T. Typically implemented by an injector
+
+## 开源AOP实现
 
 ### Hutools AOP
 
@@ -127,7 +101,7 @@ private static class MainModule extends AbstractModule {
 
 ### AspectJ AOP
 
-[AspectJ](http://www.eclipse.org/aspectj)作为 Java 中流行的 **AOP（aspect-oriented programming）** 编程扩展框架，其内部使用的是 **[BCEL框架](./bytecode.md#Apache Common BCEL)** 来完成其功能。
+[AspectJ](http://www.eclipse.org/aspectj) 作为 Java 中流行的 **AOP（aspect-oriented programming）** 编程扩展框架，其内部使用的是 **[BCEL框架](./bytecode.md#Apache Common BCEL)** 来完成其功能。
 
 - **在一些固定的切入点来进行操作**；
 - **匹配规则采用了类似正则表达式的规则**；

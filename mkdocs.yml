@@ -180,7 +180,9 @@ nav:
         - jvm-profile分布式应用分析: languages/java/performance/jvm_profile.md
       - Native: 
         - 概览: languages/java/native/README.md
-        - JNI: languages/java/native/jni.md
+        - JNI: 
+          - 原理: languages/java/native/jni.md
+          - 示例: languages/java/native/jni_demo.md
         - JNR: languages/java/native/jnr.md
       - JVM:
         - 即时编译Jit: languages/java/jit.md

@@ -6,7 +6,7 @@
 
 ## JNI
 
-标准的Java native通信工具，但复杂度高，需要很多native code到java的回调。
+标准的Java native通信工具，但复杂度高，需要很多**native code到java的回调**。
 
 详见 [JNI 使用文档](./jni.md)
 
@@ -34,10 +34,9 @@
 
 > https://github.com/java-native-access/jna
 
-- **基于libffi；**
+- **基于libffi；基于反射，数据转换从本地代码跳到 Java 代码非常昂贵；**
 - 相较于JNR，更为成熟；
 - 不需要JNI代码 ，只需要定义接口和函数（匹配）；
-- **基于反射**，**数据转换从本地代码跳到 Java 代码非常昂贵；**
 
 
 
@@ -45,7 +44,7 @@
 
 > https://github.com/jnr/jnr-ffi
 
-- 基于libffi，但使用**字节码生成**技术而不是反射；
+- **基于libffi**，但使用**字节码生成**技术而不是反射；
 - 不需要JNI代码 ，只需要定义接口和函数（匹配）；
 
 <img src="pics/jnr.png" alt="jnr" style="zoom:33%;" />
