@@ -287,12 +287,16 @@ spec:
 
 ### Cmd/Args
 
-同时在kubernetes中的yaml文件中写了`command`和`args`的时候，默认是会覆盖`DockerFile`中的命令行和参数，完整的情况分类如下：
+> 建议在 K8s 中定义 command 和 args，忽略 Dockerfile 中的 ENTRYPOINT 和 CMD。
+>
+> - K8s 中 command 使用 exec 模式启动（1号进程）
 
-- 如果command和args都没有写，那么用`DockerFile`默认的配置。
-- 如果command写了，但args没有写，那么Docker默认的配置会被忽略而且仅仅执行`.yaml`文件的command（不带任何参数的）。
-- 如果command没写，但args写了，那么Docker默认配置的ENTRYPOINT的命令行会被执行，但是调用的参数是`.yaml`中的args。
-- 如果command和args都写了，那么Docker默认的配置被忽略，使用`.yaml`的配置。
+在kubernetes中的 yaml 文件中写了`command`和`args`的时候，默认是会覆盖`DockerFile`中的命令行（ENTRYPOINT ）和参数（CMD），完整的情况分类如下：
+
+- 如果command 和 args 都没有写，那么用`DockerFile`默认的配置；
+- 如果command 写了，但 args 没有写，那么 Docker 默认的配置会被忽略而且仅仅执行`.yaml`文件的command（不带任何参数的）；
+- 如果command没写，但args写了，那么Docker默认配置的ENTRYPOINT的命令行会被执行，但是调用的参数是`.yaml`中的args；
+- 如果command和args都写了，那么Docker默认的配置被忽略，使用`.yaml`的配置；
 
 ### 卷挂载传播
 

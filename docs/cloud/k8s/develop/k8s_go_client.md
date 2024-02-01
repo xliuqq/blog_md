@@ -8,7 +8,7 @@
 
 ## k8s.io/client-go
 
-> **client-go 的 ListWatch/informer 接口**， 那它默认已经设置了 `ResourceVersion=0`，走 apiserver 的缓存，否则会走 etcd 获取；
+> **client-go 的 ListWatch/informer 接口**， 默认已经设置了 `ResourceVersion=0`，走 apiserver 的缓存，否则会走 etcd 获取；
 
 ![framework.png](pics/framework.png)
 
@@ -38,7 +38,7 @@ Informer`实例的`Lister()`方法，`List/Get Kubernetes`中的`Object`时，`I
 
 > 实现了 SharedIndexInformer 接口。
 
-一个资源只实例化一个Informer，后续所有的Listener都共享这一个Informer实例，通过 **工厂模式+map+lock** 实现。
+**一个资源只实例化一个Informer**，后续所有的Listener都共享这一个Informer实例，通过 **工厂模式+map+lock** 实现。
 
 
 
@@ -180,6 +180,8 @@ Reflector的`ListAndWatch`方法将 ApiServer 侧的 obj 同步到本地 DeltaFI
 
 ### Informer中的resync
 
+> [k8s-club/articles/Informer机制 - Resync.md at main · k8s-club/k8s-club (github.com)](https://github.com/k8s-club/k8s-club/blob/main/articles/Informer机制 - Resync.md)
+
 `Informer`和`Kubernetes`之间没有`resync`机制，但`Informer`内部的这两级缓存之间存在`resync`机制。
 
 - `resync`将 `Indexer(LocalStore)` 中的对象，全部发送到 `DeltaFIFO` 的队列中；
@@ -246,12 +248,17 @@ resyncPeriod ：每个 listener 用于判断自己是否需要同步的时间间
 
 约束：
 
-- resyncPeriod 不能小于 1s；
+- **resyncPeriod 不能小于 1s**；
 - resyncPeriod 最终的结果 >= resyncCheckPeriod；
 
 
 
 #### resync 的用途
+
+> 针对场景：请求外围系统，并将外围系统的状态推动到目标状态
+>
+> - 外围系统的变更，K8s不会感知，只能通过轮询（Resync）对象，并查看外围系统的状态保证一致；
+> - 例如定义CRD描述云磁盘，但被用户无意删掉，通过 Resync 机制，保证再查看对象时，发现其对应磁盘不在；
 
 - 让 listener 能够定期 reconcile Indexer 内的所有事件，来保证对应事件关心的对象（可能是系统内，也可能是系统外）状态都是预期状态；
 - 对于外围系统的人为修改，定时 resync 可以保证**外围系统状态**能够一直保持与 listener 内的预期状态一致；
@@ -270,7 +277,7 @@ This library is **a shared dependency for servers and clients** to work with Kub
 
 > Repo for the controller-runtime subproject of kubebuilder (sig-apimachinery)
 >
-> a set of go libraries for building Controllers,  leveraged by [Kubebuilder](https://book.kubebuilder.io/) and [Operator SDK](https://github.com/operator-framework/operator-sdk).
+> a set of **go libraries for building Controllers**,  leveraged by [Kubebuilder](https://book.kubebuilder.io/) and [Operator SDK](https://github.com/operator-framework/operator-sdk).
 
 ![](pics/controller_runtime_arch.jpg)
 
