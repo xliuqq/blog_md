@@ -15,6 +15,50 @@ mvn clean -DskipTests -T 1C package
 
 [ validate, **initialize**, generate-sources, process-sources, generate-resources, process-resources, **compile**, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, **test**, prepare-package, **package**, pre-integration-test, integration-test, post-integration-test, **verify**, install, deploy ]
 
+### 插件执行顺序
+
+**maven对于绑定到同一phase上的多个插件的执行顺序是按照它们在pom.xml声明的顺序来的**。
+
+如果在父 pom 中定义，或者在 profile 的 plugins 定义，需要在子pom中重新声明，以指定执行顺序。
+
+**Parent pom.xml**
+
+```xml
+<plugins>
+    <plugin>
+        <groupId>groupid.maven.1</groupId>
+        <artifactId>maven-plugin-1</artifactId>
+        <version>1.0</version>
+        <executions>
+            <execution>
+                <phase>package</phase>
+            </execution>
+        </executions>
+    </plugin>
+</plugins>
+```
+
+**Child pom.xml**
+
+```xml
+<plugins>
+    <plugin>
+        <groupId>groupid.maven.2</groupId>
+        <artifactId>maven-plugin-2</artifactId>
+        <version>1.0</version>
+        <executions>
+            <execution>
+                <phase>package</phase>
+            </execution>
+        </executions>
+    </plugin>
+    <plugin>
+        <groupId>groupid.maven.1</groupId>
+        <artifactId>maven-plugin-1</artifactId>
+    </plugin>
+</plugins>
+```
+
 ## 配置
 
 ### 依赖管理
