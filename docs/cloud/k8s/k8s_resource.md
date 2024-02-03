@@ -314,6 +314,8 @@ spec:
 
 `preStop`：容器结束前执行操作，同步执行即会阻塞当前的容器结束流程。
 
+
+
 ### 配置
 
 通常不需要直接创建 Pod，甚至单实例 Pod。 相反使用诸如 Deployment或 Job这类工作负载资源来创建 Pod。
@@ -847,7 +849,9 @@ Secret、ConfigMap、Downward API三种信息，可以通过**环境变量的方
 
 ### Secret
 
-> 通过卷挂载时或者通过 go client 获取 secret 时，其数据已经进行 base64 解码。
+> - 通过卷挂载时或者通过 go client 获取 secret 时，其数据已经进行 base64 解码。
+>
+> - Pod 默认可以挂载同名空间的任意 Secret，但也可以[限制Pod访问哪些secret](./k8s_security.md#Service Account)。
 
 把Pod想要访问的加密数据存储到etcd中，通过Pod的容器**挂载Volume**的形式访问Secret里的信息。
 
