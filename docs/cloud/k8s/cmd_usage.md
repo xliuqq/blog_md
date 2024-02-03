@@ -60,9 +60,9 @@ Master组件的YAML文件会被生成在`/etc/kubernetes/manifests`路径下；
 
 `kubectl expose  pod hc-base-jupyter-pod --port=8888 --target-port=8888  --type=NodePort -n ai-education`
 
-- `--port`: 容器内服务端口
-- `--target-port`：集群内部容器开放端口
-- `--type`：服务暴露类型，一般选择NodePort，会**自动分配一个外部访问的port**
+- `--port`: 集群内部服务访问端口，即通过 clusterip + port 在容器内访问；
+- `--target-port`：容器内的服务端口
+- `--type`：服务暴露类型，一般选择NodePort，会**自动分配一个外部访问的port**（通过`kubectl get service`查看）
 - `--name`：名称（可选）
 
 ### port-forward

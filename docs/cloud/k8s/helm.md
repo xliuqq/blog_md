@@ -95,6 +95,31 @@ Helm installs resources in the following order:
 
 
 
+## 原理
+
+### 升级Patch
+
+**Helm 3 three-way 合并策略**
+
+考虑 old manifest，live state 和 new manifest 三者，生成 patch。
+
+- **如果 manifest 前后不变，helm 3 会将新的 mainfest 覆盖，此时外部的改动会丢失**；
+
+可以通过 lookup 函数，将原先的配置查出来作为配置内容，如下所示
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: upgrade-test
+  namespace: default
+data:
+  content: |
+# 查找 config map 的当前内容，并应用  
+{{ (lookup "v1" "ConfigMap" "default"  "upgrade-test").data.content | indent 4 }}
+
+```
+
 
 
 ## 安装
@@ -170,6 +195,17 @@ $ helm install -f values.yaml bitnami/wordpress --generate-name
 
 
 ## 语法
+
+### lookup Function
+
+
+```yaml
+data:
+  content: |
+# 查找 config map 的当前内容，并应用  
+{{ (lookup "v1" "ConfigMap" "default"  "upgrade-test").data.content | indent 4 }}
+
+```
 
 ### 'include' Function
 

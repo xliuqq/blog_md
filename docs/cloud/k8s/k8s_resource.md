@@ -704,9 +704,9 @@ subsets:
 
 为一组Pod抽象一个稳定的网络访问地址，提供**服务注册、服务发现、服务负载均衡**等。
 
-`port`和`nodePort`都是service的端口，前者暴露给k8s集群内部服务访问，后者暴露给k8s集群外部流量访问。
+- `port`和`nodePort`都是service的端口，前者暴露给k8s集群内部服务访问，后者暴露给k8s集群外部流量访问。
 
-从上两个端口过来的数据都需要经过反向代理kube-proxy，流入后端pod的`targetPort`上，最后到达pod内的容器。
+- 从上两个端口过来的数据都需要经过反向代理kube-proxy，流入后端pod的`targetPort`上，最后到达pod内的容器。
 
 #### ClusterIP模式
 
