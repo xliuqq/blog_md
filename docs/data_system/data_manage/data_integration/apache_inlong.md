@@ -1,8 +1,8 @@
-# Apache InLong
+# [Apache InLong](https://inlong.apache.org/)
 
 > Apache InLong（应龙）是一个一站式海量数据集成框架，将**数据采集、聚合、存储、排序数据处理的全流程**整合在一起，提供自动、安全、可靠和高性能的数据传输能力，同时支持批和流，方便业务构建基于流式的数据分析、建模和应用。
 
-开源的ETL解决方案。
+Apache InLong - a **one-stop, full-scenario integration framework** for massive data.
 
 ## 架构
 
@@ -52,7 +52,7 @@ File、Sql、Binlog、Metrics等多种异构数据源
 
 ##### 架构介绍
 
-<img src="pics/image-20220624161824537.png" alt="image-20220624161824537" style="zoom:75%;" />
+<img src="pics/inlong_agent.png" alt="inlong_agent" style="zoom:75%;" />
 
 InLong Agent本身作为数据采集框架，采用channel + plugin架构构建。将数据源读取和写入抽象成为Reader/Writer插件，纳入到整个框架中。
 
@@ -92,9 +92,7 @@ DataProxy整体架构基于Apache Flume，扩展了Source层和Sink层，并对�
 
 ##### 架构介绍
 
-<img src="pics/image-20220627091918571.png" alt="image-20220627091918571" style="zoom:75%;" />
-
-、
+<img src="pics/inlong_dataproxy.png" alt="inlong_dataproxy" style="zoom:75%;" />
 
 - Source层开启端口监听，通过netty server实现。解码之后的数据发到channel层
 - channel层有一个selector，用于选择走哪种类型的channel，如果memory最终满了，会对数据做落地处理
@@ -116,7 +114,7 @@ DataProxy提供了JMX方式的监控指标Listener能力，用户可以实现Met
 
 ##### 架构
 
-<img src="pics/image-20220627092427341.png" alt="image-20220627092427341" style="zoom:75%;" />
+<img src="pics/inlong_tubemq.png" alt="inlong_tubemq" style="zoom:75%;" />
 
 
 
@@ -170,7 +168,7 @@ Zookeeper：负责offset存储的zookeeper部分
 
 ##### 架构
 
-<img src="pics/image-20220627110451781.png" alt="image-20220627110451781" style="zoom:75%;" />
+<img src="pics/inlong_manage_arch.png" alt="inlong_manage_arch" style="zoom:75%;" />
 
 #### Dashboard
 
@@ -184,7 +182,7 @@ InLong审计是独立于InLong的一个子系统，对InLong系统的Agent、Dat
 
 通过审计对账，可以清晰的了解InLong 各个模块的传输情况，以及数据流是否有丢失或者重复。
 
-![image-20220627114151129](Apache_InLong.assets/image-20220627114151129.png)
+![inlong_audit](pics/inlong_audit.png)
 
 1. 审计SDK嵌套在需要审计的服务，对服务进行审计，将审计结果发送到审计接入层。
 2. 审计接入层将审计数据写到MQ(Pulsar或者TubeMQ)。
@@ -219,7 +217,7 @@ Task包含组件(和flume组将类似)：
 
 Job/Task/Reader/Sink/Channel 概念可以用下图表示：
 
-<img src="pics/image-20220624154944966.png" alt="image-20220624154944966" style="zoom:75%;" />
+<img src="pics/inlnog_job_channel.png" alt="inlnog_job_channel" style="zoom:75%;" />
 
 工作流程：
 
