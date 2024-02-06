@@ -256,5 +256,36 @@ status:
 
 ## 网络
 
-### Calico 添加域名映射
+### CoreDNS 添加域名映射
 
+`kubectl edit configmap coredns -n kube-system`
+
+- 在 `hosts` 中 添加主机名到 ip 的映射；
+
+```yaml
+data:
+  Corefile: |
+    .:53 {
+    	... 
+    	# 添加主机名到 ip 的映射
+        hosts {
+          172.16.1.129 apiserver.cluster.local
+          172.16.2.135   node135
+          172.16.2.136   node136
+          172.16.2.137   node137
+          fallthrough
+        }
+        
+        ...
+        
+        forward . /etc/resolv.conf {
+           max_concurrent 1000
+        }
+    }
+    # 特定DNS服务器解析特定域名
+    *.baidu.com:53 {
+        errors
+        cache 30
+        forward . 192.168.8.132
+    }
+```
