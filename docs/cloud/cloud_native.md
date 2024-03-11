@@ -22,6 +22,10 @@
 
 
 
+## 技术栈
+
+![云原生技术栈](pics/云原生技术栈.webp)
+
 ## 参考文献
 
 [1].  [Kubernetes 中文指南/云原生应用架构实战手册](https://jimmysong.io/kubernetes-handbook)

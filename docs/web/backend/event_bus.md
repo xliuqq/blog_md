@@ -93,3 +93,10 @@ EventBus 的 post 方法调用，会调用 `Subscriber` 的 `dispatchEvent` 方�
 
 - 将 Dispatcher 的实例变成 LegacyAsyncDispatcher；
 - 需要显式传入 Executor；
+
+
+
+
+
+## 示例
+

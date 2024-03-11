@@ -703,6 +703,8 @@ subsets:
 
 #### NodePort模式
 
+> /etc/kubernetes/manifests/kube-apiserver.yaml
+
 在每个Node上分配一个端口作为外部访问入口，**默认kube-proxy会在全部网卡(0.0.0.0)绑定NodePort的端口号**。
 
 - **不指定，可以自动分配**；

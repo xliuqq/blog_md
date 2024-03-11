@@ -190,9 +190,9 @@ Kubernetes scheduler 是以**static pod的形式在master节点上**运行的，
 
 kube-scheduler.yaml 的修改涉及到三处地方：
 
-- kube-scheder启动参数中添加--config 参数指定kube-scheduler.yaml
-- 添加hostPath volumes将 kube-scheduler.yaml 映射到容器中
-- 更改kube-scheduler image为我们的新创建的image
+- kube-scheder启动参数中添加`--config` 参数指定`kube-scheduler.yaml`
+- 添加`hostPath volumes`将 `kube-scheduler.yaml` 映射到容器中
+- 更改`kube-scheduler image`为我们的新创建的image
 
 ```yaml
 apiVersion: v1
