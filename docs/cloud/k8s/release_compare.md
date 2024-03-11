@@ -25,25 +25,19 @@ Windows配置Hyper -V
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All
 ```
 
-
-
 ```shell
 minikube start --driver=hyperv 
 # To make hyperv the default driver:
 minikube config set driver hyperv
 ```
 
-
-
 ```bash
 minikube start --disk-size="10g"  --image-mirror-country="cn"  --image-repository="registry.cn-hangzhou.aliyuncs.com/google_containers"
 ```
 
-
-
 ## Kind
 
-> Kubernetes IN Docker - local clusters for testing Kubernetes.
+> Kubernetes IN Docker - **local clusters for testing Kubernetes**.
 >
 > kind is a tool for running local Kubernetes clusters using Docker container "nodes". kind was primarily designed for testing Kubernetes itself, but may be used for local development or CI.
 
@@ -53,11 +47,11 @@ minikube start --disk-size="10g"  --image-mirror-country="cn"  --image-repositor
 
 > **MicroK8s** is a low-ops, minimal production Kubernetes.
 >
-> MicroK8s is a small, fast, single-package Kubernetes for developers, IoT and edge.
+> MicroK8s is a small, fast, single-package Kubernetes for developers, **IoT and edge**.
 
 
 
 ## [K3s](https://github.com/k3s-io/k3s/)
 
-> Lightweight Kubernetes. The certified Kubernetes distribution built for IoT & Edge computing
+> Lightweight Kubernetes. The certified Kubernetes distribution built for **IoT & Edge computing**.
 

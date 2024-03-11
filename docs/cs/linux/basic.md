@@ -1,6 +1,9 @@
 # 基础
 
-> [GNU CoreUtils](https://github.com/coreutils/coreutils)
+> [GNU 软件包列表](https://www.gnu.org/software/software.en.html)：包含多个包软件：
+>
+> - [binutils](./binutils.md)：二进制文件（ELF）分析工具；
+> - [coreutils](https://github.com/coreutils/coreutils)：基础的命令（如 cat, ls, chown, wc）等；
 
 ## SElinux
 

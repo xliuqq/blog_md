@@ -1,4 +1,4 @@
-# GPU
+# GPU g共享
 
 GPU 天然适合向量计算。常用场景及 API：
 
@@ -120,7 +120,7 @@ data:
 
 > https://github.com/4paradigm/k8s-device-plugin/
 >
-> 劫持的源码不开源，libvgpu.so；
+> - **劫持的源码不开源，libvgpu.so**；
 
 基于NVIDIA官方插件(NVIDIA/k8s-device-plugin)，在保留官方功能的基础上，实现了对物理GPU进行切分，并对显存和计算单元进行限制，从而模拟出多张小的vGPU卡。
 

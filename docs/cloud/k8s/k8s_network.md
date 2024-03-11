@@ -408,3 +408,14 @@ spec:
       port: 5978
 ```
 
+
+
+## 多容器多网络方案
+
+当一个应用或服务既需要对外提供 API 调用服务，也需要满足自身基于分布式特性产生的数据同步（一些业务场景的控制面和数据面的分离场景），那么这时候一张网卡的性能显然很难达到生产级别的要求，网络流量延时、阻塞便成为此应用的一项瓶颈。
+
+### **[multus-cni](https://github.com/k8snetworkplumbingwg/multus-cni)**
+
+> Multus CNI enables attaching multiple network interfaces to pods in Kubernetes.
+
+Multus CNI 本身不提供网络配置功能，它是通过用其他满足 CNI 规范的插件进行容器的网络配置。

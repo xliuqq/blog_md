@@ -1,12 +1,10 @@
 # Apache Hudi
 
-> Upserts, Deletes And Incremental Processing on Big Data.
+> Apache Hudi brings **database and data warehouse capabilities** to the data lake.
 >
-> Apache Hudi ingests & manages storage of large analytical datasets over DFS (hdfs or cloud stores).
->
-> Hudi brings transactions, record-level updates/deletes and change streams to data lakes!
+> Hudi brings **transactions, record-level updates/deletes and change streams** to data lakes!
 
- 
+ 对于音频/视频这个非结构化数据，跟 Hudi 没有关系，原始数据是直接存储到 data lake 中。
 
 ## 数据库的存储方式
 

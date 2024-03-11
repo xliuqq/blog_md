@@ -32,8 +32,6 @@
 - Webhook 集成（GitHub、BitBucket、GitLab）；
 - 应用程序事件和 API 调用的审计跟踪；
 
-
-
 - ？如何获取镜像，进行构建；
 
 
@@ -120,7 +118,7 @@ rm argocd-linux-amd64
 
 ```shell
 # 登录
-argocd login <ARGOCD_SERVER>
+argocd login <ARGOCD_SERVER>  --username admin --password admin123456 --insecure
 
 # 修改密码，完成之后，需要删除`argocd-initial-admin-secret`(仅用于保存初始密码，会根据新的密码自动创建新的)
 argocd account update-password
@@ -144,7 +142,27 @@ argocd app create guestbook --repo https://github.com/argoproj/argocd-example-ap
 
 ### 多集群支持
 
-- 默认情况下只能添加argocd所在的K8S集群，添加k8s集群无法在web控制台操作。
+> 默认情况下只能添加argocd所在的K8S集群，添加k8s集群无法在web控制台操作，只能通过命令行操作。
+
+1. 目标 K8s 集群获取 context 信息
+
+   ```shell
+   # 在目标k8s集群执行 
+   $ kubectl config get-contexts
+   CURRENT   NAME                          CLUSTER      AUTHINFO           NAMESPACE
+   *         kubernetes-admin@kubernetes   kubernetes   kubernetes-admin
+   
+   # 将 kube config 文件发送到 argocd 机器，注意将里面的域名信息改为 ip 地址
+   $ scp /root/.kube/config 172.16.2.134:/argocd/prod_k8s_config
+   ```
+
+2.  在 argocd 的机器上通过命令行新增集群
+
+   ```shell
+   $ argocd cluster add kubernetes-admin@kubernetes  --kubeconfig /argocd/prod_k8s_onfig  --name prod
+   ```
+
+   
 
 
 

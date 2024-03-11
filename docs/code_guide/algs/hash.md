@@ -43,7 +43,7 @@
 
 ### 一致性Hash算法
 
-> 论文： [Consistent hashing and random trees:Distributed Caching Protocols for Relieving Hot Spots on the World Wide Web](./pdf/1997-Consistent Hashing and Random Trees.pdf) 
+> 论文： [Consistent hashing and random trees:Distributed Caching Protocols for Relieving Hot Spots on the World Wide Web](./pdfs/1997-Consistent Hashing and Random Trees.pdf) 
 
 算法流程：
 

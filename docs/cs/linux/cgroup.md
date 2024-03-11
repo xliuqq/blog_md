@@ -1,8 +1,16 @@
 # CGroup
 
+> 在当前内核版本（3.x）下，开启了kmem accounting功能，会导致 memory cgroup 的条目泄漏无法回收（无法正常计数）。
+>
+> - 内核日志的“SLUB: Unable to allocate memory on node -1”报错。
+>
+> 
+
 cgroup，其本身的作用只是任务跟踪。但其它系统（比如cpusets，cpuacct），可以利用cgroup的这个功能实现一些新的属性，比如统计或者控制一个cgroup中进程可以访问的资源。举个例子，cpusets子系统可以将进程绑定到特定的cpu和内存节点上。
 
 **control groups 理解为 controller （system resource）（for）（process）groups**，以一组进程为目标进行系统资源分配和控制。
+
+
 
 ## 功能
 

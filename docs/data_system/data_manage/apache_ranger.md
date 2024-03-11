@@ -118,7 +118,7 @@ Apache Ranger是一个Hadoop集群**数据安全管理**的框架，提供集中
 
 #### Ranger界面配置
 
-![img](pics/image.png)
+![rancher_ui](pics/rancher_ui.png)
 
 ### HBase
 

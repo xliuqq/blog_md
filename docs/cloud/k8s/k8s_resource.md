@@ -1092,6 +1092,16 @@ spec:
 
 - 主要用于某些应用程序无需永久保存的临时目录，多个容器的共享目录等
 
+
+
+### 设备类型
+
+`VolumeMode`字段支持：
+
+- Block（原始的块设备）：Pod 使用时在 container 中设置 `VolumeDevices`
+
+- FileSystem（格式化的文件系统）：Pod 使用时在 container 中设置 `VolumeMounts`
+
 ## PVC
 
 > **PV和PVC是一一对应的**。

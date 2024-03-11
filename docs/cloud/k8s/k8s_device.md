@@ -173,3 +173,9 @@ EOF
 
 https://github.com/NVIDIA/k8s-device-plugin#configuring-the-device-plugins-helm-chart
 
+
+
+### AMD GPU
+
+[K8s 插件](https://github.com/ROCm/k8s-device-plugin#deployment)
+

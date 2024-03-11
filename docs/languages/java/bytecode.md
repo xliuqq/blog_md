@@ -55,6 +55,14 @@ graph
 - 用户可以通过实现自己的Visitor对应的VisitXXX方法来达到对指定遍历对象的自定义操作；
 - ***动态生成类或者增强既有类的功能***；
 
+### Apache Common BCEL
+
+> BCEL is already being used successfully in several projects such as compilers, optimizers, obsfuscators, code generators and analysis tools. **Unfortunately there hasn't been much development going on over the past few years**. 
+
+[BCEL](https://github.com/apache/commons-bcel) 是字节码增强工具，不基于其它字节码工具。
+
+- **分析、创建和操作（二进制）Java 类文件**（以 .class 结尾的文件）
+
 
 
 ### ByteBuddy
@@ -76,22 +84,6 @@ graph
 
 - 增强逻辑采用的是硬编码形式，在开发过程中无法进行debug；
 - 底层也是采用类似 asm 的 ClassFileWriter，进行字节码的操作；
-
-
-
-### Apache Common BCEL
-
-> Unfortunately there **hasn't been much development** going on over the past few years.
-
-[BCEL](https://github.com/apache/commons-bcel) 是基于 eclipse.jdt.core/ecj 实现的字节码增强工具。
-
-- 分析、创建和操作（二进制）Java 类文件（以 .class 结尾的文件）
-
-
-
-### AspectJ
-
-> [eclipse-aspectj/eclipse.jdt.core](https://github.com/eclipse-aspectj/eclipse.jdt.core) is AspectJ-enhanced fork of Eclipse JDT Core.
 
 
 
@@ -122,5 +114,4 @@ graph
 > - Spring 自己维护了一套 [cglib](https://github.com/spring-projects/spring-framework/blob/main/spring-core/src/main/java/org/springframework/cglib/package-info.java)，可以应用于高版本的 JDK；
 
 使用 [ASM](./bytecode.md#ASM) 进行底层的字节码处理，动态代理的类不需要接口。
-
 
