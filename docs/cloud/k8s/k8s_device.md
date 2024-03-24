@@ -50,7 +50,7 @@ Nvidia 官方实现[k8s device plugin](./k8s_device.md)，作为 K8s Daemonset�
 > With the release of Docker 19.03, usage of `nvidia-docker2` packages is deprecated since NVIDIA GPUs are now natively supported as devices in the Docker runtime ( --gpus ).
 
 - 宿主机需要安装 nvidia driver；
-- 支持 docker 和 containerd；
+- 支持 docker / containerd / CRI-O；
 
 ##### nvidia-container-toolkit
 
@@ -106,13 +106,14 @@ version = 2
 
 ##### GPU Plugin
 
-Yaml
+Yaml 安装
 
 ```shell
-$ kubectl create -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v0.12.3/nvidia-device-plugin.yml
+# 最新版见 https://github.com/NVIDIA/k8s-device-plugin/releases/
+$ kubectl create -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v0.14.4/nvidia-device-plugin.yml
 ```
 
-Helm
+Helm 安装
 
 ```shell
 $ helm repo add nvdp https://nvidia.github.io/k8s-device-plugin
@@ -166,9 +167,9 @@ EOF
 | `--device-id-strategy`   | `$DEVICE_ID_STRATEGY`   | `"uuid"`      |
 | `--config-file`          | `$CONFIG_FILE`          | `""`          |
 
-`--pass-device-specs`  ：是否与 CPUManager 一起使用
+`--pass-device-specs`  ：是否与 [CPUManager(cpuset 减少cpu切换)](https://kubernetes.io/zh-cn/docs/tasks/administer-cluster/cpu-management-policies/#static-policy-options) 一起使用
 
-##### helm
+##### helm 安装前配置
 
 https://github.com/NVIDIA/k8s-device-plugin#configuring-the-device-plugins-helm-chart
 

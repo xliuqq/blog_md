@@ -47,7 +47,7 @@ cgroup2 on /sys/fs/cgroup/unified type cgroup2 (rw,nosuid,nodev,noexec,relatime)
 
 ### cgroup 
 
-控制组，它提供了一套机制用于**控制一组特定进程对资源的使用**。
+控制组，它提供了一套机制用于**控制<font color='red'>一组特定进程</font>对资源的使用**。
 
 **关联一组task和一组subsystem的配置参数**。一个task对应一个进程，cgroup是资源分片的最小单位。
 

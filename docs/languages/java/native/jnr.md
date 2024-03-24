@@ -1,6 +1,6 @@
-# JNR
+# [JNR-FFI](https://github.com/jnr/jnr-ffi)
 
-## 类型转换
+## [类型转换](https://github.com/jnr/jnr-ffi/blob/master/docs/TypeMappings.md)
 
 ### 基本类型
 
@@ -121,7 +121,7 @@ lib.setCallback(callback);     // Callback is passed internally as a function po
 referenceManager.remove(key);  // Free the callback when no more required
 ```
 
-## 内存管理
+## [内存管理](https://github.com/jnr/jnr-ffi/blob/master/docs/MemoryManagement.md)
 
 ### Pointers
 
@@ -131,7 +131,7 @@ native memory 地址的引用；
 
 ## 示例
 
-maven依赖
+[maven依赖](https://github.com/jnr/jnr-ffi/tags)
 
 ```xml
 <dependency>
@@ -158,6 +158,7 @@ public class Getpid {
     }
 
     public static void main(String[] args) {
+        // load libc.so
         LibC libc = LibraryLoader.create(LibC.class).load("c");
 
         System.out.println("pid=" + libc.getpid() + " parent pid=" + libc.getppid());

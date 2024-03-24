@@ -17,7 +17,7 @@ YARN 支持可扩展的资源模型。**默认情况下，YARN会跟踪所有节
 - 参数：`yarn.resource-types`，逗号分隔的附加资源列表；
 - 参数：`yarn.resource-types.<resource>.units`，指定资源类型的默认单位；
 - 参数：`yarn.resource-types.<resource>.minimum-allocation`，指定资源类型的最小请求；
-- 参数：`yarn.resource-types.<resource>.minimum-allocation`，指定资源类型的最大请求；
+- 参数：`yarn.resource-types.<resource>.maximum-allocation`，指定资源类型的最大请求；
 
 **node-resources.xml**（所有NM节点都要配置）
 

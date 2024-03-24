@@ -2,26 +2,49 @@
 
 ## 配置
 
-### 支持的元数据存储
+### 元数据存储 
 
-单台 Redis Server，目前不支持Redis cluster
+#### PostgreSQL
 
-- JuiceFS uses **[transaction](https://redis.io/topics/transactions) to guarantee the atomicity of metadata operations, which is not well supported in cluster mode**.
+- 默认使用的 public [schema](https://www.postgresql.org/docs/current/ddl-schemas.html) 
+- 密码中的特殊字符需要进行 url 编码，例如 `|` 需要编码为`%7C`
 
-Redis需要开启持久化（RDB 和AOF），防止元数据丢失。
+```shell
+# 需要提前手动创建数据库，使用如下的格式来指定参数
+export META_PASSWORD="mypassword"
+juicefs format \
+    --storage s3 \
+    ... \
+    "postgres://user@192.168.1.6:5432/juicefs" \
+    pics
+# 挂载文件系统
+export META_PASSWORD="mypassword"
+juicefs mount -d "postgres://user:mypassword@192.168.1.6:5432/juicefs" /mnt/jfs
+```
 
-#### 支持的对象存储
 
-- Amazon S3
-- Google Cloud Storage
-- Azure Blob Storage
-- Alibaba Cloud Object Storage Service (OSS)
-- Tencent Cloud Object Storage (COS)
-- QingStor Object Storage
-- Ceph RGW
-- MinIO
-- Local disk
-- Redis
+
+#### Redis
+
+> 支持使用 Redis Cluster 作为元数据引擎，但为了避免在 Redis 集群中执行跨节点事务，**同一个文件系统的元数据总会坐落于单个 Redis 实例**中。
+
+保证元数据安全，参考 [Redis 最佳实践](https://juicefs.com/docs/zh/community/redis_best_practices)
+
+-  内存满时不驱除：设置 [`maxmemory-policy noeviction`](https://redis.io/docs/reference/eviction/)，juicefs 启动时会自动设置，设置失败会打印警告；
+
+- Redis需要开启持久化（RDB 和AOF），防止元数据丢失；
+
+### 对象存储
+
+
+
+
+
+### Hadoop 使用
+
+> [在 Hadoop 生态使用 JuiceFS | JuiceFS Document Center](https://juicefs.com/docs/zh/community/hadoop_java_sdk#部署客户端)
+
+
 
 ## 命令
 
@@ -31,7 +54,18 @@ Redis需要开启持久化（RDB 和AOF），防止元数据丢失。
 
 ### juicefs mount
 
-挂载完成之后，默认会切到后端运行。
+> 挂载完成之后，默认会切到后端运行。
+
+#### FUSE 挂载选项
+
+> [FUSE 挂载选项 | JuiceFS Document Center](https://juicefs.com/docs/zh/community/fuse_mount_options)
+
+```shell
+# -o 选项设置
+juicefs mount -d -o allow_other,writeback_cache sqlite3://myjfs.db ~/jfs
+```
+
+
 
 #### 缓存相关参数
 

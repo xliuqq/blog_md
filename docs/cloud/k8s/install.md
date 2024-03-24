@@ -1,4 +1,4 @@
-# 部署
+# 基于 kubeadmin 部署
 
 > Kubernetes原生的可扩展性受制于`list/watch`的长连接消耗，生产环境能够稳定支持的节点规模是1000左右。
 
@@ -173,7 +173,7 @@ systemctl start docker
 
 ### 安装kubeadm/kubelet/kubectl（所有节点)
 
-- 配置 k8s 的 yum repo
+- 配置 **k8s 的 yum repo**
 
 ```bash
 cat <<EOF > /etc/yum.repos.d/kubernetes.repo
@@ -451,3 +451,103 @@ docker rmi $(docker images | grep "none" | awk '{print $3}')
 systemctl disable docker.service
 systemctl stop docker
 ```
+
+
+
+## K8s版本升级
+
+> kubeadmin 升级k8s，可以升级一个小版本，可以升级一个大版本，但是不能跨版本升级，会有报错提示。建议一个版本一个版本升级。
+
+查看版本升级计划
+
+- `kubeadm  upgrade plan`
+
+升级版本
+
+- `kubeadm upgrade apply [version]`
+
+
+
+## 集群备份与恢复
+
+### Etcd 快照
+
+> 不区分数据的内在逻辑关系，把数据存储作为一个整体来备份，恢复时也是作为整体恢复，不可能只恢复一部分数据，类似快照的概念。
+
+安装 `ectdctl`：`yum install -y etcd-client`
+
+备份：
+
+- 备份：
+
+  ```shell
+  # 执行备份，从 api-server 或者 etcd 启动命令上查询证书的路径
+  date;
+  CACERT="/etc/kubernetes/pki/etcd/ca.crt"
+  CERT="/etc/kubernetes/pki/etcd/server.crt"
+  EKY="/etc/kubernetes/pki/etcd/server.key"
+  ENDPOINTS="127.0.0.1:2379"
+  
+  ETCDCTL_API=3 etcdctl \
+  --cacert="${CACERT}" --cert="${CERT}" --key="${EKY}" \
+  --endpoints=${ENDPOINTS} \
+  snapshot save /backup/etcd-snapshot-`date +%Y%m%d`.db
+  ```
+
+恢复：
+
+```shell
+# 1.停止所有 Master 上 kube-apiserver 服务
+systemctl stop kube-apiserver
+
+# 2.停止集群中所有 ETCD 服务（宿主机上安装 etcd）
+systemctl stop etcd
+
+# 3.移除所有 ETCD 存储目录下数据
+mv xxx/etcd/data xxx/etcd/data.bak
+
+# 4.从备份文件中恢复数据
+ETCDCTL_API=3 etcdctl snapshot restore /backup/etcd-snapshot-xx.db  
+
+# 5.启动 etcd
+systemctl start etcd
+
+# 6.启动 apiserver
+systemctl start kube-apiserver
+
+# 7.检查服务是否正常
+```
+
+
+
+### [Velero](https://github.com/vmware-tanzu/velero)
+
+> back up and restore your Kubernetes cluster resources and persistent volumes.
+>
+> - 按照数据的内在逻辑关系，选择性提取部分数据或全部数据，恢复时可以选择恢复一部分数据  
+
+**velero的作用：**
+
+- 灾备能力：提供备份恢复k8s集群的能力
+- 迁移能力：提供拷贝集群资源到其他集群的能力
+
+**和 etcd 备份的区别：**
+
+- etcd 的备份必须拥有 etcd 运维权限，有些用户无法操作 etcd，如多租户场景。
+- etcd 更适合单集群内数据备份，不太适合集群迁移
+- etcd 是当前状态备份，velero 可以做到只备份集群内的一部分资源
+
+使用：
+
+```shell
+# 备份，将 nginx-example 名空间下的资源备份
+velero backup create nginx-backup --include-namespaces nginx-example
+
+
+# 恢复
+# 先删除资源
+kubectl delete namespaces nginx-example
+# 恢复资源
+velero restore create --from-backup nginx-backup
+```
+

@@ -1,4 +1,14 @@
-# 集群安全机制
+# K8s安全机制
+
+## Pod Security
+
+> `hostPID` - Use the host’s pid namespace. Optional: Default to false.
+>
+> `hostIPC` - Use the host’s ipc namespace. Optional: Default to false.
+>
+> -  **container processes to communicate with processes on the host**
+
+
 
 ## API Server 认证
 
