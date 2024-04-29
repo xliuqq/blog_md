@@ -64,11 +64,9 @@ $ mount --bind /host /test
 $ mount -t aufs -o dirs=./A:./B none ./C
 ```
 
+### 自动挂载
 
-
-### /etc/fstab 自动挂载配置文件
-
-
+`/etc/fstab`配置文件
 
 ### 查看已经挂载的目录
 
@@ -76,7 +74,13 @@ $ mount -t aufs -o dirs=./A:./B none ./C
 mount -l
 ```
 
+### 回环设备
 
+回环设备（ 'loopback device'）允许用户**以一个普通磁盘文件虚拟一个块设备**。
+
+- 对它的所有读写操作都将被重定向到读写一个名为 disk-image 的普通文件而非操作实际磁盘或分区的轨道和扇区。
+
+回环设备以 /dev/loop0、/dev/loop1 等命名。每个设备可虚拟一个块设备。注意只有超级用户才有权限设置回环设备。
 
 ## 虚存分配策略
 
