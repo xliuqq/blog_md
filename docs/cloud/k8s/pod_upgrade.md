@@ -40,8 +40,6 @@ K8s 支持的Pod 原地升级仅限于：
   - 如果 env from 这些改动的 labels/anntations，Kruise 会原地升级这些容器来生效新的 env 值；
 - 更新 workload 中的 `spec.template.spec.containers[x].image`；
 
-
-
 > [SidecarSet](https://openkruise.io/zh/docs/user-manuals/sidecarset) 的原地升级流程和其他 workloads 不太一样，比如它在升级 Pod 之前并不会把 Pod 设置为 not-ready 状态。因此，下文中讨论的内容并不完全适用于 SidecarSet。
 
 以 [CloneSet](https://openkruise.io/zh/docs/user-manuals/cloneset) 为例，其执行流程如下：

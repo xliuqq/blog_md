@@ -475,9 +475,26 @@ aggDF
 
 
 
-## 持续处理（TODO）
+## Continuous Processing [Experimental]
 
+> 只能提供 at-least-once 语义。
 
+### 原理
+
+如下图所示：`epoch` 是 `input` 中数据被发送给 `operator` 处理的最小单位，在处理过程中，`epoch` 的 `offset` 会被记录到 `wal` 中。另外 `continuous` 模式下的 `snapshot` 存储使用的一致性算法是 `Chandy-Lamport` 算法。
+
+![img](pics/sss_continous_processing_arch.png)
+
+### 跟微批模式的对比
+
+与 micro-batch 模式缺点和优点都很明显。
+
+- 缺点是不容易做扩展
+- 优点是延迟更低
+
+![img](pics/sss_mico_batch.png)
+
+![img](pics/sss_continous_processing.png)
 
 ## 额外信息（TODO）
 

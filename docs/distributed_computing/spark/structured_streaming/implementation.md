@@ -220,13 +220,9 @@ Fault-tolerance model：
 - Multiple attempts to commit the same version of updates may overwrite each other. Consistency guarantees depend on whether multiple attempts have the same updates and  the overwrite semantics of underlying file system.                                            
 - Background maintenance of files ensures that last versions of the store is always recoverable to ensure re-executed RDD operations re-apply updates on the correct past version of the store.                    
 
-
-
 配置
 
 - `spark.sql.streaming.maxBatchesToRetainInMemory`配置在内存中最多保存的version的statestore的个数；
-
-
 
 启动定时线程`state-store-maintenance-task`，执行snapshot操作和清除过期的检查点文件。
 
