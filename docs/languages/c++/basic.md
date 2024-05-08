@@ -49,11 +49,40 @@ int main(int argc, char* argv[])
 
 libc will **line-buffer when stdout to screen** and **block-buffer when stdout to a file**, but no-buffer for stderr.
 
+
+
+## extern C
+
+> C++ 的关键字，用于引入 C 的头文件
+
+- 被 extern "C" 限定的函数或变量是<font color='red'>**`extern` 类型**</font>的
+  - 表明函数和全局变量作用范围（可见性）的关键字，可以被外部模块使用
+- 被 extern "C" 修饰的变量和函数是<font color='red'>**按照 `C` 语言方式编译和连接**</font>的。
+  - C中的函数`C++` 编译后在符号库中的名字与 `C` 语言的有所不同（因为C++支持函数重载）
+
+示例：C 中的库，如<stdlib.h>，都在其定义的时候，使用了`extern C`
+
+- 如果 C++ 中使用 C 的库，如 stdlib，应该引入 \<cstdlib> ，因为会将函数限定在 `std` 的名空间；
+
+```c
+#ifndef __BEGIN_DECLS
+# ifdef  __cplusplus
+#  define __BEGIN_DECLS  extern "C" {
+#  define __END_DECLS    }
+# else
+#  define __BEGIN_DECLS
+#  define __END_DECLS
+# endif
+#endif
+```
+
 ## ABI
 
  针对 library （主要是 shared library，即动态链接库）的 ABI (application binary interface)，当 library 升级时，依赖该库的二进制不需要改动。
 
 - non-virtual 函数比 virtual 函数更健壮：因为 **virtual function 是 bind-by-vtable-offset，而 non-virtual function 是 bind-by-name**。
+
+
 
 ### 二进制代码不兼容例子
 

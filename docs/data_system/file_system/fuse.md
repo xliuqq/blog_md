@@ -4,13 +4,13 @@
 
 > 用户空间文件系统（Filesystem in Userspace），用户可通过fuse在用户空间来定制实现自己的文件系统。
 
-## 背景
+## 介绍
 
 现存文件系统难以满足用户的特别需求，内核下定制开发文件系统难度较高，在用户空间可定制实现文件系统是有需求的。并且，用户空间下调试工具丰富，出问题不会导致系统崩溃，开发难度相对较低，开发周期较短。
 
-fuse本身是**内核提供的一个功能**，内核开启fuse支持后，会在/dev/fuse设备节点（char service），应用层可以通过该设备节点完成用户态文件系统。
+fuse本身是**内核提供的一个功能**，内核开启fuse支持后，会在`/dev/fuse`设备节点（`char service`），应用层可以通过该设备节点完成用户态文件系统。
 
-## 原理图
+### 原理图
 
 完整的fuse功能包括
 
@@ -24,7 +24,7 @@ c）内核支持（fs/fuse/*）
 
 ![bridge](pics/fuse_kernel_user.jpg)
 
-## 调用过程
+### 调用过程
 
 /mnt/fuse目录已经挂载了ZFUSE，准备在/mnt/fuse目录下创建第一个文件my.log。
 
@@ -50,22 +50,35 @@ c）内核支持（fs/fuse/*）
 
 
 
-## libfuse
-
-https://github.com/libfuse/libfuse
+## [libfuse](https://github.com/libfuse/libfuse)
 
 > The reference implementation of the Linux FUSE (Filesystem in Userspace) interface
 
 
 
-## jnr-fuse
+## Java 的 Fuse
 
->  FUSE implementation in Java using Java Native Runtime (JNR)
+#### [jnr-fuse](https://github.com/SerCeMan/jnr-fuse)(Not Recommend)
 
-## 实现库
+>  FUSE implementation in Java using Java Native Runtime (JNR).
+>
+>  - 个人项目，活跃性较差，最新版本 2021 年 0.5.7.
 
-### alluxio（基于jnr-fuse）
+基于 Jnr-Fuse 和 libfuse 实现的 Java Fuse。
+
+- 定义自己的文件系统，只需要继承`FuseStubFS `类，并实现相关接口即可；
+
+### [alluxio(jni-fuse)](https://github.com/Alluxio/alluxio)
+
+> alluxio 的 jnr-fuse 和 jni-fuse 的性能对比见： [Alluxio FUSE 实现原理](https://zhuanlan.zhihu.com/p/361151559)
 
 
 
-### hdfs（）
+### [hcfs-fuse](https://github.com/opendataio/hcfsfuse)
+
+> a fuse program which can access any hcfs(hadoop compatiable file system) implemented file system. Such as local filesystem, hdfs, ozone, alluxio, oss, cos, s3, and so on.
+
+实现原理：基于 Hadoop FileSystem 实现了 Fuse 的接口，Fuse 支持
+
+- [jnr-fuse](#jnr-fuse(Not Recommend))：使用 jnr-fuse，实现了`FuseStubFS`；
+- [jni-fuse](#alluxio(jni-fuse))：使用 Alluxio 提供的 jni-fuse，实现了`AbstractFuseFileSystem `；
