@@ -1,5 +1,7 @@
 # 注解
 
+> 注解定义时，不可以继承其它的注解或接口；
+
 ## 元注解
 
 四种元注解，java.lang.annotation，专门注释其他的注解：
@@ -13,9 +15,10 @@
   - RUNTIME：不丢弃，运行期也保留注解，可以使用反射机制读取注解信息；自定义注解使用；
 
 - @Target：注解用于什么地方，ElementType.{TYPE, METHOD,…}
-- @Inherited：是否允许子类继承该注解
+- @Inherited：是否允许子类继承该注解，只对`类`生效；
+  - **如果元注解Inherited修饰的其他注解，修饰了除类之外的其他程序元素，那么继承性将会失效**。
+  - 方法和属性上注解的继承，忠实于方法/属性继承本身，客观反映方法/属性上的注解。
 
-> 注解定义时，不可以继承其它的注解或接口；
 
 @interface用来声明一个注解，其中的每一个方法实际上是声明了一个配置参数。方法的名称就是参数的名称，返回值类型就是参数的类型（返回值类型只能是基本类型、Class、String、enum）。可以通过default来声明参数的默认值。
 
@@ -38,6 +41,33 @@ public @interface Action {
 @GuardedBy("mResourcesManager")
 
 是一个同步锁，只有在**线程持有mResourcesManager对象锁**时，才能使用这写变量。
+
+
+
+## 注解组合
+
+> Spring 的能力，并非是 Java 自身的能力，更详细的内容见 Spring 的注解组合。
+
+```java
+// 通过该函数能够获取到被注解的注解
+AnnotatedElementUtils.getMergedAnnotation(Element.class, Test2.class);
+
+@Target({ ANNOTATION_TYPE, FIELD, TYPE })
+@Retention(RUNTIME)
+@interface Test2 {
+    String test2() default "test2";
+}
+
+@Target({ ANNOTATION_TYPE, FIELD, TYPE })
+@Retention(RUNTIME)
+@Test2
+@interface Test3 {
+    String tset3() default "test3";
+}
+ 
+@Test3
+static class Element {}
+```
 
 
 

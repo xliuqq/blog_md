@@ -1,5 +1,42 @@
 # Network
 
+## 浮动 IP 创建
+
+例如：两个机器 ip 地址为`192.168.2.5/6`；要设置的浮动 ip 为`192.168.2.10`
+
+- 创建浮动ip：
+
+  ```shell
+  ifconfig eth0:1 192.168.2.10 netmask 255.255.255.0 up   # broadcast 192.168.2.255
+  ```
+
+- 将浮动 ip 写入本地开机启动，确保机器重启仍然生效
+
+  ```shell
+  echo ifconfig eth0:1 192.168.2.10 netmask 255.255.255.0 broadcast 192.168.2.255 >> /etc/rc.local
+  ```
+
+
+- 停止浮动IP
+
+  ```shell
+  ifconfig eth0:1 down
+  ```
+
+使用 keepalived 的时候主机挂了，备机显示绑定了VIP。但是此时实际还是不能访问。其实就是网关的arp缓存没有刷新。
+
+在服务器上执行一下就行了
+
+```shell
+arping -I eth0 -c 5 -s $VIP $GATEWAY
+# intf=${1/:*/}  #`/usr/bin/awk '/default/ {print $2}' /etc/sysconfig/network/routes`
+/sbin/arping -b -I "$intf" -s "$2" "$route" -c 4                 
+```
+
+
+
+
+
 ## IP命令
 
 ### link 
@@ -58,6 +95,7 @@ $ ip netns exec nstest ip link set dev veth-b up
 # 主机，表明目的地址10.0.0.0/24的IP包从veth-a网卡发出
 $ ip route
 10.0.0.0/24 dev veth-a proto kernel scope link src 10.0.0.1 
+
 # nstest，表明目的地址10.0.0.0/24的IP包从veth-b网卡发出
 $ ip netns exec nstest ip route
 10.0.0.0/24 dev veth-b proto kernel scope link src 10.0.0.2
@@ -69,12 +107,36 @@ $ ping 10.0.0.2
 $ ip netns exec nstest ping 10.0.0.1
 ```
 
-## Brctl
+## bridge
+
+上面的示例是通过 route 进行通信，本例是通过网桥对 veth pair 通信：
 
 ```shell
+# 创建 veth pair
+$ ip link add veth1 type veth peer name veth2
+$ ip link set dev veth1 up
+$ ip link set dev veth2 up
+
+# 创建网桥br1
+$ ip link add br0 type bridge
+
+# 将 veth 加入 br0
+$ ip link set veth1 master br0
+$ ip link set veth2 master br0
+
+# 网桥的地址，和 veth2 的地址
+$ ip addr add 10.0.0.1/24 dev br0
+$ ip addr add 10.0.0.2/24 dev veth2
+
 # 查看所有的网桥以及对应的网卡信息
-$ brctl show
-bridge name	    bridge id		STP enabled	    interfaces	
+$ ip link show type bridge
+$ bridge link
+
+# 从网桥br1中删除eth0
+$ ip link set dev eth0 nomaster
+
+# 删除网桥br1
+$ ip link del br1
 ```
 
 

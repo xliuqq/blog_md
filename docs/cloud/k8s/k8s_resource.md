@@ -758,7 +758,9 @@ spec:
 
 - `ingress controller`基于`Ingress`规则将客户端请求直接转发到`Service`对应的后端`Endpoint(Pod)`上。
 
-### [NGINX Ingress](https://github.com/kubernetes/ingress-nginx)
+### 实现
+
+#### [NGINX Ingress](https://github.com/kubernetes/ingress-nginx)
 
 默认的 Ingress 是基于 NGINX 实现的。NGINX Ingress Controller 帮助维护了 Kubernetes 集群与 NGINX 的状态同步，并且提供了基本的反向代理能力。
 
@@ -774,11 +776,11 @@ nginx 配置的upstream，是通过lua脚本动态处理，需要通过相应的
 
 `nginx.ingress.kubernetes.io/proxy-body-size: "50m"`
 
-### [Apache APISIX Ingress](https://apisix.apache.org/docs/ingress-controller/getting-started/)
+#### [Apache APISIX Ingress](https://apisix.apache.org/docs/ingress-controller/getting-started/)
 
 
 
-## IngressClass
+### IngressClass
 
 > 默认的 IngressClass，需要加上注解
 >
@@ -788,7 +790,7 @@ nginx 配置的upstream，是通过lua脚本动态处理，需要通过相应的
 
 - 如`nginx-controller`，其启动命令中，有2个配置在此时有用(`--ingress-class`和`--controller-class`)；
 
-### 无default ingressclass
+#### 无default ingressclass
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -805,7 +807,7 @@ spec:
 - ingress设置`ingressClassName`，对应`IngressClass`的`metadata.name`：
   - 对应的 ingressclass 的 spec.controller字段所对应的 ingress-controller 处理（即等于 controller-class 字段值 ）；
 
-### 有default ingressclas
+#### 有default ingressclas
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -823,6 +825,16 @@ spec:
 - ingress未设置ingressClassName，被default ingressclass 的 spec.controller 指定的 ingress-controller 处理；
 - ingress设置`ingressClassName`，对应`IngressClass`的`metadata.name`：
   - 对应的 ingressclass 的 spec.controller字段所对应的 ingress-controller 处理（即等于 controller-class 字段值 ）；
+
+## Gateway
+
+> Ingress提供了某些字段配置，通过annotations进行配置也很有挑战性。
+>
+> 使用Ingress，集群运维人员和应用开发人员在同一个Ingress对象上操作，却不知道彼此的角色，可能会导致设置错误。
+
+`GatewayClass`、`Gateway`、`HTTPRoute`、`TCPRoute`、`Service`等，旨在通过表达性的、可扩展的、面向角色的接口来定义Kubernetes服务网络。
+
+在Ingress API的基础上增加了更多特性，例如HTTP头匹配、加权流量分割、多协议支持(如HTTP、gRpc)以及其他各种后端功能(如桶、函数)。
 
 ## Project Volumes
 
@@ -1005,7 +1017,7 @@ spec:
 - `storageclass.kubernetes.io/is-default-class: "true"` 注解表明使用这个StorageClass作为默认的持久化存储提供者；
 - 有两个或多个被标记为默认，Kubernetes 将忽略这个注解， 也就是它将表现为没有默认 StorageClass。
 
-示例：cephfs 
+示例：`cephfs `
 
 ```yaml
 apiVersion: storage.k8s.io/v1
@@ -1029,7 +1041,7 @@ parameters:
 
 ### Local PV
 
-应用于分布式数据存储如MongoDB，分布式文件系统如Ceph等，以及需要在本地磁盘缓存大量数据的分布式应用。
+应用于分布式数据存储如 MongoDB，分布式文件系统如 Ceph 等，以及需要在本地磁盘缓存大量数据的分布式应用。
 
 - 不应该将宿主机上的目录用作PV。会对宿主机造成影响，且不同本地目录之间缺乏哪怕最基础的I/O隔离机制；
 - Local PV对应的存储介质，一定是一块额外挂载在宿主机上的磁盘或者块设备（即不是宿主机根目录使用的主硬盘）；

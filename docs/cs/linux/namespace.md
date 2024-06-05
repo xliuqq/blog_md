@@ -1,42 +1,42 @@
 # Namespace
 
+> [相关的示例代码](https://gitee.com/oscsc/cloudnativetech/tree/master/namespace)
+
 进程间隔离，linux内核提供`PID、Mount、UTS、IPC、Network、User` Namespace。
 
 
 
 ## UTS NameSpace（主机域名）
 
+> 示例：`ns_uts.c`
+
 主机/域名（uts）：UNIX Time-sharing System，在网络上视作独立节点；
 
-示例：[`ns_uts.c`](https://gitee.com/luckyQQQ/lifelearning/blob/master/cpp/namespace/ns_uts.cpp)（需要root权限执行）
+
 
 ## IPC NameSpace（进程通信）
 
-> ipcs/ipcmk/ipcrm 查看/创建/删除 信号量、消息队列、共享内存；
+> 示例：`ns_ipc.c`
 
 进程间通信（ipc）：Inter-Process Communication，包括信号、消息队列和共享内存。
 
-示例：[`ns_ipc.c`](https://gitee.com/luckyQQQ/lifelearning/blob/master/cpp/namespace/ns_ipc.cpp)（需要root权限执行）
+- `ipcs/ipcmk/ipcrm` 查看/创建/删除 信号量、消息队列、共享内存；
 
-```c
-// IPC，验证：
-// 1. 通过父进程 ipcmk -Q 创建消息队列，ipcs -q 显示已创建的队列；
-// 2. 执行本程序，执行 ipcs -q 看不到父进程创建消息队列。
-```
+
 
 ## User NameSpace（用户/组）
 
+> 示例：`ns_user.c`
+>
 > Linux 3.8 新增的一种 namespace，用于隔离安全相关的资源，包括 **user IDs and group IDs**，**keys**, 和 **capabilities**。同样一个用户的 user ID 和 group ID 在不同的 user namespace 中可以不一样(与 PID nanespace 类似)。
 >
 > 换句话说，**一个用户可以在一个 user namespace 中是普通用户，但在另一个 user namespace 中是超级用户**。
 
-隔离安全相关的标识符(identifiers)和属性（attributes），包括用户ID、用户组ID、root目录、key（密钥）以及特殊权限。
-
-示例：[`ns_user.c`](https://gitee.com/luckyQQQ/lifelearning/blob/master/cpp/namespace/ns_user.cpp)（不需要root权限执行，且安装`libcap-dev`）
+隔离安全相关的标识符（identifiers）和属性（attributes），包括用户ID、用户组ID、root目录、key（密钥）以及特殊权限。
 
 - user namespace创建后，第一个进程被赋予该namespace下的所有权限；
 
-- 默认用户显示65534，表示尚未与外部namespace用户映射；
+- 默认用户显示*65534*，表示尚未与外部namespace用户映射；
 
 - 通过**`uid_map`和`gid_map`**将子进程的`root(0)`和外部进程的`1000`用户绑定；
 
@@ -49,17 +49,31 @@
 
   > **Writing "deny" to the `/proc/[pid]/setgroups`** file before writing to `/proc/[pid]/gid_map` will permanently disable `setgroups(2)` in a user namespace and **allow writing to `/proc/[pid]/gid_map` without having the CAP_SETGID capability in the parent user namespace**.
 
+
+
 ## Net NameSpace（网络）
+
+> `network namespace` 的增删改查功能已经集成到 Linux 的 ip 工具的[ `netns` ](./network#netns)子命令。
 
 网络资源的隔离：网络设备，IPV4/IPV6，IP路由表，防火墙，/proc/net目录，/sys/class/net目录，套接字等；
 
 一个**物理的网络设备最多存在一个network namespace**中，可以通过**创建`veth pair`（虚拟网络设备对，类似管道，双向数据传输）在不同的network namespace间创建通道**，达到通信目的。
 
-在建立`veth pair`前，新旧namespace通过**管道**进行通信。
+- 在建立`veth pair`前，新旧namespace通过**管道**进行通信。
 
+Linux 为不同空间创建不同的 struct net 对象：
 
+- 每个 struct net 中都有独立的路由表、iptable 等数据结构；
+
+- 每个设备、每个 socket 上也都有指针指明自己归属那个 netns
+
+通过这种方法从**逻辑上看起来好像是真的有多个协议栈一样**。
+
+![namespace_net_struct.png](pics/namespace_net_struct.png)
 
 ## PID NameSpace（PID）
+
+> 示例：`ns_pid.c`
 
 **不同NS下的进程可以有相同的PID**，内核为所有PID NS维护树形结构；
 
@@ -67,7 +81,7 @@
 
 - PID隔离，需要**配合MOUNT隔离**，将`/proc`文件系统重新挂载；
 
-示例：[`ns_pid.c`](https://gitee.com/luckyQQQ/lifelearning/blob/master/cpp/namespace/ns_pid.cpp)（需要root权限执行）
+
 
 ### Init进程
 
@@ -80,18 +94,19 @@
 
 - 一个进程的PID被认为是常量，因此`setns`和`unshare`调用者无法加入新的PID NS，随后创建的子进程才可以加入新的NS。
 
+
+
 ## Mount NameSpace（挂载）
 
 > 默认情况下，对于Mount命名空间里的挂载点列表的后续修改，将不会影响到另外命名空间里看到的挂载点列表(除了下面提到的shared subtrees情况)。
 
-```shell
-# /proc 的重新挂载
-$ mount -t proc proc /proc
-```
+
 
 ### Shared Subtreee
 
-> 引入该机制是为了消除mount ns带来的不便，比如系统新增一块磁盘，我希望所有的NS都感知到新挂载的这块磁盘，那么如果NS 之间是完全隔离的，就需要每个都执行一次挂载操作。
+> 引入该机制是为了消除mount ns带来的不便，比如系统新增一块磁盘，**希望所有的NS都感知到新挂载的这块磁盘**，那么如果NS 之间是完全隔离的，就需要每个都执行一次挂载操作。
+>
+> `cat /proc/self/mountinfo`可以看到，系统默认的挂载点都是shared的。clone系统调用会完全copy父进程的挂载点信息，因此子进程的挂载点也是shared。
 
 #### peer group
 
@@ -121,13 +136,18 @@ Mount Namespace跟其它Namespace使用不同的地方：
 
 - 对容器进程视图的改变一定要伴随着**挂载操作**才能生效。
 
-即先clone指定`CLONE_NEWNS`标志，然后在执行/bin/bash前，先挂载目录。
+即先clone指定`CLONE_NEWNS`标志，然后***在执行/bin/bash前，先挂载目录***。
 
 ### 示例
 
-`cat /proc/self/mountinfo`可以看到，系统默认的挂载点都是shared的，clone系统调用会完全copy父进程的挂载点信息，因此子进程的挂载点也是shared，因此子进程`mount proc`之后，父进程的`/proc`也会被改变。
+> 代码：ns_mnt.c（需要root权限执行）
 
-代码：[`ns_mnt.c`](https://gitee.com/luckyQQQ/lifelearning/blob/master/cpp/namespace/ns_mnt.cpp)（需要root权限执行）
+因此子进程的挂载点是shared，如果子进程直接`mount proc`之后，父进程的`/proc`也会被改变。
+
+```shell
+# 在子进程中的 /proc 的重新挂载，会改变父进程 ps -ef 看到的信息
+$ mount -t proc proc /proc
+```
 
 - 注意在子命令空间，需要先执行`mount --make-rprivate /`或者`mount --make-private /proc`修改`/proc`的挂载属性为`private`；
 - 再执行`mount -t proc proc /proc`；
@@ -215,7 +235,7 @@ lrwxrwxrwx 1 mtk mtk 0 10月 30 10:55 uts -> 'uts:[4026531838]'
 > - fd : 加入namespace的文件描述符，及`/proc[pid]/ns`目录下的对应文件；
 > - 同`unshare`，但是原进程不入新的NS（包括PID），创建子进程才入新的NS（包括PID）；
 
-`exec**`族的函数(`execv, execvp, execl, execlp`)执行命令。
+`exec`族的函数(`execv, execvp, execl, execlp`)执行命令。
 
 - `exec`：C程序立即被实际命令替换，即`exec**`之后的代码不会执行，如果需要控制，可以使用`fork-exec`机制；命令执行失败，返回-1；
 

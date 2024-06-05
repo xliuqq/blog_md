@@ -234,13 +234,13 @@ controlPlaneEndpoint: "node131:6443"
 controllerManager:
   extraArgs:
     horizontal-pod-autoscaler-sync-period: "10s"
-    node-monitor-grace-period: "10s"
+    node-monitor-grace-pe	riod: "10s"
 apiServer:
   exitArgs:
     runtime-config: "api/all=true"
 imageRepository: registry.aliyuncs.com/google_containers  
 networking:
-  podSubnet: "10.10.0.1/16"
+  podSubnet: "10.10.0.0/16"
 
 ```
 

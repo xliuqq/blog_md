@@ -71,7 +71,7 @@ Pod中的容器网络拓扑
 
 ### Flannel 网络模型
 
-Flannel 是由CoreOS团队设计的覆盖网络工具
+Flannel 是由 CoreOS 团队设计的覆盖网络工具
 
 - **UDP**模式：性能最差，已废弃；
 - **VXLAN**模式：
@@ -177,7 +177,7 @@ BGP（border gateway protocol）：边界网关协议，Linux 内核原生支持
 
 Calico 组成：
 
-- calico/node（作为DaemonSet）是一个由两个容器组成的Pod
+- `calico/node`（作为DaemonSet）是一个由两个容器组成的Pod
 
   - Felix（守护进程）：负责在宿主机插入路由规则（写入Linux内核的FIB转发信息库），维护Calico所需的网络设备；
   - BIRD（守护进程）：BGP的客户端，负责在集群总分发路由规则信息；

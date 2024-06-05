@@ -54,7 +54,7 @@ slf4j（Simple Logging Facade for Java）是日志框架的抽象，java.util.lo
 - **slf4j** 在**编译时静态绑定真正的Log库**，因此可以在OSGI中使用。
 - **slf4j** 支持**参数化的log字符串**
 
-![slf4j_bound](E:/personal/blog_md/devops/log/pics/slf4j_bound.png)
+![slf4j_bound](pics/slf4j_bound.png)
 
 ### 使用
 

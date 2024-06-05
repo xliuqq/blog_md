@@ -9,7 +9,7 @@
 
 ## JDK
 
-序列版本UID（serial version UID），流的唯一标识符：
+序列版本**UID（serial version UID）**，流的唯一标识符：
 
 - **默认根据类名称、实现接口、成员等信息自动生成**，因此很容易出现兼容性问题；
 - `transient`修饰的变量，默认序列化不会进行序列化；
@@ -64,44 +64,49 @@ Serializable还有两个标记接口方法可以实现序列化对象的替换�
 
 同时，**编译器是不允许任何对这种序列化机制的定制**，因此禁用了writeObject、readObject、readObjectNoData、writeReplace和readResolve等方法。
 
-### Lambda 表达式的序列化
+### Lambda 表达式的序列化（TODO）
 
 ```scala
 val writeReplace = closure.getClass.getDeclaredMethod("writeReplace")
 writeReplace.setAccessible(true)
 writeReplace.invoke(closure).asInstanceOf[java.lang.invoke.SerializedLambda]
+```
 
+lambda 会生成如下字节码
+
+```java
 // lambda生成的字节码
 @FunctionalInterface
- interface Print<T> {
-   public void print(T x);
- }
- public class Lambda {  
-   public static void PrintString(String s, Print<String> print) {
-     print.print(s);
-   }
-   private static void lambda$0(String x) {
-     System.out.println(x);
-   }
-   final class $Lambda$1 implements Print{
-     @Override
-     public void print(Object x) {
-       lambda$0((String)x);
-     }
-   }
-   public static void main(String[] args) {
-     PrintString("test", new Lambda().new $Lambda$1());
-   }
- }
+interface Print<T> {
+    public void print(T x);
+}
+public class Lambda {  
+    public static void PrintString(String s, Print<String> print) {
+        print.print(s);
+    }
+    private static void lambda$0(String x) {
+        System.out.println(x);
+    }
+    final class $Lambda$1 implements Print{
+        @Override
+        public void print(Object x) {
+            lambda$0((String)x);
+        }
+    }
+    public static void main(String[] args) {
+        PrintString("test", new Lambda().new $Lambda$1());
+    }
+}
+
 ```
+
+
 
 ## [Kryo](](https://github.com/EsotericSoftware/kryo))
 
 > Java 主流的序列化框架。
 
-###  
-
-### 线程
+###  线程
 
 > [非线程安全]([GitHub - EsotericSoftware/kryo: Java binary serialization and cloning: fast, efficient, automatic](https://github.com/EsotericSoftware/kryo#thread-safety))，`Each thread should have its own Kryo, Input, and Output instances.`
 

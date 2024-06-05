@@ -58,6 +58,7 @@ https://squidfunk.github.io/mkdocs-material/setup/changing-the-language/#site-la
 - 相关问题和解释可见：[markdown - configuring image filepaths correctly in mkdocs - Stack Overflow](https://stackoverflow.com/questions/71074662/configuring-image-filepaths-correctly-in-mkdocs)
 
 ```yaml
+# 根级别
 use_directory_urls: false
 ```
 

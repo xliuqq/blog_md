@@ -53,6 +53,12 @@ CPU重排：
 - 部分存储定序（part store order）
 - 宽松存储模型（relax memory order）
 
+### Memory Order
+
+C/C++ 中的  [memory order](https://en.cppreference.com/w/cpp/atomic/memory_order) 。
+
+[Making Sense of Acquire-Release Semantics | Dave Kilian's Blog](https://davekilian.com/acquire-release.html)
+
 
 
 ## 进程
