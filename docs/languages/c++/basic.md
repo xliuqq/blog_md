@@ -1,5 +1,24 @@
 # C++
 
+## 数组
+
+C99 标准中新增了变长数组（variable-length array，简称VLA）
+
+- <font color='red'>**允许使用变量指定数组的大小**</font>：栈上分配
+
+```c
+int n = a + b;
+int arr[n];
+```
+
+
+
+## 指针
+
+`shared_ptr`
+
+`unique_ptr`
+
 
 
 ## \# 和 \##
@@ -43,9 +62,68 @@ int main(int argc, char* argv[])
 - constructor 可以使被修饰的函数在 **main() 执行前被调用**；
 - destructor 可以使被修饰的函数在 **main() 执行结束或 exit() 调用结束后**被执行。
 
+## const 修饰
+
+**指针参数为 `const`**
+
+- 不会修改通过该指针传递的数据
+
+```c++
+void foo(const int* ptr) {  
+    // *ptr = 42; // 编译错误，不能修改通过const指针传递的数据  
+}
+void foo(const int& ref) {  
+    // ref = 42; // 编译错误，不能修改通过const引用传递的数据  
+}
+```
+
+**返回值类型为 `const`**
+
+- 用于返回指向常量数据的指针或引用，以确保调用者不会意外地修改这些数据
+
+```c++
+const int* get_const_pointer() {  
+    static int x = 42;  
+    return &x;  
+}  
+
+const int& get_const_reference() {  
+    static int y = 42;  
+    return y;  
+}
+```
+
+**成员函数后的 `const`**
+
+- 函数**不会修改调用它的对象的状态**（即，该函数是一个常量成员函数）
+
+```c++
+class MyClass {  
+public:  
+    int value;  
+ 
+    int getValue() const { // 这是一个常量成员函数  
+        return value;  
+    }  
+ 
+    // 以下函数不能是常量成员函数，因为它试图修改成员变量  
+    // void setValue(int v) const { // 编译错误  
+    //     value = v;  
+    // }  
+ 
+    void setValue(int v) { // 非常量成员函数  
+        value = v;  
+    }  
+};  
+ 
+const MyClass obj;  
+int val = obj.getValue(); // 正确，因为getValue是常量成员函数  
+// obj.setValue(42); // 编译错误，因为obj是常量对象，不能调用非常量成员函数
+```
 
 
-## Buffer
+
+## Std Buffer
 
 libc will **line-buffer when stdout to screen** and **block-buffer when stdout to a file**, but no-buffer for stderr.
 
@@ -76,21 +154,19 @@ libc will **line-buffer when stdout to screen** and **block-buffer when stdout t
 #endif
 ```
 
+
+
 ## ABI
 
  针对 library （主要是 shared library，即动态链接库）的 ABI (application binary interface)，当 library 升级时，依赖该库的二进制不需要改动。
 
 - non-virtual 函数比 virtual 函数更健壮：因为 **virtual function 是 bind-by-vtable-offset，而 non-virtual function 是 bind-by-name**。
 
-
-
 ### 二进制代码不兼容例子
 
 - 给函数增加**默认参数**，现有的可执行文件无法传这个额外的参数；
 - 增加**虚函数**，会造成 vtbl 里的排列变化（不要考虑“只在末尾增加”这种取巧行为，因为你的 class 可能已被继承。）；
 - 增加**默认模板类型参数**，比方说 `Foo<T>` 改为 `Foo<T, Alloc=alloc<T>>`，这会改变 name mangling；
-
-
 
 给 class Bar 增加数据成员，造成 sizeof(Bar) 变大，以及内部数据成员的 offset 变化：
 
@@ -105,16 +181,12 @@ libc will **line-buffer when stdout to screen** and **block-buffer when stdout t
 - 兼容的客户端使用：
   - 通过成员函数访问对象的数据成员，且该成员函数定义在 cpp 中，不是内联函数；
 
-
-
 ### 解决办法
 
 第一种类似**桥接**设计模式：间接调用实现类实现，可能有一定的性能损失；
 
 - 接口类：只定义 non-virtual 接口，只包含 `Impl *` 的私有成员；
 - 接口类新增函数，只要新增 non-virtual 接口；
-
-
 
 第二种：
 

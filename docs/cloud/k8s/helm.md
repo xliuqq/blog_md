@@ -209,6 +209,10 @@ data:
 
 ### 'include' Function
 
+> template is an action，无法将输出通过管道给其它操作，可以完全使用 include 而不是 template.
+>
+> 返回是个被渲染的字符串，即使`mytpl`定义的时候是 bool，也会被转为字符串。
+
 ```yaml
 # includes a template called mytpl, then lowercases the result, then wraps that in double quotes.
 value: {{ include "mytpl" . | lower | quote }}

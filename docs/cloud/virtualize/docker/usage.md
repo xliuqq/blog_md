@@ -164,22 +164,42 @@ Untagged:192.168.0.1/you/tom:1.0.8
 
 ## Dockerfile
 
-`docker build `
+> 两种运行模式：建议 ENTRYPOINT 和 CMD 都使用 Exec 模式
+>
+> - Shell 模式：以`/bin/sh -c "task command"`的方式执行任务命令，即等价于 `["/bin/sh", "-c", "task command"]`
+>   - 此时`sh`是父进程，而`task command`是子进程，`sh`接受到的信号，默认无法传给子进程，只能超时强行Kill；
+> - Exec 模式：只有一个单独的进程
+
+```shell
+# /bin/sh -c "sleep 100"  # 命令所启动的进程关系
+$ ps -ef |grep 500109 | grep -v grep
+root      500109  500096  0 May21 pts/2    00:00:00 -bash
+root     2356429  500109  0 09:26 pts/2    00:00:00 sleep 100
+# ps -ef |grep 500109 | grep -v grep # 直接替换当前 shell，退出后当前shell退出；
+root      500109  500096  0 May21 pts/2    00:00:00 sleep 100
+```
+
+`docker build ` 根据 Dockerfile 构建镜像；
 
 ### 指令集
 
 ```dockerfile
+# scratch是空白镜像
 # FROM <image>:<tag>
 
 # MAINTAINER 
- 
-# ENV <key> <value>
 
+# 定义变量，容器运行时无用，类似于定义局部变量，在 docker build 中用 --build-arg <参数名>=<值> 来覆盖
+# ARG <key>=<value>
+
+# 环境变量
+# ENV <key>=<value>
+
+# 文件拷贝，<src> 支持通配符和多个源
 # COPY <src> <dst>
-# <src> 支持通配符和多个源
 
+# 所有的文件复制均使用 COPY 指令，仅在需要本地文件自动解压缩的场合使用 ADD
 # ADD <src> <dst>
-# <src> 对于本地压缩归档文件，复制到容器中会被解压提取，推荐使用 COPY
 
 # RUN <command> (shell格式)
 # RUN  ["executable", "param1", "param2"] （exec格式，推荐）
@@ -189,6 +209,7 @@ Untagged:192.168.0.1/you/tom:1.0.8
 # CMD  ["executable", "param1", "param2"] （exec格式，推荐）
 # 容器运行时的默认值，配合ENTRYPOINT使用，会被docker run命令时指定的命令参数覆盖
 
+# 表示表示默认程序，docker run 时指定的 CMD 命令会被当做参数传入
 # ENTRYPOINT <command> (shell格式)
 # ENTRYPOINT  ["executable", "param1", "param2"] （exec格式，推荐）
 # shell格式时，会忽略 CMD 和 docker run的命令的参数，运行在 /bin.sh -c 中，非1号进程
@@ -196,16 +217,18 @@ Untagged:192.168.0.1/you/tom:1.0.8
 # ONBUILD [INSTRUCTION]
 # 添加一个将来执行的触发器指令到镜像中。
 
-# VOLUME
-
+# 指定当前用户
 # USER
 
+# 指定工作目录
 # WORKDIR
 
+# 端口映射，一般不在 Dockerfile 中指定，而是 docker 命令行中使用
 # EXPOSE
+
+# 挂载卷，一般不在 Dockerfile 中指定，而是 docker 命令行中使用
+# VOLUME
 ```
-
-
 
 ### 实践
 
@@ -228,6 +251,8 @@ https://blog.csdn.net/networken/article/details/108218569
 
 
 ## Alpine
+
+> musl libc 和 BusyBox.
 
 ### Alpine-docker容器中安装GCC
 

@@ -28,7 +28,7 @@ Virtual Server via Network Address Translation
 
 通过网络地址转换（Network Address Translation）将一组服务器构成一个高性能的、高可用的虚拟服务器；
 
-<img src="pics/clip_image001.png" alt="img"  />
+<img src="pics/vs_nat.png" alt="img"  />
 
 优点：  
 

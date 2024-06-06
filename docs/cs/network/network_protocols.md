@@ -178,7 +178,7 @@ IPSec 模式：
 
 ## ARP
 
-**Address Resolution Protocol**：地址解析协议，***IP地址到MAC地址***
+**Address Resolution Protocol**：地址解析协议，<font color='red'>**IP地址到MAC地址**</font>
 
 工作流程：
 
@@ -196,8 +196,8 @@ IPSec 模式：
 
 ```shell
 # -b 保持广播  -I 指定网卡  -s 指定源IP地址  -c 发送的数据包的数目
-# ifconfig eth0:1 10.90.143.176 netmask 255.255.255.0 up
-/sbin/arping -b -I eth0 -s "10.90.143.176" "10.90.143.1" -c 4
+$ ifconfig eth0:1 10.90.143.176 netmask 255.255.255.0 up
+$ /sbin/arping -b -I eth0 -s "10.90.143.176" "10.90.143.1" -c 4
 ```
 
 

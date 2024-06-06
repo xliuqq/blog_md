@@ -9,37 +9,39 @@
 - `starti` 可以进行指令执行；
 - `layout asm` 可以查看相应的汇编代码；（如下，查看 $rsp 寄存器的地址所指定的值（main函数的返回地址））
 
-![image-20230404152726029](pics/image-20230404152726029.png)
+![gdb_layout_asm.png](pics/gdb_layout_asm.png)
 
 ## 异常
 
 ### 处理规则
 
-C++中，异常不可以忽略，当异常找不到匹配的catch字句时，会调用系统的库函数terminate()（在头文件中）。
+C++中，异常不可以忽略，当异常找不到匹配的catch字句时，会调用系统的库函数`terminate()`（在头文件中）。
 
-默认情况下，terminate（）函数调用标准C库函数abort（）使程序终止而退出。
+默认情况下，terminate（）函数调用标准**C库函数abort（）**使程序终止而退出。
 
 当调用abort函数时，程序不会调用正常的终止函数，**全局对象和静态对象的析构函数不会执行**。
 
 
 
-### 异常堆栈
+### 设置异常堆栈处理函数
 
 #### std::set_terminate
 
 处理未设置异常处理函数的异常（即通过throw抛出的异常）：
 
-- 对于数组越界异常，无法捕获；
+- 对于数组越界异常（未定义行为，Undefined Behavior, UB），无法捕获；
 
 
 
-#### 异常信号
+### 异常信号
 
 当程序出现异常时通常伴随着会收到一个由内核发过来的异常信号，如当**对内存出现非法访问时将收到段错误信号SIGSEGV**，然后才退出。
 
 利用这一点，当我们在收到异常信号后将程序的调用栈进行输出，它通常是利用`signal()`函数。
 
 
+
+### 异常代码行定位
 
 #### backtrace
 
@@ -65,31 +67,47 @@ void backtrace_symbols_fd(void *const *array, int size, int fd);
 
 它们由GNU C Library提供，关于它们更详细的介绍可参考[Linux Programmer’s Manual](http://man7.org/linux/man-pages/man3/backtrace.3.html)中关于backtrack相关函数的介绍。
 
-backtrace需要注意的地方：
+`backtrace`需要注意的地方：
 
-- backtrace的实现**依赖于栈指针（fp寄存器）**，在gcc编译过程中任何**非零的优化等级（-On参数）**或加入了栈指针优化参数**-fomit-frame-pointer**后多将**不能正确得到程序栈信息**；
-- backtrace_symbols的实现需要符号名称的支持，在**gcc编译过程中需要加入-rdynamic**参数；
+- `backtrace`的实现**依赖于栈指针（fp寄存器）**，在gcc编译过程中任何**非零的优化等级（-On参数）**或加入了栈指针优化参数**-fomit-frame-pointer**后多将**不能正确得到程序栈信息**；
 - 内联函数没有栈帧，它在编译过程中被展开在调用的位置；
 - 尾调用优化（Tail-call Optimization）将复用当前函数栈，而不再生成新的函数栈，这将导致栈信息不能正确被获取。
 
-获取到的堆栈信息如下所示：
+对于静态链接文件的错误信息，获取到的错误信息如下:
+
+```
+Dump stack start...
+backtrace() returned 9 addresses
+  [00] [0x401806]
+  [01] [0x401925]
+  [02] [0x40a2a0]
+  [03] [0x401793]
+  [04] [0x4017cc]
+  [05] [0x401988]
+  [06] [0x401dda]
+  [07] [0x403677]
+  [08] [0x401675]
+Dump stack end...
+```
+
+对于动态链接的错误信息，获取到的堆栈信息如下所示：
 
 ```shell
 Dump stack start...
-backtrace() returned 8 addresses
-  [00] ./backtrace(dump+0x1f) [0x400a53]
-  [01] ./backtrace(signal_handler+0x31) [0x400b1b]
-  [02] /lib/x86_64-linux-gnu/libc.so.6(+0x36150) [0x7f8583672150]
-  [03] ./libadd.so(add1+0x1a) [0x7f85839fa5c6]
-  [04] ./libadd.so(add+0x1c) [0x7f85839fa5f9]
-  [05] ./backtrace(main+0x2f) [0x400a13]
-  [06] /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xed) [0x7f858365d76d]
-  [07] ./backtrace() [0x400929]
+backtrace() returned 9 addresses
+  [00] ./dynamic.out(+0x12bb) [0x55be3cc4a2bb]
+  [01] ./dynamic.out(+0x13da) [0x55be3cc4a3da]
+  [02] /lib/x86_64-linux-gnu/libc.so.6(+0x42520) [0x7f1e1c42c520]
+  [03] ./libadd.so(add1+0x1e) [0x7f1e1c61e137]
+  [04] ./libadd.so(add+0x20) [0x7f1e1c61e170]
+  [05] ./dynamic.out(+0x143d) [0x55be3cc4a43d]
+  [06] /lib/x86_64-linux-gnu/libc.so.6(+0x29d90) [0x7f1e1c413d90]
+  [07] /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x80) [0x7f1e1c413e40]
+  [08] ./dynamic.out(+0x11c5) [0x55be3cc4a1c5]
 Dump stack end...
+
 Segmentation fault
 ```
-
-可以看出出错的函数为 `Java_JniTest_callC`，但地址为 0x7f0bfd8d91ab，看不出是哪一行。
 
 #### addr2line
 
@@ -101,9 +119,9 @@ Segmentation fault
 
 ```shell
 # addr2line -e ${exe_name} ${error_address}
-$ addr2line -e backtrace 0x400a3e
+$ addr2line -e static.out 0x401793
 # 输出结果类似如下信息，可以看出行号信息
-/home/share/work/backtrace/add.c:13
+/home/share/work/backtrace/add.c:10
 ```
 
 ##### 动态链接情况下的错误信息分析定位
@@ -111,78 +129,27 @@ $ addr2line -e backtrace 0x400a3e
 按照上面方法，得不到正确的信息
 
 ```shell
-$ addr2line -e libadd.so 0x7f85839fa5c6
+$ addr2line -e dynamic.out 0x7fa4aa022137
+??:0
+$ addr2line -e libadd.so 0x1e
 ??:0
 ```
 
-因为，动态链接库是程序运行时动态加载的而其加载地址也是每次可能都是不一样，如 0x7f0bfd8d91ab，不是一个实际的物理地址（用户空间的程序无法直接访问物理地址），而是经过MMU（内存管理单元）映射过的。
+因为，动态链接库是程序运行时动态加载的，**其加载地址也是每次可能都是不一样**（ASLR：Address Space Layout Randomization）。
 
 注意到`add+0x1c `描述出错的地方发生在符号add1偏移0x1a处的地方，**获取 add1 在程序中的入口地址再加上偏移量0x1a也能得到正常的出错地址**。
 
-**得到libadd.so的加载地址**
-
-```shell
-# 通过/proc/$pid/maps 获取内存和动态链接库的情况
-$ cat /proc/$pid/map
-# 输出类似的结果
-....................................................
-7f0962fb3000-7f0962fb4000 r-xp 00000000 08:01 2895572                    /home/share/work/backtrace/libadd.so
-7f0962fb4000-7f09631b3000 ---p 00001000 08:01 2895572                    /home/share/work/backtrace/libadd.so
-7f09631b3000-7f09631b4000 r--p 00000000 08:01 2895572                    /home/share/work/backtrace/libadd.so
-7f09631b4000-7f09631b5000 rw-p 00001000 08:01 2895572                    /home/share/work/backtrace/libadd.so
-.....................省略大量无关内容....................
-=========>>>catch signal 11 <<<=========
-Dump stack start...
-backtrace() returned 8 addresses
-  [00] ./backtrace(dump+0x1f) [0x400b7f]
-  [01] ./backtrace(signal_handler+0x83) [0x400c99]
-  [02] /lib/x86_64-linux-gnu/libc.so.6(+0x36150) [0x7f0962c2b150]
-  [03] ./libadd.so(add1+0x1a) [0x7f0962fb35c6]
-  [04] ./libadd.so(add+0x1c) [0x7f0962fb35f9]
-  [05] ./backtrace(main+0x2f) [0x400b53]
-  [06] /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xed) [0x7f0962c1676d]
-  [07] ./backtrace() [0x400a69]
-Dump stack end...
-Segmentation fault
-```
-
-Maps信息第一项表示的为地址范围如第一条记录中的7f0962fb3000-7f0962fb4000，第二项r-xp分别表示只读、可执行、私有的。
-
-```shell
-# 根据出错位置的 0x7f0962fb35c6 减去初始的加载地址 0x7f0962fb3000，得到 0x5c6
-$ addr2line -e libadd.so 0x5c6
-/home/share/work/backtrace/add.c:13
-```
-
 **得到函数add的入口地址再上偏移量来得到正确的地址（推荐）**
 
-1. 利用gcc编译生成的map文件，添加`-Map,add.map`，生成map文件；
+通过 `nm` 获取符号 `add1` 的地址
 
-   ```shell
-   $ gcc -Wl,-Map,add.map -rdynamic add.c -fPIC -shared -o libadd.so 
-   # 查看add.map，关键信息如下
-   ................................... 
-   .text          0x00000000000005ac       0x55 /tmp/ccCP0hNf.o
-                   0x00000000000005ac                add1
-                   0x00000000000005dd                add
-   ...................................
-   ```
-
-   add1的地址为0x5ac，然后加上偏移地址0x1a即0x5ac + 0x1a = 0x5c6。
-
-2. 通过nm获取（**推荐，直接对so获取函数入口地址**）
-
-   ```shell
-   $ nm -n libJniC.so 
-   # 输出类似如下的信息，获取到函数的入口地址
-   00000000000010a0 T _Z10printStackv
-   000000000000115d T _Z16exceptionHandlerv
-   0000000000001256 T Java_JniTest_callC
-   00000000000012f8 t _Z41__static_initialization_and_destruction_0ii
-   0000000000001340 t _GLOBAL__sub_I_JniTest.cpp
-   ```
-
-
+```shell
+$ nm -n libadd.so | grep add1
+0000000000001119 T add1
+# add1的地址为 0x1119，然后加上偏移地址0x1a即`0x1119 + 0x1e = 0x1137`，通过 addr2line 可以定位到行。
+$ addr2line -e libadd.so 0x1137
+~/backtrace/add.c:10
+```
 
 #### 示例
 
@@ -286,5 +253,25 @@ int main(int argc, char *argv[])
 	printf(" sum = %d \n", sum);
 	return 0x00;
 }
+```
+
+Makefile
+
+```makefile
+
+all: add dynamic static
+
+add: add.c
+	gcc -g -shared -fPIC add.c -o libadd.so
+
+# 只要求出错的 so 有符号信息即可
+dynamic: add dump.c backtrace.c	
+	gcc dump.c backtrace.c -L./ -ladd -Wl,-rpath,./ -o dynamic.out
+
+static: add dump.c backtrace.c
+	gcc -g -static add.c dump.c backtrace.c -o static.out
+	
+clean:
+	rm *.out *.so
 ```
 

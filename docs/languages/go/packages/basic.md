@@ -46,6 +46,16 @@ go func() {
 
 ## json
 
+json包是通过反射机制来实现编解码的，因此结构体必须导出所转换的字段，不导出的字段不会被json包解析。
+
+ ```go
+ type DebugInfo struct {
+ 	Level  string `json:"level,omitempty"` // Level解析为level,忽略空值
+ 	Msg    string `json:"message"`     // Msg解析为message
+ 	Author string `json:"-"`        // 忽略Author
+ }
+ ```
+
 
 
 ## log 

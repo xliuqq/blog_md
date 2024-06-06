@@ -171,6 +171,15 @@ func add(x int, y int) int { return x + y}
 func split(sum int) (x, y int) {x = … y = … return}
 ```
 
+### defer
+
+> 在同一个函数内部调用多个 defer 语句，执行顺序是<font color='red'>**后进先出（LIFO）**</font>
+
+将一个函数调用的执行推迟到包含该 `defer` 语句的函数执行完毕，无论是正常返回还是panic 异常退出，都会被执行。
+
+- 通常用于资源释放和清理，保证一定执行；
+- **参数值的即时求值**：当 `defer` 语句被执行时，传递给它的**函数参数会被立即求值**，并存储起来；
+
 ## 映射Map
 
 ```go
@@ -237,23 +246,6 @@ var a Abser  // a可以赋值为任意实现Abs() float64方法的类型值
 a = &Dog{2}  // a = Dog(2)是错的，因为没有定义Dog类型的Abs方法
 // 接口类型断言： 
 value, ok := element.(T) // 将element当作T类型，value是转换后结果，ok表示成功与否，nil表示成功；
-```
-
-
-
-## 异常
-
-golang提供了recover机制进行断点调试
-
-```go
-func A() { 
-    defer func() { 
-        if r := recover(); r != nil { 
-            fmt.Println("Recovered in f", r) // 断点设于此，当发生error的时，GoLand可保存error发生时的现场
-         } 
-    } () 
-    // 正常的函数代码逻辑
-}
 ```
 
 
@@ -338,10 +330,26 @@ func init() {
 函数的可见性：
 
 - 小写开头，则包内可见；
-- 大小开头，则全局可见；
+- <font color='red'>**大写开头，则全局可见**</font>；
 
-## 
 
-## 异常
 
-panic
+## 错误和异常
+
+`error`类型表示错误，值位`nil`表示没有错误；
+
+`panic`表示异常，可以通过`recover`恢复；
+
+golang提供了 recover 机制进行断点调试
+
+```go
+func A() { 
+    defer func() { 
+        if r := recover(); r != nil { 
+            fmt.Println("Recovered in f", r) // 断点设于此，当发生error的时，GoLand可保存error发生时的现场
+         } 
+    } () 
+    // 正常的函数代码逻辑
+}
+```
+

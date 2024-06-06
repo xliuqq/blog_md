@@ -1,5 +1,3 @@
-[toc]
-
 # Mars
 
 > alibaba开源：https://github.com/mars-project/mars

@@ -21,6 +21,8 @@
 - Kubernetes **凭据存储**在Jenkins服务器中；
 - 可以使用 Jenkins 创建和更改配置，但**无法使用它删除现有资源**；
 
+
+
 ## Gitops CD
 
 ### Flux CD

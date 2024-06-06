@@ -83,11 +83,15 @@
 
 - 使用 dev 作为默认分支
 
+
+
 ## Artifacts
 
 [制品库](./cicd/nexus.md)：采用 nexus 作制品库（maven/npm/image 等）
 
 - 可选：采用 habor 作为 docker image 库
+
+
 
 ## Notifier
 
@@ -95,6 +99,20 @@
 
 - CI 通知，Gitlab Webhook 配置 Pipeline 结果；（钉钉的极弧Gitlab不支持）
 - CD 通知，Argo Workflow ？
+
+
+
+## CheckGate
+
+### 本地
+
+IDEA 中的代码检查：[SonarLint](https://www.sonarlint.org)
+
+### 服务器
+
+代码质量管理的开源平台：[SonarQube](https://www.sonarsource.com/products/sonarqube/downloads/)
+
+Git -> CI/CD(Jenkins, GitlabCI) -> SonarQube + Webhook -> Message Notifier 
 
 
 

@@ -1,5 +1,28 @@
 # 算法
 
+## Master 定理
+
+> $O$：表示上界（tightness unknown），即小于等于
+>
+> $\Theta$：该时间复杂度既是上界也是下界（tight），即等于的意思
+>
+> $\Omega$：表示下界（tightness unknown），即大于等于的意思
+
+递推公式的复杂度计算，*n* 是问题规模，*b* 是递归子问题的数量，*n/c* 为每个子问题的规模（假设每个子问题的规模基本一样），*f(n)* 为递归以外进行的计算工作。
+
+$T(n)=b*T(\frac{n}{c})+f(n)$
+
+如果对任意正数 $\epsilon $，$E = lg(b) / lg(c) = lg_c{b}$
+
+- $f(n) = O(n^{(E−\epsilon)})，则T(n) = \Theta(n^E)$；
+- $f(n)= \Theta(n^E)，则T(n)=Θ(f(n)log⁡(n))$；
+- $f(n)=Ω(n^{(E−ϵ)}), 且对某个δ≥ϵ有f(n)=Ο(n^{(E+δ))}，则T(n)=Θ(f(n))$；
+
+示例：
+
+- 二叉树遍历：$T(n)=2*T(\frac{n}{2}) + \Omega(1)=\Theta(n)$
+- 归并排序：$T(n)=2T(\frac{n}{2}) + \Omega(n)=\Theta(nlog n)$
+
 ## 递归转循环
 
 > 代码实现见 [Java数据结构与算法](https://gitee.com/oscsc/data-structure-and-algorithm)的递归部分。

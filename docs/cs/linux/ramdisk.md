@@ -9,15 +9,15 @@
   - Linux 2.0/2.2支持，大小固定，不能改变；
   - 内核编译时将Block device中Ramdisk支持选上，
 
-- ramfs和tmpfs是Linux内核2.4支持，大小可以自动增加或减少；
+- `ramfs` 和 `tmpfs` 是Linux内核2.4支持，大小可以自动增加或减少；
 
-  - ramfs内存文件系统，它处于虚拟文件系统(VFS)层，无需格式化，默认一半内存大小；
-  - 可以在mount时限定大小，不会自动增长
+  - `ramfs` 内存文件系统，它处于虚拟文件系统(VFS)层，无需格式化，**默认一半内存大小**
+  - 可以在 mount 时限定大小，不会自动增长
   - **ramfs不会用swap**，**tmpfs会使用swap**
   
   
 
-Linux下的挂载：
+## Linux下的挂载
 
 ``` shell
 mkdir -p /media/nameme
@@ -29,7 +29,7 @@ mount -t ramfs -o size=2048M ramfs /mnt/ramdisk
 
 
 
-性能测试
+## 性能测试
 
 ```shell
 # 测试磁盘的写速率

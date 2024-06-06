@@ -7,13 +7,27 @@
 >
 > - 对变量的读和写（超过一个机器字的变量时）都**没有原子性**的保证
 
+## 并发模型
+
+> **Go语言的并发模型是基于CSP（Communicating Sequential Processes）**。
+>
+> - 通过 goroutine 和 channel 来完成
+
+### goroutine
+
+`go f(x, y, z)` 开启一个新的 goroutine 执行 f(x, y, z)
+
+- `sync.Mutex` 解决线程互斥，`channel` 解决线程协作
+
 ## Go 内存模型
 
 > https://go.dev/ref/mem
 
-? 问题：
+问题：
 
 - Mutex 中对变量的访问，怎么确保拿到的是内存的值，而不是寄存器的旧值？
+  - 特定的编译指令？
+
 
 ```go
 var a string

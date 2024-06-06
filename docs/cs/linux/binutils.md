@@ -39,10 +39,10 @@ $ addr2line -e backtrace 0x400a3e
 # 输出结果类似如下信息，可以看出行号信息
 /home/share/work/backtrace/add.c:13
 
-# 动态链接，运行时动态加载，其加载地址不一样，通过/proc/$pid/maps 获取内存和动态链接库
+# 动态链接，运行时动态加载，其加载地址不一样
 $ addr2line -e libadd.so 0x7f85839fa5c6
 ??:0
-# 根据出错位置的 0x7f0962fb35c6 减去初始的加载地址 0x7f0962fb3000，得到 0x5c6
+# 通过 nm 获取 add 中函数的地址基址，再加上偏移量，可以获得具体行
 $ addr2line -e libadd.so 0x5c6
 /home/share/work/backtrace/add.c:13
 ```

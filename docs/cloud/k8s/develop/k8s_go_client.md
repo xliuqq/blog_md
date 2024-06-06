@@ -84,7 +84,7 @@ Reflector中存储待处理obj(确切说是Delta)的地方，存储本地**最�
 
 > **存储类型**的接口Store 和 **索引类型**的接口，其实现类为 `cache`。
 
-本地**最全的**数据存储，提供数据存储和数据索引功能。
+本地**最全的**数据存储，提供数据存储和**数据索引**功能。
 
 索引原理解析：
 
@@ -285,6 +285,28 @@ This library is **a shared dependency for servers and clients** to work with Kub
 -  Cache 会启动 Informer，Informer 向 ApiServer 发出请求，建立连接；
 -  Informer 检测到有资源变动后，使用 Controller 注册进来的 eventHandler 判断是否推入队列中；
 -  当队列中有元素被推入时，Controller 会将元素取出，并执行用户侧的 Reconciler；
+
+```go
+ctrl.NewManager(controllers.GetConfigOrDieWithQPSAndBurst(kubeClientQPS, kubeClientBurst), ctrl.Options{
+    Scheme:                  scheme,
+    MetricsBindAddress:      metricsAddr,
+    LeaderElection:          enableLeaderElection,
+    LeaderElectionNamespace: leaderElectionNamespace,
+    LeaderElectionID:        "dataset.data.fluid.io",
+    Port:                    9443,
+    NewCache:                cache.BuilderWithOptions(cache.Options{
+		Scheme:            scheme,
+        // 针对 CronJob ，只list-watch 特定 label的 CronJob
+		SelectorsByObject: cache.SelectorsByObject{
+			&batchv1.CronJob{}: cache.ObjectSelector{Label: labels.SelectorFromSet(labels.Set{
+				common.JobPolicy: common.CronPolicy,
+			})},
+	}),
+    NewClient:               controllers.NewFluidControllerClient,
+})
+```
+
+
 
 ### Cache
 

@@ -1,14 +1,8 @@
-[toc]
-
 # Cython
 
 > **Cython** is an **optimising static compiler** for both the **[Python](http://www.python.org/about/)** programming language and the extended Cython programming language (based on **Pyrex**). It makes writing C extensions for Python as easy as Python itself.
 
 *Cython*定义单独的一门语言，专门用来写**在Python里面import用的扩展库**。本身是个python 包。
-
-
-
-
 
 ## 编译
 
