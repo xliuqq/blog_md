@@ -6,8 +6,11 @@
 
 ## gdb
 
+> - 编译时 -ggdb 添加调试信息。
+> - [gdbgui](https://www.gdbgui.com/) 基于浏览器的 gdb 调试。
+
 - `starti` 可以进行指令执行；
-- `layout asm` 可以查看相应的汇编代码；（如下，查看 $rsp 寄存器的地址所指定的值（main函数的返回地址））
+- `layout asm/src` 可以查看相应的汇编/源代码；（如下，查看 $rsp 寄存器的地址所指定的值（main函数的返回地址））
 
 ![gdb_layout_asm.png](pics/gdb_layout_asm.png)
 

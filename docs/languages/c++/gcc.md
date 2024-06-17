@@ -7,30 +7,37 @@
   - 将`#include`包含的文件直接插入到程序文本中，宏定义替换等
 
 - 编译（.s文件）：  gcc -S hello.c -o hello.s
-
-- - 生成汇编文件；
+  - 0生成汇编文件；
 
 - 汇编（.o文件）：gcc -c hello.c -o hello.o
-
-- - 可重定位目标程序，翻译成机器语言指令；
+  - 可重定位目标程序，翻译成机器语言指令；
 
 - 链接阶段：gcc hello.c -o hello
+  - 可执行目标程序，链接其它的.o文件
 
-- - 可执行目标程序，链接其它的.o文件
 
 
 ![compile_load_link](pics/compile_load_link.png)
 
+
+
 ## 静态链接和动态链接
 
 - 静态链接：(.a )
-
-- - `ar`命令的`-t`参数查看静态库的组成，`ar -t libg.a`；
+  - `ar`命令的`-t`参数查看静态库的组成，`ar -t libg.a`；
   - 浪费空间；库函数的代码修改，需要重新进行编译链接（bug修复）；执行速度快（没有搜索加载的过程）；
 
 - 动态链接：(.so)
+  - 把程序按照模块拆分成各个相对独立部分，在程序运行时才将它们链接在一起形成一个完整的程序
 
-- - 把程序按照模块拆分成各个相对独立部分，在程序运行时才将它们链接在一起形成一个完整的程序
+
+
+
+## 动态库
+
+当 A.so 依赖 B.so 时，编译 A.so 时，只需要 include B 的头文件，不需要 `-L`,`-l`链接 B.so。
+
+
 
 ## 编译
 
@@ -46,6 +53,7 @@
 
 
 
+## 参数
 
 ### -g 
 
@@ -60,10 +68,34 @@ gcc 的 **-g** ，并且根据调试工具的不同，还能直接选择更有�
 
 
 ### -fPIC/-shared
-
 -fPIC 作用于编译阶段，告诉编译器产生与位置无关代码(Position-Independent Code)，则产生的代码中，**没有绝对地址，全部使用相对地址，故而代码可以被加载器加载到内存的任意位置，都可以正确的执行。这正是共享库所要求的，共享库被加载时，在内存的位置不是固定的。**
 
-GCC来看，shared应该是包含fPIC选项的，但似乎不是所以系统都支持，所以最好显式加上fPIC选项
+GCC来看，`-shared`应该是包含 fPIC 选项的，但似乎不是所以系统都支持，所以最好显式加上fPIC选项
+
+
+
+### -fvisibility=hidden
+
+不同的 so 库中含有同样的函数（同名的全局符号），如 libA 中和 libB 中都有 subfunc 函数：
+
+- main先加载了libA，得到了libA中的subfunc符号，再加载libB时，就把libB中的subfunc忽略了。
+
+实际情况 libA 里面有很多的内部函数，而暴露给外部的只有少数，能不能指定少数符号为GLOBAL，其它的都是LOCAL呢？答案是肯定的，修改libA.cpp如下：
+
+```c
+int subfunc(int a, int b) {
+    return a + b;
+}
+
+__attribute__ ((visibility ("default"))) int funcA(int a, int b) {
+    return subfunc(a, b);
+}这时，libA的编译参数需要加上`-fvisibility=hidden`：
+```
+
+```shell
+g++ -fPIC libA.cpp -shared -fvisibility=hidden -o libA.so
+```
+
 
 
 

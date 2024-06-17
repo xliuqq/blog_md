@@ -60,11 +60,11 @@ Scheduling Cycle
   Unreserve(ctx context.Context, state *CycleState, p *v1.Pod, nodeName string)
   ```
 
-- `PermitPlugin`：不满足条件时，返回 WAIT 状态（等待多久后重新调度），用于Gang/Co-Scheduler场景；
+- `PermitPlugin`：**不满足条件时，返回 WAIT 状态（等待多久后重新调度），用于Gang/Co-Scheduler场景**；
 
   - 返回 WAIT 状态，该 Pod 会被记录到waitingPods中保存；
 
-  - 通过 IterateOverWaitingPods 方法对所有的 waitingPod 调用 `waitingPod.Allow(cs.Name())`方法（发送chan），允许调度，不再等待；
+  - 通过 `IterateOverWaitingPods` 方法对所有的 waitingPod 调用 `waitingPod.Allow(cs.Name())`方法（发送chan），允许调度，不再等待；
 
   - `WaitOnPermit`在 bind 阶段调用，会等待 waitPod 的 chan，从waitingPods中删除；
 
@@ -83,6 +83,8 @@ Binding Cycle
 - `PostBindPlugin`：信息扩展点，在 Pod 绑定了节点之后调用。
 
 ## 插件实现
+
+> 可以参考官方示例：[coscheduler plugin code](https://github.com/kubernetes-sigs/scheduler-plugins/tree/master/pkg/coscheduling)
 
 编写plugin代码主要分为三个步骤：
 

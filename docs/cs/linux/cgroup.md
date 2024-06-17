@@ -224,6 +224,8 @@ linuxkernel从2.6.23版本开始所支持的一种安全机制。
 
 当选择systemd作为Linux发行版的init system时，init proccess生成并使用root控制组（/sys/fs/cgroup），并充当CGroup管理器。
 
+
+
 ## 使用示例
 
 ### Linux是否启用cgroup
@@ -366,5 +368,62 @@ Thu May 18 19:11:30 2023
 No devices were found
 No devices were found
 No devices were found
+```
+
+
+
+### 使用`group`限制单用户/多用户计算资源
+
+> yum install libcgroup-tools
+>
+> apt install cgroup-tools
+
+在 `/etc/cgconfig.conf`添加如下配置，将会对组users_mem_limit 内的用户所能申请的最大内存进行限制。
+
+```conf
+# template 表示模板，对于每个用户单独限制
+template users/%u {
+    memory {
+        memory.limit_in_bytes = 200M;
+        memory.memsw.limit_in_bytes = 0M;
+    }   
+    cpu {
+        cpu.cfs_quota_us = 200000;
+        cpu.cfs_period_us = 100000;
+    }   
+}
+# group是特殊字段，`rootg`是组的名称
+# 属于同一组的是共享资源限制
+group rootg {
+    memory {
+        memory.limit_in_bytes = 500M;
+    }   
+    cpu {
+        cpu.cfs_quota_us = 400000;
+        cpu.cfs_period_us = 100000;
+    }   
+}
+```
+
+`/etc/cgrules.conf`添加如下配置，实现将某个/某些用户添加到该组。
+
+```conf
+#用户名			   #限制类型        		#所属组
+root    			cpu,memory              rootg
+*       			cpu,memory              users/%u
+```
+
+设置`cgconfig.service`开启自启动
+
+- 当服务启动以后，在`/sys/fs/cgroup/cpu/`和`/sys/fs/cgroup/memory/`目录下，会出现以 `root`命名和`users`命名的目录。
+- `root`目录下，即是对root用户的资源限制，`users`目录下是登陆到此节点上普通用户的资源限制。
+
+```shell
+#开机启动
+systemctl enable cgconfig
+systemctl enable cgred
+#重启服务
+systemctl restart cgconfig
+systemctl restart cgred
 ```
 
