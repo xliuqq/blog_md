@@ -20,7 +20,6 @@
   gcc -shared -fPIC -D_REENTRANT -I${JAVA_HOME}/include/linux -I${JAVA_HOME}/include -I/home/test/jnidemo/ JNIDemo.c -o libJNIDemo.so
   ```
 
-
 **关于C代码中的jobject obj 的解释:**
 
 - 如果native方法不是static的话，这个obj就代表这个native方法的**类实例**；
@@ -35,8 +34,26 @@
 
 - 需要指定jni.h的头文件路径，通过 `-I` 选项加在 gcc/g++ 编译时；
 
+- 通过`-Lpath -ljvm`，运行时还需要加载链接库路径；
+
+- 将`$JAVA_HOME/jre/lib/amd64/server`路径添加到PATH（可以搜索到链接库的地址）
+
   ```c++
   #include<jni.h>
+  #include <stdio.h>
+  
+  // 创建 VM 虚拟机
+  JNIEnv* create_vm(JavaVM** jvm, JNIEnv** env)
+  {
+          JavaVMInitArgs args;
+          JavaVMOption options[1];
+          args.version = JNI_VERSION_1_6;
+          args.nOptions = 1;
+          options[0].optionString = "-Djava.class.path=./";
+          args.options = options;
+          args.ignoreUnrecognized = JNI_FALSE;
+          return JNI_CreateJavaVM(jvm, (void **)env, &args);
+  }
   
   char* jstringtochar(JNIEnv *env, jstring jstr ) {
     char* rtn = NULL;
@@ -77,11 +94,54 @@
   	return newArr;
    
   }
+  
+  
+  int main(int argc, char **argv) {
+      JavaVM* jvm;
+      JNIEnv* env;
+  
+      jclass cls;
+      int ret = 0;
+  
+      jmethodID mid;
+  
+      /* 1. create java virtual machine */
+      if(create_vm(&jvm, &env)) {
+          printf("can not create jvm\n");
+          return -1;
+      }
+  
+      /* 2. get class */
+      cls = (*env)->FindClass(env, "Hello");
+      if(cls == NULL) {
+          printf("can not find hello class\n");
+          ret = -1;
+          goto destory;
+      }
+  
+      /* 3. create object */
+  
+      /* 4. call method
+       *  4.1 get method
+       *  4.2 create parameter
+       *  4.3 call method
+       */
+  
+      mid = (*env)->GetStaticMethodID(env, cls, "main", "([Ljava/lang/String;)V");
+      if(mid == NULL) {
+          ret = -1;
+          printf("can not get method\n");
+          goto destory;
+      }
+  
+      (*env)->CallStaticVoidMethod(env, cls, mid, NULL);
+  
+  destory:
+      (*jvm)->DestroyJavaVM(jvm);
+  
+      return ret;
+  }
   ```
-
-- 通过`-Lpath -ljvm`，运行时还需要加载链接库路径；
-
-- 将`$JAVA_HOME/jre/lib/amd64/server`路径添加到PATH（可以搜索到链接库的地址）
 
 
 

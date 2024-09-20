@@ -166,6 +166,25 @@ jobject NewObjectV(jclass clazz, jmethodID methodID, va_list args)
 
 ### 二、方法操作
 
+```c
+// 查找Test类
+jclass testClass = env->FindClass("com/afei/jnidemo/Test");  
+// 获取Test类的构造函数ID（无参构造函数）  
+jmethodID constructorID = env->GetMethodID(testClass, "<init>", "()V"); 
+// 创建Test类的实例  
+jobject testInstance = env->NewObject(testClass, constructorID);
+// 获取show方法的ID  
+jmethodID showMethodID = env->GetMethodID(testClass, "show", "(Ljava/lang/String;I)I");  
+// 创建一个jstring对象  
+jstring jMsg = env->NewStringUTF("Hello from JNI!"); 
+// 调用show方法  
+jint result = env->CallIntMethod(testInstance, showMethodID, jMsg, 42);  
+```
+
+
+
+
+
 #### 1. jmethodID GetMethodID(jclass clazz, const char name, const char sig)
 
 说明：获取类中某个非静态方法的ID
@@ -202,6 +221,7 @@ JNI 调用如下：
 jclass clazz = env->FindClass("com/afei/jnidemo/Test");
 jmethodID constructor_method = env->GetMethodID(clazz, "<init>", "()V");
 jmethodID show_method=env->GetMethodID(clazz,"show", "(Ljava/lang/String;I)I");
+
 ```
 
 签名时其中括号内是方法的参数，括号后是返回值类型。例如 show 方法，第一个参数是 String 类，对应 `Ljava/lang/String;`（注意后面有一个分号），第二个参数是 int 基本类型，对应的类型描述符是 `I`，返回值也是 int，同样是 `I`，所以最终该方法的签名为 `(Ljava/lang/String;I)I`。
@@ -437,7 +457,7 @@ JNI 支持3中不透明的引用：**局部(local)引用**、**全局(global)引
 
 
 
-局部引用只有当**本地函数返回Java（当Java调用native）**或**调用线程detach JVM（native调用Java）**时才会被GC，因此，当有**长时间运行的本地函数**或者**创建很多局部引用**时需要调用**DeleteLocalRef**进行引用删除。
+局部引用默认只有当**本地函数返回Java（当Java调用native）**或**调用线程detach JVM（native调用Java）**时才会被GC，因此，当有**长时间运行的本地函数**或者**创建很多局部引用**时需要调用**DeleteLocalRef**进行引用删除。
 
 <font color='red'>对于C++ call Java时创建的global reference和local reference 创建，需要定义其释放之处；</font>
 
@@ -490,5 +510,4 @@ After an exception has been raised, the native code must first clear the excepti
 - ReleaseStringCritical、Release<Type>ArrayElements、ReleasePrimitiveArrayCritical、DeleteLocalRef、DeleteGlobalRef、
 
 - DeleteWeakGlobalRef、MonitorExit、PushLocalFrame、PopLocalFrame
-
 
