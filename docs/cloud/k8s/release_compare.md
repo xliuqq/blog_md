@@ -32,8 +32,18 @@ minikube config set driver hyperv
 ```
 
 ```bash
-minikube start --disk-size="10g"  --image-mirror-country="cn"  --image-repository="registry.cn-hangzhou.aliyuncs.com/google_containers"
+minikube start --image-repository='registry.cn-hangzhou.aliyuncs.com/google_containers' --base-image=registry.cn-hangzhou.aliyuncs.com/google_containers/kicbase:v0.0.44
 ```
+
+
+
+### 本地镜像使用
+
+> [minikube推送镜像到本机](https://minikube.sigs.k8s.io/docs/handbook/pushing/)
+
+使用 docker driver，因为 docker daemon 存在，可以共享 docker sock；
+
+podman driver 需要配合 cri-o 而非 docker ，因为 podman 不存在 daemon 进程。
 
 ## Kind
 
