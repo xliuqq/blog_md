@@ -1,8 +1,12 @@
 # Spark重试
 
+
+
 ## ApplicationMaster 重试
 
 Yarn 上会配置作业重试次数。
+
+
 
 ## Executor 重试
 
@@ -14,6 +18,8 @@ Yarn 上会配置作业重试次数。
 
 ## Stage 重试
 
+> [Spark Stage Restarts](https://cloudsqale.com/2023/10/06/spark-stage-restarts-partial-restarts-multiple-retry-attempts-with-different-task-sets-accepted-late-results-from-failed-stages-cost-of-restarts/)
+
 参数：spark.stage.maxConsecutiveAttempts=默认为 4
 
 说明：在一个 stage 被中止之前，允许的连续 stage 重试的次数
@@ -22,6 +28,10 @@ Yarn 上会配置作业重试次数。
 
 - Stage是ShuffleMapStage，则会终止该Stage所有Task，并进行Stage整体重试，超过重试次数（默认4），作业失败；
 - Stage是ResultStage，则不会重试，作业失败；
+
+### 什么情况会重试
+
+若任务执行失败的原因是：FetchFailed，说明是Task获取远端的shuffle数据失败。通过`DAGSchedulerEventProcessLoop`发送`ResubmitFailedStages`事件，再次尝试提交该Stage
 
 
 
