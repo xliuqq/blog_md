@@ -26,6 +26,8 @@ Yarn 上会配置作业重试次数。
 
 ### RDDBarrier
 
+Spark还为MPI任务引入了一种新的容错机制：当任何MPI任务在中间失败时，Spark将中止所有任务并重新启动该stage。
+
 - Stage是ShuffleMapStage，则会终止该Stage所有Task，并进行Stage整体重试，超过重试次数（默认4），作业失败；
 - Stage是ResultStage，则不会重试，作业失败；
 
