@@ -291,4 +291,6 @@ Java API
 
 使用 java 8u191+ 或者 JDK 10之后的版本，默认开启`+XX:-UseContainerSupport`；
 
-- JVM知道在Docker容器中运行，并将提取特定于容器的配置信息（已分配给容器的CPU数量和总内存），而不是从宿主机提取；
+- JVM 知道在Docker容器中运行，从主机读取cgroup限制（已分配给容器的CPU数量和总内存），而不是从宿主机提取；
+- `-XX:InitialRAMPercentage`：设置JVM使用容器内存的初始百分比。建议与 -XX:MaxRAMPercentage 保持一致，推荐设置为70.0。
+- `-XX:MaxRAMPercentage`：其值介于0.0到100.0之间，默认值为25.0。设置JVM使用容器内存的最大百分比。由于存在系统组件开销，建议最大不超过75.0，推荐设置为70.0。
