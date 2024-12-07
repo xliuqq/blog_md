@@ -1,4 +1,6 @@
-# Hutools工具包
+# 工具包
+
+## Hutools
 
 一个Java基础工具类，对文件、流、加密解密、转码、正则、线程、XML等JDK方法进行封装，组成各种Util工具类，同时提供以下组件：
 
@@ -26,7 +28,7 @@
 
 可以根据需求对每个模块单独引入，也可以通过引入`hutool-all`方式引入所有模块。
 
-## 使用
+### 使用
 
 ```xml
 <dependency>
@@ -38,6 +40,15 @@
 
 
 
-## 功能
+## Guava 常用
 
-### 
+### RateLimit 限流
+
+RateLimiter 流控；Cache 线程安全的缓存；
+
+
+
+### Cache 缓存
+
+#### Caffine 替代
+
